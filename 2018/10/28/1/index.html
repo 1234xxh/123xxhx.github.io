@@ -106,7 +106,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="a:/Blog/blog/source/image/web-anheng/web1.png">
 <meta property="og:image" content="a:/Blog/blog/source/image/web-anheng/web2.png">
-<meta property="og:image" content="a:/Blog/blog/source/image/web-anheng/web3.png">
+<meta property="og:image" content="http://1234xxh.github.io/2018/10/image/web-anheng/web3.png">
 <meta property="og:image" content="a:/Blog/blog/source/image/web-anheng/web4.png">
 <meta property="og:image" content="a:/Blog/blog/source/image/web-anheng/web5.png">
 <meta property="og:image" content="a:/Blog/blog/source/image/web-anheng/web6.png">
@@ -121,7 +121,7 @@
 <meta property="og:image" content="a:/Blog/blog/source/image/web-anheng/web15.png">
 <meta property="og:image" content="a:/Blog/blog/source/image/web-anheng/web16.png">
 <meta property="og:image" content="a:/Blog/blog/source/image/web-anheng/web17.png">
-<meta property="og:updated_time" content="2018-10-28T19:13:35.559Z">
+<meta property="og:updated_time" content="2018-10-28T19:40:15.390Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="2018WEB安全测试秋季预选赛WriteUp">
 <meta name="twitter:description" content="题记：学校组织参加这个比赛，对于没有信安专业的学院来说，参赛重点就是嵌入式与开发者，留下我们自生自灭，在此记录一下，刷下一存在感吧，虽然没拿到理想结果，毕竟来过233333。错误的地方，欢迎大佬们指正。">
@@ -479,7 +479,7 @@
 </blockquote>
 <h2 id="0x04-新闻查询"><a href="#0x04-新闻查询" class="headerlink" title="0x04 新闻查询"></a>0x04 新闻查询</h2><p>传送门：<a href="http://114.55.36.69:8010/" target="_blank" rel="noopener">http://114.55.36.69:8010/</a><br><br></p>
 <blockquote>
-<p>先上图<br><br><br><img src="A:/Blog/blog/source/image/web-anheng/web3.png" alt="image"><br><br><br>有关键词，有条数，初步猜测是注入，关键词输入1’发现<br><br><br><img src="A:/Blog/blog/source/image/web-anheng/web4.png" alt="image"><br><br><br>查看源码，发现前端过滤</p>
+<p>先上图<br><br><br><img src="../../image/web-anheng/web3.png" alt="image"><br><br><br>有关键词，有条数，初步猜测是注入，关键词输入1’发现<br><br><br><img src="A:/Blog/blog/source/image/web-anheng/web4.png" alt="image"><br><br><br>查看源码，发现前端过滤</p>
 </blockquote>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">function myFunction()</span><br><span class="line">	&#123;</span><br><span class="line">		var x=document.getElementById(&quot;number&quot;).value;</span><br><span class="line">    var a=document.getElementById(&quot;word&quot;).value;</span><br><span class="line">    var b=a.replace(/[\ |\~|\`|\!|\@|\#|\$|\%|\^|\&amp;|\*|\(|\)|\-|\_|\+|\=|\||\\|\[|\]|\&#123;|\&#125;|\;|\:|\&quot;|\&apos;|\,|\&lt;|\.|\&gt;|\/|\?|\·|\！|\（|\）|\￥|\——|\……|\【|\】|\、|\；|\：|\‘|\“|\”|\’|\，|\。|\、|\《|\》|\？|\ ]/g,&quot;&quot;);</span><br><span class="line">    if(a.length!=b.length)</span><br><span class="line">    &#123;</span><br><span class="line">      alert(&quot;请输入正确字符。&quot;);</span><br><span class="line">      document.getElementById(&quot;number&quot;).value = &apos;&apos;;</span><br><span class="line">      document.getElementById(&quot;word&quot;).value = &apos;&apos;;</span><br><span class="line">    &#125;</span><br><span class="line">    else if(isNaN(x))</span><br><span class="line">    &#123;</span><br><span class="line">      alert(&quot;请输入数字。&quot;);</span><br><span class="line">      document.getElementById(&quot;number&quot;).value = &apos;&apos;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
 <blockquote>
