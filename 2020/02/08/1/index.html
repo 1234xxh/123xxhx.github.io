@@ -120,7 +120,7 @@
 <meta property="og:image" content="http://1234xxh.github.io/image/got_plt/got_plt13.png">
 <meta property="og:image" content="http://1234xxh.github.io/image/got_plt/got_plt14.png">
 <meta property="og:image" content="http://1234xxh.github.io/image/got_plt/got_plt.gif">
-<meta property="og:updated_time" content="2020-02-08T05:54:25.700Z">
+<meta property="og:updated_time" content="2020-02-08T08:28:23.691Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="深入理解GOT表和PLT表">
 <meta name="twitter:description" content="一起感受二进制魅力所在">
@@ -472,7 +472,7 @@
 <p>那么此刻，got表怎么知道scanf函数的真实地址？这个问题已经解决了。<br>我们可以看一下其中的装在过程：<br><img src="/image/got_plt/got_plt13.png" alt="image"><br><img src="/image/got_plt/got_plt14.png" alt="image"><br>说到这个，可以看到在_dl_runtimw_resolve之前和之后，会将真正的函数地址，也就是glibc运行库中的函数的地址，回写到代码段，就是got[n]（n&gt;=3）中。<br>也就是说在函数第一次调用的时，才通过连接器动态解析并加载到.got.plt中，而这个过程称之为<strong>延时加载</strong>或者<strong>惰性加载</strong>。<br>到这里，也要接近尾声了，当第二次调用同一个函数的时候，就不会与第一次一样那么麻烦了，因为got[n]中已经有了真实地址，直接jmp该地址即可。</p>
 </blockquote>
 <h1 id="0x04-尾记"><a href="#0x04-尾记" class="headerlink" title="0x04 尾记"></a>0x04 尾记</h1><blockquote>
-<p>忘记当时学习时看的哪位大佬的文章了，看到了大佬精心制作的一张动图，在此借用一下，特别感谢。<br><img src="/image/got_plt/got_plt.gif" alt="image"></p>
+<p>当时学习时看到大佬精心制作的一张动图，在此借用一下，特别感谢。<br><img src="/image/got_plt/got_plt.gif" alt="image"></p>
 </blockquote>
 <blockquote>
 <p>想学习二进制的pwn弟弟还需要努力，希望我的小白学习经验记录下来可以帮助更多和我一样的小白。</p>
