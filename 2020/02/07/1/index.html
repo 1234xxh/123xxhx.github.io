@@ -99,7 +99,7 @@
 <meta name="description" content="想学二进制的pwn弟弟正在艰难的起步">
 <meta name="keywords" content="二进制安全,pwn,pwnable">
 <meta property="og:type" content="article">
-<meta property="og:title" content="pwnable-fd">
+<meta property="og:title" content="深入理解File descriptor">
 <meta property="og:url" content="http://1234xxh.github.io/2020/02/07/1/index.html">
 <meta property="og:site_name" content="ThreePwn&#39;s Blog">
 <meta property="og:description" content="想学二进制的pwn弟弟正在艰难的起步">
@@ -119,9 +119,9 @@
 <meta property="og:image" content="http://1234xxh.github.io/image/pwnable-fd/fd9.png">
 <meta property="og:image" content="http://1234xxh.github.io/image/pwnable-fd/fd10.png">
 <meta property="og:image" content="http://1234xxh.github.io/image/pwnable-fd/fd11.png">
-<meta property="og:updated_time" content="2020-02-08T05:57:38.857Z">
+<meta property="og:updated_time" content="2020-02-08T06:32:11.975Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="pwnable-fd">
+<meta name="twitter:title" content="深入理解File descriptor">
 <meta name="twitter:description" content="想学二进制的pwn弟弟正在艰难的起步">
 <meta name="twitter:image" content="http://1234xxh.github.io/image/N2LL/11.jpg">
 
@@ -159,7 +159,7 @@
 
 
 
-  <title>pwnable-fd | ThreePwn's Blog</title>
+  <title>深入理解File descriptor | ThreePwn's Blog</title>
   
 
 
@@ -349,7 +349,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">pwnable-fd</h1>
+          <h1 class="post-title" itemprop="name headline">深入理解File descriptor</h1>
         
 
         <div class="post-meta">
@@ -423,7 +423,7 @@
 
           
           
-             <span id="/2020/02/07/1/" class="leancloud_visitors" data-flag-title="pwnable-fd">
+             <span id="/2020/02/07/1/" class="leancloud_visitors" data-flag-title="深入理解File descriptor">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -463,7 +463,7 @@
 <h1 id="0x01-前言"><a href="#0x01-前言" class="headerlink" title="0x01 前言"></a>0x01 前言</h1><blockquote>
 <p>首先我们先普及一下什么是File descriptor？<br>维基百科中说：is an abstract indicator (handle) used to access a file or other input/output resource<br>一个文件或其他输入/输出资源的抽象指示符<br><img src="/image/pwnable-fd/wiki.png" alt="image"><br>在操作系统中可以这样去理解：<br><img src="/image/pwnable-fd/wiki1.png" alt="image"><br><strong>进程(数值+指针)-&gt;系统(文件表中一系列操作)-&gt;引节点表(描述文件系统对象)</strong><br>那么进程中的file descriptor的这个数值其实就是 is an abstract indicator (handle) used to access a file or other input/output resource 然后他是指向相应的file table</p>
 </blockquote>
-<h1 id="0x02-深入理解File-descriptor"><a href="#0x02-深入理解File-descriptor" class="headerlink" title="0x02 深入理解File descriptor"></a>0x02 深入理解File descriptor</h1><blockquote>
+<h1 id="0x02-走进File-descriptor"><a href="#0x02-走进File-descriptor" class="headerlink" title="0x02 走进File descriptor"></a>0x02 走进File descriptor</h1><blockquote>
 <p>我们来看<br><img src="/image/pwnable-fd/fd1.png" alt="image"><br>四个file descriptor的值会以此增加，他们只想不同的操作<br>那么为什么从3开始？是不是巧合？012去哪呢？<br>在证明0、1、2的去向之前，我们先看一下file descriptor值的分配规则：<br><img src="/image/pwnable-fd/fd2.png" alt="image"><br>fd0与fd1从3开始依次递增，我们刚才的第二个问题就不是巧合，然后我们把fd0的句柄close掉，也就说刚才的3关闭了，重新开始一个fd2，发现fd2的值为3，而不是5，也就是占用了刚才关闭的fd0的值<br>我们就不妨这么猜测，如下图<br><img src="/image/pwnable-fd/fd3.png" alt="image"><br>假如继续fd3=open，那么fd3值为5，也就是在红色区域<br>那么我们可以初步得出一个结论，分配原则：寻找没有被占用的最低的值，然后去占用<br>那么我们证实我们的结论和探寻0、1、2在哪？<br>其实<br><img src="/image/pwnable-fd/form.png" alt="image"><br>那么，我们关闭stdin标准输入来看下会发生什么？<br><img src="/image/pwnable-fd/fd4.png" alt="image"><br>运行fd后直接输入数值，两次不一样，也就是标准输入被关闭，in自动填充一个随机值<br>继续关闭stdout<br><img src="/image/pwnable-fd/fd5.png" alt="image"><br>输入hello后，没有执行printf输出函数，然后我们将stdout关闭调，新开一个fd，按照我们之前的推断那么fd值应该为1<br><img src="/image/pwnable-fd/fd6.png" alt="image"></p>
 </blockquote>
 <h1 id="0x03-pwnable-fd"><a href="#0x03-pwnable-fd" class="headerlink" title="0x03 pwnable-fd"></a>0x03 pwnable-fd</h1><blockquote>
@@ -502,7 +502,7 @@
   </li>
     <li class="post-copyright-author">
     <strong>Post title:</strong>
-    <a href="/2020/02/07/1/">pwnable-fd</a>
+    <a href="/2020/02/07/1/">深入理解File descriptor</a>
   </li>
   <li class="post-copyright-author">
     <strong>Publishing time:</strong>
@@ -510,7 +510,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>Post link:</strong>
-    <a href="http://1234xxh.github.io/2020/02/07/1/" title="pwnable-fd">http://1234xxh.github.io/2020/02/07/1/</a>
+    <a href="http://1234xxh.github.io/2020/02/07/1/" title="深入理解File descriptor">http://1234xxh.github.io/2020/02/07/1/</a>
   </li>
   <li class="post-copyright-license">
     <strong>Copyright Notice: </strong>
@@ -769,7 +769,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0x01-前言"><span class="nav-number">1.</span> <span class="nav-text">0x01 前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x02-深入理解File-descriptor"><span class="nav-number">2.</span> <span class="nav-text">0x02 深入理解File descriptor</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x03-pwnable-fd"><span class="nav-number">3.</span> <span class="nav-text">0x03 pwnable-fd</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x04-尾记"><span class="nav-number">4.</span> <span class="nav-text">0x04 尾记</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0x01-前言"><span class="nav-number">1.</span> <span class="nav-text">0x01 前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x02-走进File-descriptor"><span class="nav-number">2.</span> <span class="nav-text">0x02 走进File descriptor</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x03-pwnable-fd"><span class="nav-number">3.</span> <span class="nav-text">0x03 pwnable-fd</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x04-尾记"><span class="nav-number">4.</span> <span class="nav-text">0x04 尾记</span></a></li></ol></div>
             
 
           </div>
