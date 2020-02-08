@@ -96,19 +96,34 @@
 
 
 
-<meta name="description" content="一起感受二进制魅力所在吧">
+<meta name="description" content="一起感受二进制魅力所在">
 <meta name="keywords" content="二进制安全,pwn">
 <meta property="og:type" content="article">
 <meta property="og:title" content="深入理解GOT表和PLT表">
 <meta property="og:url" content="http://1234xxh.github.io/2020/02/08/1/index.html">
 <meta property="og:site_name" content="ThreePwn&#39;s Blog">
-<meta property="og:description" content="一起感受二进制魅力所在吧">
+<meta property="og:description" content="一起感受二进制魅力所在">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://1234xxh.github.io/image/N2LL/6.jpg">
-<meta property="og:updated_time" content="2020-02-08T04:38:21.278Z">
+<meta property="og:image" content="http://1234xxh.github.io/image/got_plt/got_plt1.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/got_plt/got_plt2.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/got_plt/got_plt3.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/got_plt/got_plt4.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/got_plt/got_plt5.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/got_plt/got_plt6.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/got_plt/got_plt7.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/got_plt/got_plt8.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/got_plt/got_plt9.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/got_plt/got_plt10.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/got_plt/got_plt11.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/got_plt/got_plt12.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/got_plt/got_plt13.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/got_plt/got_plt14.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/got_plt/got_plt.gif">
+<meta property="og:updated_time" content="2020-02-08T05:54:25.700Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="深入理解GOT表和PLT表">
-<meta name="twitter:description" content="一起感受二进制魅力所在吧">
+<meta name="twitter:description" content="一起感受二进制魅力所在">
 <meta name="twitter:image" content="http://1234xxh.github.io/image/N2LL/6.jpg">
 
 
@@ -434,8 +449,35 @@
       
 
       
-        <p>一起感受二进制魅力所在吧<br><img src="/image/N2LL/6.jpg" alt="image"><br><a id="more"></a></p>
-<h1 id="0x1"><a href="#0x1" class="headerlink" title="0x1"></a>0x1</h1>
+        <p>一起感受二进制魅力所在<br><img src="/image/N2LL/6.jpg" alt="image"><br><a id="more"></a></p>
+<h1 id="0x01-前言"><a href="#0x01-前言" class="headerlink" title="0x01 前言"></a>0x01 前言</h1><blockquote>
+<p>操作系统通常使用动态链接的方法来提高程序运行的效率。<br>在动态链接的情况下，程序加载的时候并不会把链接库中所有函数都一起加载进来，而是程序执行的时候按需加载，如果有函数并没有被调用，那么它就不会在程序生命中被加载进来。<br>这样的设计就能提高程序运行的流畅度，也减少了内存空间。而且现代操作系统不允许修改代码段，只能修改数据段，那么GOT表与PLT表就应运而生。</p>
+</blockquote>
+<h1 id="0x02-初探GOT表和PLT表"><a href="#0x02-初探GOT表和PLT表" class="headerlink" title="0x02 初探GOT表和PLT表"></a>0x02 初探GOT表和PLT表</h1><blockquote>
+<p>我们先简单看一个例子<br><img src="/image/got_plt/got_plt1.png" alt="image"><br>我们跟进一下scanf@plt<br><img src="/image/got_plt/got_plt2.png" alt="image"><br>会发现，有三行代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">jmp 一个地址</span><br><span class="line">push 一个值到栈里面</span><br><span class="line">jmp 一个地址</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>看函数的名字就可以知道这是scanf函数的plt表，先不着急去了解plt是做什么用的，我们继续往下看<br>我们先看一下第一个jmp是什么跳到哪里<br><img src="/image/got_plt/got_plt3.png" alt="image"><br>其实这是got表对应函数的got表，而且我们会发现0x201020的值是压栈命令的地址，其他地方为0，此时就想问：<br>一、got表与plt表有什么意义，为什么要跳来跳去？<br>二、got表与plt表有什么联系，有木有什么对应关系？<br>那么带着疑问先看答案，再去印证<br>我们要明白操作系统通常使用动态链接的方法来提高程序运行的效率，而且不能回写到代码段上。<br>在上面例子中我们可以看到，<strong>call scanf —&gt; scanf的plt表 —&gt;scanf的got表</strong>，至于got表的值暂时先不管，我们此刻可以形成这样一个思维，它能从got表中找到真实的scanf函数供程序加载运行。<br>我们这么认为后，那么这就变成了一个间接寻址的过程<br><img src="/image/got_plt/got_plt4.png" alt="image"><br>我们就把获取数据段存放函数地址的那一小段代码称为PLT（Procedure Linkage Table）<strong>过程链接表</strong><br>存放函数地址的数据段称为GOT（Global Offset Table）<strong>全局偏移表</strong>。<br>我们形成这么一个思维后，再去仔细理解里面的细节</p>
+</blockquote>
+<h1 id="0x03-再探GOT表和PLT表"><a href="#0x03-再探GOT表和PLT表" class="headerlink" title="0x03 再探GOT表和PLT表"></a>0x03 再探GOT表和PLT表</h1><blockquote>
+<p>已经明白了这么一个大致过程后，我们来看一下这其中是怎么一步一步调用的<br>上面有几个疑点需要去解决：<br>一、got表怎么知道scanf函数的真实地址？<br>二、got表与plt表的结构是什么？<br>我们先来看plt表<br>刚才发现scanf@plt表低三行代码是 jmp 一个地址 ，跟进看一下是什么<br><img src="/image/got_plt/got_plt5.png" alt="image"><br>其实这是一个程序PLT表的开始（plt[0]），它做的事情是：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">push got[1]</span><br><span class="line">jmp **got[2]</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>后面是每个函数的plt表。<br>此时我们再看一下这个神秘的GOT表<br><img src="/image/got_plt/got_plt6.png" alt="image"><br>除了这两个（printf和scanf函数的push 0xn的地址，也就是对应的plt表的第二条代码的地址），其它的got[1]， got[2] 为0，那么plt表只想为0的got表干什么呢？<br>因为我们落下了一个条件，现代操作系统不允许修改代码段，只能修改数据段，也就是回写，更专业的称谓应该是<strong>运行时重定位</strong>。<br>我们把程序运行起来，我们之前的地址和保存的内容就变了<br>在这之前，我们先把链接时的内容保存一下，做一个对比<br><img src="/image/got_plt/got_plt7.png" alt="image"><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">② 寻找printf的plt表</span><br><span class="line">③ jmp到plt[0]</span><br><span class="line">④ jmp got[2] -&gt; 0x00000</span><br><span class="line">⑤⑥ printf和scanf的got[3] got[4] -&gt; plt[1] plt[2]的第二条代码的地址</span><br><span class="line">⑦⑧ 证实上面一点</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>运行程序，在scanf处下断点<br><img src="/image/got_plt/got_plt8.png" alt="image"><br>可以发现，此时scanf@plt表变了，查看got[4]里内容<br><img src="/image/got_plt/got_plt9.png" alt="image"><br>依然是push 0x1所在地址<br>继续调试，直到这里，got[4]地址被修改<br><img src="/image/got_plt/got_plt10.png" alt="image"><br>此时想问了，这是哪里？<br><img src="/image/got_plt/got_plt11.png" alt="image"><br><img src="/image/got_plt/got_plt12.png" alt="image"><br>然后就是got[2]中call&lt;_dl_fixup&gt;从而修改got[3]中的地址<br>那么问题就来了，刚才got[2]处不是0吗，怎么现在又是这个(_dl_runtime_resolve)？这就是运行时重定位。其实got表的前三项是：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">got[0]：address of .dynamic section 也就是本ELF动态段(.dynamic段）的装载地址</span><br><span class="line">got[1]：address of link_map object( 编译时填充0）也就是本ELF的link_map数据结构描述符地址，作用：link_map结构，结合.rel.plt段的偏移量，才能真正找到该elf的.rel.plt表项。</span><br><span class="line">got[2]：address of _dl_runtime_resolve function (编译时填充为0) 也就是_dl_runtime_resolve函数的地址，来得到真正的函数地址，回写到对应的got表位置中。</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>那么此刻，got表怎么知道scanf函数的真实地址？这个问题已经解决了。<br>我们可以看一下其中的装在过程：<br><img src="/image/got_plt/got_plt13.png" alt="image"><br><img src="/image/got_plt/got_plt14.png" alt="image"><br>说到这个，可以看到在_dl_runtimw_resolve之前和之后，会将真正的函数地址，也就是glibc运行库中的函数的地址，回写到代码段，就是got[n]（n&gt;=3）中。<br>也就是说在函数第一次调用的时，才通过连接器动态解析并加载到.got.plt中，而这个过程称之为<strong>延时加载</strong>或者<strong>惰性加载</strong>。<br>到这里，也要接近尾声了，当第二次调用同一个函数的时候，就不会与第一次一样那么麻烦了，因为got[n]中已经有了真实地址，直接jmp该地址即可。</p>
+</blockquote>
+<h1 id="0x04-尾记"><a href="#0x04-尾记" class="headerlink" title="0x04 尾记"></a>0x04 尾记</h1><blockquote>
+<p>忘记当时学习时看的哪位大佬的文章了，看到了大佬精心制作的一张动图，在此借用一下，特别感谢。<br><img src="/image/got_plt/got_plt.gif" alt="image"></p>
+</blockquote>
+<blockquote>
+<p>想学习二进制的pwn弟弟还需要努力，希望我的小白学习经验记录下来可以帮助更多和我一样的小白。</p>
+</blockquote>
+
       
     </div>
 	<div>
@@ -523,8 +565,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2020/02/07/1/" rel="next" title="pwnable-fd.md">
-                <i class="fa fa-chevron-left"></i> pwnable-fd.md
+              <a href="/2020/02/07/1/" rel="next" title="pwnable-fd">
+                <i class="fa fa-chevron-left"></i> pwnable-fd
               </a>
             
           </div>
@@ -726,7 +768,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0x1"><span class="nav-number">1.</span> <span class="nav-text">0x1</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0x01-前言"><span class="nav-number">1.</span> <span class="nav-text">0x01 前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x02-初探GOT表和PLT表"><span class="nav-number">2.</span> <span class="nav-text">0x02 初探GOT表和PLT表</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x03-再探GOT表和PLT表"><span class="nav-number">3.</span> <span class="nav-text">0x03 再探GOT表和PLT表</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x04-尾记"><span class="nav-number">4.</span> <span class="nav-text">0x04 尾记</span></a></li></ol></div>
             
 
           </div>
