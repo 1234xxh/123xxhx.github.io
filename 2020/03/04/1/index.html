@@ -115,7 +115,7 @@
 <meta property="og:image" content="http://1234xxh.github.io/image/20200304/8.png">
 <meta property="og:image" content="http://1234xxh.github.io/image/20200304/9.png">
 <meta property="og:image" content="http://1234xxh.github.io/image/20200304/10.png">
-<meta property="og:updated_time" content="2020-03-04T15:19:40.130Z">
+<meta property="og:updated_time" content="2020-03-05T01:23:19.523Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="走进栈溢出">
 <meta name="twitter:description" content="最近事情较多，又是停了好久才更，无奈，我渴望知识的心灵遭受到了创伤">
@@ -405,7 +405,7 @@
 <h1 id="0x01-前言"><a href="#0x01-前言" class="headerlink" title="0x01 前言"></a>0x01 前言</h1><blockquote>
 <p>和我一样，有一些计算机专业的同学可能一直都在不停地码代码，却很少关注程序是怎么执行的，也不会考虑到自己写的代码是否会存在栈溢出漏洞，借此机会我们一起走进栈溢出。</p>
 </blockquote>
-<h1 id="0x02-程序时怎么运行的"><a href="#0x02-程序时怎么运行的" class="headerlink" title="0x02 程序时怎么运行的"></a>0x02 程序时怎么运行的</h1><blockquote>
+<h1 id="0x02-程序是怎么运行的"><a href="#0x02-程序是怎么运行的" class="headerlink" title="0x02 程序是怎么运行的"></a>0x02 程序是怎么运行的</h1><blockquote>
 <p>在了解栈溢出之前我们先了解一下程序执行过程<br>程序的执行过程可看作连续的函数调用。当一个函数执行完毕时，程序要回到call指令的下一条指令继续执行，函数调用过程通常使用堆栈实现。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line">int main(int argc, char **argv) &#123;</span><br><span class="line">	test1(1);</span><br><span class="line">	test2(2);</span><br><span class="line">	test3(3);</span><br><span class="line">	return 0;</span><br><span class="line">&#125;</span><br><span class="line">int test1(int test1)&#123;</span><br><span class="line">int a = 6;</span><br><span class="line">	printf(&quot;1&quot;);</span><br><span class="line">	return 1;</span><br><span class="line">&#125;</span><br><span class="line">int test2(int test2)&#123;</span><br><span class="line">	printf(&quot;2&quot;);</span><br><span class="line">	return 2;</span><br><span class="line">&#125;</span><br><span class="line">int test3(int test3)&#123;</span><br><span class="line">	printf(&quot;3&quot;);</span><br><span class="line">	return 3;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 </blockquote>
 <blockquote>
@@ -704,7 +704,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0x01-前言"><span class="nav-number">1.</span> <span class="nav-text">0x01 前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x02-程序时怎么运行的"><span class="nav-number">2.</span> <span class="nav-text">0x02 程序时怎么运行的</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x03-栈溢出"><span class="nav-number">3.</span> <span class="nav-text">0x03 栈溢出</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x04-尾记"><span class="nav-number">4.</span> <span class="nav-text">0x04 尾记</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0x01-前言"><span class="nav-number">1.</span> <span class="nav-text">0x01 前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x02-程序是怎么运行的"><span class="nav-number">2.</span> <span class="nav-text">0x02 程序是怎么运行的</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x03-栈溢出"><span class="nav-number">3.</span> <span class="nav-text">0x03 栈溢出</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x04-尾记"><span class="nav-number">4.</span> <span class="nav-text">0x04 尾记</span></a></li></ol></div>
             
 
           </div>
