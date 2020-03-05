@@ -104,7 +104,7 @@
 <meta property="og:site_name" content="ThreePwn&#39;s Blog">
 <meta property="og:description" content="只有不断地探索新的知识，才能感受到无穷的乐趣">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="http://1234xxh.github.io/image/N2LL/1.jpg">
+<meta property="og:image" content="http://1234xxh.github.io/image/N2LL/4.jpg">
 <meta property="og:image" content="http://1234xxh.github.io/image/sprintf漏洞/1.jpg">
 <meta property="og:image" content="http://1234xxh.github.io/image/sprintf漏洞/2.jpg">
 <meta property="og:image" content="http://1234xxh.github.io/image/sprintf漏洞/3.jpg">
@@ -116,11 +116,11 @@
 <meta property="og:image" content="http://1234xxh.github.io/image/sprintf漏洞/9.jpg">
 <meta property="og:image" content="http://1234xxh.github.io/image/sprintf漏洞/10.jpg">
 <meta property="og:image" content="http://1234xxh.github.io/image/sprintf漏洞/11.jpg">
-<meta property="og:updated_time" content="2020-02-08T08:31:28.865Z">
+<meta property="og:updated_time" content="2020-03-05T14:57:57.173Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="深入解析sprintf格式化字符串漏洞">
 <meta name="twitter:description" content="只有不断地探索新的知识，才能感受到无穷的乐趣">
-<meta name="twitter:image" content="http://1234xxh.github.io/image/N2LL/1.jpg">
+<meta name="twitter:image" content="http://1234xxh.github.io/image/N2LL/4.jpg">
 
 
 
@@ -402,7 +402,8 @@
       
 
       
-        <p>只有不断地探索新的知识，才能感受到无穷的乐趣<br><img src="/image/N2LL/1.jpg" alt="image"><br><a id="more"></a></p>
+        <p>只有不断地探索新的知识，才能感受到无穷的乐趣</p>
+<p><img src="/image/N2LL/4.jpg" alt="image"><br><a id="more"></a></p>
 <h2 id="0x01-sprintf-讲解"><a href="#0x01-sprintf-讲解" class="headerlink" title="0x01 sprintf()讲解"></a>0x01 sprintf()讲解</h2><h3 id="首先我们先了解sprintf-函数"><a href="#首先我们先了解sprintf-函数" class="headerlink" title="首先我们先了解sprintf()函数"></a>首先我们先了解sprintf()函数</h3><blockquote>
 <p>sprintf() 函数把格式化的字符串写入变量中。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sprintf(format,arg1,arg2,arg++)</span><br><span class="line">arg1、arg2、++ 参数将被插入到主字符串中的百分号（%）符号处。该函数是逐步执行的。在第一个 % 符号处，插入 arg1，在第二个 % 符号处，插入 arg2，依此类推。</span><br><span class="line">注释：如果 % 符号多于 arg 参数，则您必须使用占位符。占位符位于 % 符号之后，由数字和 &quot;\$&quot; 组成。</span><br></pre></td></tr></table></figure></p>
 </blockquote>
