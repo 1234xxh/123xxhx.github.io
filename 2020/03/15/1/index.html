@@ -116,7 +116,7 @@
 <meta property="og:image" content="http://1234xxh.github.io/image/20200315/9.png">
 <meta property="og:image" content="http://1234xxh.github.io/image/20200315/10.png">
 <meta property="og:image" content="http://1234xxh.github.io/image/20200315/11.png">
-<meta property="og:updated_time" content="2020-03-16T07:55:19.314Z">
+<meta property="og:updated_time" content="2020-03-16T08:02:42.222Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="初探ROP">
 <meta name="twitter:description" content="一步一步走，一点一点来，究其原因：我太菜了">
@@ -503,7 +503,7 @@
 <p>我们来看这一套流程：<br>1、存在栈溢出<br>2、使用ret2syscall手法进行操作<br>第一步与前两个方法一样，怎么样去偏移怎么去覆盖不再赘述，详见<a href="#ret2shellcode">ret2shellcode</a>，第二步ret2syscall手法也是中规中矩，照猫画虎即可。</p>
 </blockquote>
 <h3 id="细说系统调用在ret2syscall的作用"><a href="#细说系统调用在ret2syscall的作用" class="headerlink" title="细说系统调用在ret2syscall的作用"></a>细说系统调用在ret2syscall的作用</h3><blockquote>
-<p>我们这里要说一说系统调用在其中充当了什么角色？这样才能更好地理解为什么要ret2syscall。</p>
+<p>我们这里要说一说系统调用在其中充当了什么角色，这样才能更好地理解为什么要ret2syscall。</p>
 </blockquote>
 <h4 id="一探系统调用"><a href="#一探系统调用" class="headerlink" title="一探系统调用"></a>一探系统调用</h4><h5 id="从用户态到内核态"><a href="#从用户态到内核态" class="headerlink" title="从用户态到内核态"></a>从用户态到内核态</h5><blockquote>
 <p>先对这三个词的概念进行了解一下</p>
@@ -529,21 +529,21 @@
 </blockquote>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">set_system_gate(0x80,&amp;system_call);</span><br></pre></td></tr></table></figure>
 <blockquote>
-<p>在系统启动时，会在sched_init(void)函数中调用set_system_gate(0x80,&amp;system_call)，设置中断向量号0x80的中断描述符，也就是说实现了系统调用 (处理过程system_call)和 int 0x80中断的对应，进而通过此中断号用EAX实现不同子系统的调用。<br>详细了解，参见《linux 0.12》<br>int 0x80后发生了什么？<br>经过初始化以后，每当执行 int 0x80 指令时，产生一个异常使系统陷入内核空间并执行128号异常处理程序，也就是绑定后的函数，即系统调用处理程序 system_call()，此时CPU完成从用户态到内核态切换，开始执行system_call()。</p>
+<p>在系统启动的时候，系统会在sched_init(void)函数中调用set_system_gate(0x80,&amp;system_call)，设置中断向量号0x80的中断描述符，也就是说实现了系统调用 (处理过程system_call)和 int 0x80中断的对应，进而通过此中断号用EAX实现不同子系统的调用。<br>详细了解，参见《linux 0.12》<br>int 0x80后发生了什么？<br>经过初始化以后，每当执行 int 0x80 指令时，产生一个异常使系统陷入内核空间并执行128号异常处理程序，也就是绑定后的函数，即系统调用处理程序 system_call()，此时CPU完成从用户态到内核态切换，开始执行system_call()。</p>
 </blockquote>
 <h5 id="system-call"><a href="#system-call" class="headerlink" title="system_call()"></a>system_call()</h5><blockquote>
 <p>当进入system_call()后，主要做了两件事(我们关心的事情，其它的事情忽略，有兴趣可以去了解)<br>首先处理中断前设置环境的过程<br>然后找到实际处理在入口<br>规定：数值会放在eax,ebx,ecx,edx，参数一般为4个<br>所以ebx,ecx,edx会被压入栈中设置环境(也就是函数所需要的参数)，当然ds、es等也要压入，这里不是我们考虑的范围内，有兴趣可以去了解。<br>然后就会调用call_sys_call_table(,%eax,4)来实现相应系统函数的调用。<br>那么从大门进入后怎么知道进那个小门(系统函数)呢？<br>存在这么一个数组——sys_call_table(对应的处理函数少部分在这里面进行处理)，处理函数功能号对应sys_call_table[]的下标，sys_execve()函数的下标就是11，也就是0xb。<br>此刻应该会明朗了，那么我们言归正传，回到ret2syscall来。</p>
 </blockquote>
 <h3 id="从例子中再次解析ret2syscall"><a href="#从例子中再次解析ret2syscall" class="headerlink" title="从例子中再次解析ret2syscall"></a>从例子中再次解析ret2syscall</h3><h4 id="创造条件"><a href="#创造条件" class="headerlink" title="创造条件"></a>创造条件</h4><blockquote>
-<p>通过以上的了解，我们知道如果像执行execve(“/bin/sh”,NULL,NULL)函数我们需要这样：</p>
+<p>通过以上的了解，我们知道如果要执行execve(“/bin/sh”,NULL,NULL)函数我们需要这样做：</p>
 </blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">; NASM</span><br><span class="line">int execve(const char *filename, char *const argv[], char *const envp[]); </span><br><span class="line">mov eax, 0xb           ; execve系统调用号为11</span><br><span class="line">mov ebx, filename   </span><br><span class="line">mov ecx, argv</span><br><span class="line">mov edx, envp</span><br><span class="line">int 0x80                    ; 触发系统调用</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">; NASM</span><br><span class="line">int execve(const char *filename, char *const argv[], char *const envp[]); </span><br><span class="line">mov eax, 0xb                ; execve系统调用号为11</span><br><span class="line">mov ebx, filename   </span><br><span class="line">mov ecx, argv</span><br><span class="line">mov edx, envp</span><br><span class="line">int 0x80                    ; 触发系统调用</span><br></pre></td></tr></table></figure>
 <blockquote>
-<p>其中，execve()执行程序由 filename决定。<br>filename必须是一个二进制的可执行文件，或者是一个脚本以#！格式开头的解释器参数参数。<br>记得当时考(ku)研(bi)观看张宇老师视频时的一句话：大手一挥，毛主席说,没有条件要创造条件。那么我们也要小手一挥，没有条件创造条件。<br>上面也提到了，我们只能控制用户态的操作，也就是上面程序类似mov指令的操作。<br>那么怎么做呢？<br>这里需要ret2syscall的特有操作<br>之前已经知道各个寄存器的需要的内容了，此时就要想办法把这些值存储进对应的寄存器中<br>回归词意，ret to syscall，也就是找ret结尾的片段，比如把EAX置为0xb</p>
+<p>其中，execve()执行程序由 filename决定。<br>filename必须是一个二进制的可执行文件，或者是一个脚本以#！格式开头的解释器参数参数。<br>记得当时考(ku)研(bi)观看张宇老师视频时的一句话：大手一挥，毛主席说,没有条件要创造条件。那么我们也要小手一挥，没有条件创造条件。<br>上面也提到了，我们只能控制用户态的操作，也就是上面程序类似mov指令的操作。<br>那么怎么做呢？<br>这里需要ret2syscall的特有操作<br>之前已经知道各个寄存器的需要的内容了，此时就要想办法把这些值存储进对应的寄存器中<br>回归词意，ret to syscall，也就是找ret结尾的片段，比如把EAX置为0xb，执行以下程序即可完成。</p>
 </blockquote>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pop eax</span><br><span class="line">ret</span><br></pre></td></tr></table></figure>
 <blockquote>
-<p>再保证执行ret后，栈顶值为0xb，那么EAX寄存器就会置为0xb<br>如果有多个片段连接起来不就可以把四个寄存器置为相应的值了吗</p>
+<p>当然父程序通过栈溢出，执行ret后栈顶值为0xb，这样再调用此片段(父程序的ret addr为此片段的首地址)，EAX寄存器就会置为0xb，后面详细解读过程。<br>如果有多个片段连接起来不就可以把四个寄存器置为相应的值了吗</p>
 </blockquote>
 <p><img src="/image/20200315/10.png" alt="image"></p>
 <blockquote>
