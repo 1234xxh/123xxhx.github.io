@@ -1154,7 +1154,7 @@ pre .javascript .function {
   position: relative;
 }
 .headband {
-  height: 3px;
+  height: 0px;
   background: #222;
 }
 .site-meta {
@@ -1604,7 +1604,7 @@ pre .javascript .function {
   }
 }
 .post-button {
-  margin-top: 40px;
+  margin-top: 0px;
 }
 .posts-expand .post-tags {
   margin-top: 40px;
@@ -1933,7 +1933,7 @@ pre .javascript .function {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #5025ff;
+  background: #327c85;
 }
 .links-of-blogroll {
   font-size: 13px;
@@ -3146,7 +3146,7 @@ code {
 .post {
   margin-top: -20px;
   margin-bottom: 60px;
-  padding: 25px;
+  padding: 25px 25px 15px 25px;
   -webkit-box-shadow: 0 0 10px rgba(202,203,203,0.5);
   -moz-box-shadow: 0 0 10px rgba(202,203,204,0.5);
 }
