@@ -116,7 +116,7 @@
 <meta property="og:image" content="http://1234xxh.github.io/image/20200315/9.png">
 <meta property="og:image" content="http://1234xxh.github.io/image/20200315/10.png">
 <meta property="og:image" content="http://1234xxh.github.io/image/20200315/11.png">
-<meta property="og:updated_time" content="2020-03-16T07:47:58.852Z">
+<meta property="og:updated_time" content="2020-03-16T07:52:51.518Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="初探ROP">
 <meta name="twitter:description" content="一步一步走，一点一点来，究其原因：我太菜了">
@@ -408,7 +408,7 @@
 <p>在了解栈溢出后，我们再从原理和方法两方面深入理解基本ROP。</p>
 </blockquote>
 <h1 id="0x02-什么是ROP"><a href="#0x02-什么是ROP" class="headerlink" title="0x02 什么是ROP"></a>0x02 什么是ROP</h1><blockquote>
-<p>ROP的全称为Return-oriented programming（返回导向编程），这是一种高级的内存攻击技术可以用来绕过现代操作系统的各种通用防御（比如内存不可执行和代码签名等）。通过上一篇的<a href="http://bey0nd.xyz/2020/03/04/1/" target="_blank" rel="noopener">栈溢出</a>，我们可以发现栈溢出的控制点是ret处，那么ROP的核心思想就是利用以ret结尾的指令序列把栈中的应该返回EIP的地址更改成我们需要的值，从而控制程序的执行流程。</p>
+<p>ROP的全称为Return-oriented programming（返回导向编程），这是一种高级的内存攻击技术可以用来绕过现代操作系统的各种通用防御（比如内存不可执行和代码签名等）。通过上一篇文章<a href="http://bey0nd.xyz/2020/03/04/1/" target="_blank" rel="noopener">走进栈溢出</a>，我们可以发现栈溢出的控制点是ret处，那么ROP的核心思想就是利用以ret结尾的指令序列把栈中的应该返回EIP的地址更改成我们需要的值，从而控制程序的执行流程。</p>
 </blockquote>
 <h1 id="0x03-为什么要ROP"><a href="#0x03-为什么要ROP" class="headerlink" title="0x03 为什么要ROP"></a>0x03 为什么要ROP</h1><blockquote>
 <p>探究原因之前，我们先看一下什么是NX(DEP)<br>NX即No-eXecute（不可执行）的意思，NX（DEP）的基本原理是将数据所在内存页标识为不可执行，当程序溢出成功转入shellcode时，程序会尝试在数据页面上执行指令，此时CPU就会抛出异常，而不是去执行恶意指令。<br>随着 NX 保护的开启，以往直接向栈或者堆上直接注入代码的方式难以继续发挥效果。所以就有了各种绕过办法，rop就是一种</p>
