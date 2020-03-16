@@ -116,7 +116,7 @@
 <meta property="og:image" content="http://1234xxh.github.io/image/20200315/9.png">
 <meta property="og:image" content="http://1234xxh.github.io/image/20200315/10.png">
 <meta property="og:image" content="http://1234xxh.github.io/image/20200315/11.png">
-<meta property="og:updated_time" content="2020-03-16T07:53:28.262Z">
+<meta property="og:updated_time" content="2020-03-16T07:55:19.314Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="初探ROP">
 <meta name="twitter:description" content="一步一步走，一点一点来，究其原因：我太菜了">
@@ -493,7 +493,7 @@
 </blockquote>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">int __cdecl main(int argc, const char **argv, const char **envp)</span><br><span class="line">&#123;</span><br><span class="line">  int v4; // [esp+1Ch] [ebp-64h]</span><br><span class="line">  setvbuf(stdout, 0, 2, 0);</span><br><span class="line">  setvbuf(stdin, 0, 1, 0);</span><br><span class="line">  puts(&quot;This time, no system() and NO SHELLCODE!!!&quot;);</span><br><span class="line">  puts(&quot;What do you plan to do?&quot;);</span><br><span class="line">  gets(&amp;v4);</span><br><span class="line">  return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <blockquote>
-<p>与上面两个例子相似，原理详细见<a href="#ret2shellcode">ret2shellcode</a>，但是获取/bin/sh则需要使用系统调用来获取，也就是ret2syscall专属方法，下面我们就说一下这个专属方法。<br>什么是系统调用？</p>
+<p>与上面两个例子相似，原理详细见<a href="#ret2shellcode">ret2shellcode</a>，但是获取/bin/sh则需要使用系统调用来获取，也就是ret2syscall专属方法，下面我们就说一下这个专属方法。<br>首先什么是系统调用？</p>
 </blockquote>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">在计算中，系统调用是一种编程方式，计算机程序从该程序中向执行其的操作系统内核请求服务。这可能包括与硬件相关的服务（例如，访问硬盘驱动器），创建和执行新进程以及与诸如进程调度之类的集成内核服务进行通信。系统调用提供了进程与操作系统之间的基本接口。</span><br></pre></td></tr></table></figure>
 <blockquote>
