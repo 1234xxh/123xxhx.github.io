@@ -111,7 +111,7 @@
 <meta property="og:image" content="http://1234xxh.github.io/image/20200325/4.png">
 <meta property="og:image" content="http://1234xxh.github.io/image/20200325/5.png">
 <meta property="og:image" content="http://1234xxh.github.io/image/20200325/6.png">
-<meta property="og:updated_time" content="2020-03-25T13:49:40.786Z">
+<meta property="og:updated_time" content="2020-03-26T01:40:12.590Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="不一样的整数溢出">
 <meta name="twitter:description" content="一个经常被忽视的溢出">
@@ -453,7 +453,7 @@
 </blockquote>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">char *__cdecl check_passwd(char *s)&#123;</span><br><span class="line">  char *result; // eax</span><br><span class="line">  char dest; // [esp+4h] [ebp-14h]</span><br><span class="line">  unsigned __int8 v3; // [esp+Fh] [ebp-9h]</span><br><span class="line">  v3 = strlen(s);</span><br><span class="line">  if ( v3 &lt;= 3u || v3 &gt; 8u ) &#123;</span><br><span class="line">    puts(&quot;Invalid Password&quot;);</span><br><span class="line">    result = (char *)fflush(stdout);</span><br><span class="line">  &#125;</span><br><span class="line">  else&#123;</span><br><span class="line">    puts(&quot;Success&quot;);</span><br><span class="line">    fflush(stdout);</span><br><span class="line">    result = strcpy(&amp;dest, s);</span><br><span class="line">  &#125;</span><br><span class="line">  return result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <blockquote>
-<p>查看到这里，我们首先发现就是strcpy函数导致的栈溢出，为什么这么说呢？<br>变量buf的长度0x199，又可以发现变量dest的位置是ebp-14h，也就是我们可以控制变量s来控制函数的返回值，进而控制EIP的值，详细的原理和方法，可以参看<a href="http://bey0nd.xyz/2020/03/04/1/" target="_blank" rel="noopener">走进栈溢出</a>和<a href="http://bey0nd.xyz/2020/03/15/1/" target="_blank" rel="noopener">初探ROP</a>。<br>但是问题又来了，程序用了一个if语句限制了变量buf的长度，使得我们无法达到所想的栈溢出效果，是不是就无法攻击了？回到这一篇文章的核心思想，就知道我们需要寻找整数的溢出的地方。</p>
+<p>查看到这里，我们首先发现就是strcpy函数导致的栈溢出，为什么这么说呢？<br>变量buf的长度0x199，又可以发现变量dest的位置是ebp-14h，也就是我们可以控制变量buf来控制函数的返回值，进而控制EIP的值，详细的原理和方法，可以参看<a href="http://bey0nd.xyz/2020/03/04/1/" target="_blank" rel="noopener">走进栈溢出</a>和<a href="http://bey0nd.xyz/2020/03/15/1/" target="_blank" rel="noopener">初探ROP</a>。<br>但是问题又来了，程序用了一个if语句限制了变量buf的长度，使得我们无法达到所想的栈溢出效果，是不是就无法攻击了？回到这一篇文章的核心思想，就知道我们需要寻找整数溢出的地方。</p>
 </blockquote>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">unsigned __int8 v3; // [esp+Fh] [ebp-9h]</span><br><span class="line">v3 = strlen(s);</span><br><span class="line">if ( v3 &lt;= 3u || v3 &gt; 8u ) &#123;</span><br></pre></td></tr></table></figure>
 <blockquote>
