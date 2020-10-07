@@ -118,7 +118,7 @@
 <meta property="og:image" content="http://1234xxh.github.io/image/20200928/image9.png">
 <meta property="og:image" content="http://1234xxh.github.io/image/20200928/image10.png">
 <meta property="og:image" content="http://1234xxh.github.io/image/20200928/image11.png">
-<meta property="og:updated_time" content="2020-09-29T03:29:36.185Z">
+<meta property="og:updated_time" content="2020-10-06T15:50:52.210Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="高级rop之ret2_dl_runtime_resolve">
 <meta name="twitter:description" content="昔我往矣，杨柳依依；今我来思，雨雪霏霏。">
@@ -563,7 +563,7 @@
 </blockquote>
 <p><img src="/image/20200928/image10.png" alt="image"></p>
 <blockquote>
-<p>经过调试发现，我们代码中是添加14个a（80-len(rop.chain())=14），结果有18个a，经过测试发现，这个a是这样分的：a*2 + a<em>14 + a</em>2，前两个a是system\x00补的，后两个是14个a补齐的，因此base_stage+80刚好是这个‘aa/bin/sh’的起始地址。</p>
+<p>经过调试发现，我们代码中是添加14个a（80-len(rop.chain())=14），结果有18个a，经过测试发现，这个a是这样分的：a✖️2 + a✖️14 + a✖️2，前两个a是system\x00补的，后两个是14个a补齐的，因此base_stage+80刚好是这个‘aa/bin/sh’的起始地址。</p>
 </blockquote>
 <p><img src="/image/20200928/image11.png" alt="image"></p>
 <blockquote>
