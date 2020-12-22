@@ -109,10 +109,10 @@
 <meta property="og:image" content="http://1234xxh.github.io/image/20201222/image2.png">
 <meta property="og:image" content="http://1234xxh.github.io/image/20201222/image3.png">
 <meta property="og:image" content="http://1234xxh.github.io/image/20201222/image4.png">
-<meta property="og:image" content="http://1234xxh.github.io/image/20201222/image4.png">
-<meta property="og:image" content="http://1234xxh.github.io/image/20201222/image4.png">
-<meta property="og:image" content="http://1234xxh.github.io/image/20201222/image4.png">
-<meta property="og:updated_time" content="2020-12-22T12:38:23.560Z">
+<meta property="og:image" content="http://1234xxh.github.io/image/20201222/image5.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20201222/image6.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20201222/image7.png">
+<meta property="og:updated_time" content="2020-12-22T12:43:01.143Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="FramingSignals-AReturntoPortableShellcode(SROP)">
 <meta name="twitter:description" content="拥抱生命里的巨浪惊涛，迎接风雨中几许争斗">
@@ -483,13 +483,13 @@
 <p>恢复frame，还是用第二步的方法，这样就可以执行execve(‘/bin/sh’,0,0)了。</p>
 </blockquote>
 <blockquote>
-<p><strong> 最后总结一下流程，大体如下：</strong><br>1、随便泄漏一个栈地址<br><img src="/image/20201222/image4.png" alt="image"></p>
+<p><strong> 最后总结一下流程，大体如下：</strong><br>1、随便泄漏一个栈地址<br><img src="/image/20201222/image5.png" alt="image"></p>
 </blockquote>
 <blockquote>
-<p>2、写入read(0,stack_addr,0x400)的SigreturnFrame，进而通过执行sigreturn的系统调用，执行read(0,stack_addr,0x400)<br><img src="/image/20201222/image4.png" alt="image"></p>
+<p>2、写入read(0,stack_addr,0x400)的SigreturnFrame，进而通过执行sigreturn的系统调用，执行read(0,stack_addr,0x400)<br><img src="/image/20201222/image6.png" alt="image"></p>
 </blockquote>
 <blockquote>
-<p>3、写入execve(‘/bin/sh’,0,0)的SigreturnFrame，进而通过执行sigreturn的系统调用，执行execve(‘/bin/sh’,0,0)<br><img src="/image/20201222/image4.png" alt="image"></p>
+<p>3、写入execve(‘/bin/sh’,0,0)的SigreturnFrame，进而通过执行sigreturn的系统调用，执行execve(‘/bin/sh’,0,0)<br><img src="/image/20201222/image7.png" alt="image"></p>
 </blockquote>
 <h1 id="0x04-尾记"><a href="#0x04-尾记" class="headerlink" title="0x04 尾记"></a>0x04 尾记</h1><p> 还未入门，详细记录每个知识点，为了能更好地温故知新，也希望能帮助和我一样想要入门二进制安全的初学者，如有错误，希望大佬们指出。</p>
 <blockquote>
